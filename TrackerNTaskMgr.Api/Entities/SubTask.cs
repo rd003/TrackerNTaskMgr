@@ -1,15 +1,13 @@
-namespace TrackerNTaskMgr.Api.Entities;
+﻿namespace TrackerNTaskMgr.Api.Entities;
 
-public class SubTask : EntityBase
+public class SubTask
 {
-    public int SubTaskId { get; private set; }
-    public int TaskId { get; private set; }
-    public string Title { get; private set; } = string.Empty;
-    public string? ShortDescription { get; private set; }
-    public Uri? Uri { get; private set; }
-
-    private SubTask(int taskId, string title, string? shortDescription, Uri? uri)
-    {
-
-    }
+    public int SubTaskId { get; set; }
+    public int TaskId { get; set; }
+    public string SubTaskTitle { get; set; } = string.Empty;
+    public string SubTaskUri { get; set; } = string.Empty;
+    public DateTime Created { get; set; }
+    public DateTime? Updated { get; set; }
+    public DateTime? Deleted { get; set; }
+    public Task? Task { get; set; }
 }

@@ -1,73 +1,20 @@
-using TrackerNTaskMgr.Api.Constants;
-
-namespace TrackerNTaskMgr.Api.Entities;
-
-public class Task : EntityBase
+﻿namespace TrackerNTaskMgr.Api.Entities;
+public class Task
 {
-    public int TaskId { get; private set; }
-    public int TaskHeaderId { get; private set; }
-    public string Title { get; private set; } = string.Empty;
-    public string? ShortDescription { get; private set; }
-    public Priority Priority { get; private set; }
-    public Uri? Uri { get; private set; }
-    public DateTime? Deadline { get; private set; }
-    public DateTime? ScheduledAt { get; private set; }
-    public Constants.TaskStatus TaskStatus { get; private set; } = Constants.TaskStatus.Pending;
-    public bool DisplayAtBoard { get; private set; }
-
-
-    private Task(int taskHeaderId, string title, string? shortDescription, Priority priority, Uri uri, DateTime? deadline, DateTime? scheduledAt, bool displayAtBoard)
-    {
-        TaskHeaderId = taskHeaderId;
-        Title = title;
-        ShortDescription = shortDescription;
-        Priority = priority;
-        Uri = uri;
-        Deadline = deadline;
-        ScheduledAt = scheduledAt;
-        DisplayAtBoard = displayAtBoard;
-    }
-
-    public static Task Create(int taskHeaderId, string title, string? shortDescription, Priority priority, Uri uri, DateTime? deadline, DateTime? scheduledAt, Constants.TaskStatus taskStatus, bool displayAtBoard)
-    {
-        ValidateInputs(taskHeaderId, title, shortDescription);
-        return new Task(taskHeaderId, title, shortDescription, priority, uri, deadline, scheduledAt, displayAtBoard);
-    }
-
-    public void Update(int taskHeaderId, string title, string? shortDescription, Priority priority, Uri uri, DateTime? deadline, DateTime? scheduledAt, Constants.TaskStatus taskStatus, bool displayAtBoard)
-    {
-        ValidateInputs(taskHeaderId, title, shortDescription);
-        TaskHeaderId = taskHeaderId;
-        Title = title;
-        ShortDescription = shortDescription;
-        Priority = priority;
-        Uri = uri;
-        Deadline = deadline;
-        ScheduledAt = scheduledAt;
-        TaskStatus = taskStatus;
-        DisplayAtBoard = displayAtBoard;
-
-        ModifyUpdated();
-    }
-
-    private static void ValidateInputs(int taskHeaderId, string title, string? shortDescription)
-    {
-        if (taskHeaderId < 0)
-        {
-            throw new ArgumentException("TaskHeaderId must be greater than 0", nameof(taskHeaderId));
-        }
-
-        if (string.IsNullOrWhiteSpace(title))
-        {
-            throw new ArgumentException("Title can't be null", nameof(taskHeaderId));
-        }
-
-        if (!string.IsNullOrWhiteSpace(shortDescription))
-        {
-            if (shortDescription.Length > 200)
-            {
-                throw new ArgumentException("", nameof(shortDescription));
-            }
-        }
-    }
+    public int TaskId { get; set; }
+    public int TaskHeaderId { get; set; }
+    public string TaskTitle { get; set; } = string.Empty;
+    public string? TaskUri { get; set; }
+    public byte TaskPriorityId { get; set; }
+    public byte TaskStatusId { get; set; }
+    public DateTime? Deadline { get; set; }
+    public DateTime? ScheduledAt { get; set; }
+    public DateTime Created { get; set; }
+    public DateTime? Updated { get; set; }
+    public DateTime? Deleted { get; set; }
+    public  ICollection<SubTask> SubTasks { get; set; } = new List<SubTask>();
+    public TaskHeader TaskHeader { get; set; } = null!;
+    public TaskPriority TaskPriority { get; set; } = null!;
+    public TaskStatus TaskStatus { get; set; } = null!;
+    public  ICollection<TaskTag> TaskTags { get; set; } = [];
 }
