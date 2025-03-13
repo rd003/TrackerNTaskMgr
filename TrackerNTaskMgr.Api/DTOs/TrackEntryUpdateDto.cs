@@ -9,5 +9,6 @@ DateTime EntryDate,
 DateTime SleptAt,
 DateTime WokeUpAt,
 short? NapInMinutes,
-short TotalWorkInMinutes
+short TotalWorkInMinutes,
+string? Remarks
 );
