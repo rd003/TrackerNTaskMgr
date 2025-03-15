@@ -4,7 +4,6 @@ using Dapper;
 using Microsoft.Data.SqlClient;
 using TrackerNTaskMgr.Api.DTOs;
 using TrackerNTaskMgr.Api.Entities;
-using TrackerNTaskMgr.Api.Mappings;
 
 namespace TrackerNTaskMgr.Api.Services;
 
@@ -21,10 +20,6 @@ public class TrackEntryService
     public async Task<TrackEntryReadDto?> CreateTrackEntryAsync(TrackEntryCreateDto trackEntryToCreate)
     {
         using IDbConnection connection = new SqlConnection(_connectionString);
-        // Craete task entry
-        // create task remark if remark in not null
-        // return created track entry with related data
-        // use transaction
         using var scope = new TransactionScope();
         string trackEntryQuery = @"insert into TrackEntries(EntryDate,SleptAt,WokeUpAt,NapInMinutes,TotalWorkInMinutes)
                          values (@EntryDate,@SleptAt,@WokeUpAt,@NapInMinutes,@TotalWorkInMinutes);
@@ -102,4 +97,38 @@ public class TrackEntryService
              );
         return trackEntries;
     }
+
+    public async System.Threading.Tasks.Task UpdateTrackEntryAsync(TrackEntryUpdateDto trackEntryToUpdate)
+    {
+        using IDbConnection connection = new SqlConnection(_connectionString);
+        using var transactionScope = new TransactionScope();
+        // updating TrackEntry
+        string trackEntryQuery = @"Update TrasactionEntries set 
+                                         EntryDate=@EntryDate,
+                                         SleptAt=@SleptAt,
+                                         WokeUpAt=@WokeUpAt,
+                                         NapInMinutes=@NapInMinutes,
+                                         TotalWorkInMinutes=@TotalWorkInMinutes
+                                         where TrackEntryId=@TrackEntryId
+                                         ";
+        await connection.ExecuteAsync(trackEntryQuery, trackEntryToUpdate);
+
+        // Updating TrackEntryRemark
+        if (!string.IsNullOrWhiteSpace(trackEntryToUpdate.Remarks))
+        {
+            string trackEntryRemarkQuery = @"Update TrackEntryRemarks 
+                                         set Remarks=@Remarks 
+                                         where TrackEntryId=@TrackEntryId";
+            await connection.ExecuteAsync(trackEntryRemarkQuery,
+                                          new
+                                          {
+                                              TrackEntryId = trackEntryToUpdate.TrackEntryId,
+                                              Remarks = trackEntryToUpdate.Remarks
+                                          });
+        }
+
+        transactionScope.Complete();
+    }
+
+
 }
