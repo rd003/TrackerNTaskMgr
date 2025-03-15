@@ -3,11 +3,10 @@ using System.Transactions;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using TrackerNTaskMgr.Api.DTOs;
-using TrackerNTaskMgr.Api.Entities;
 
 namespace TrackerNTaskMgr.Api.Services;
 
-public class TrackEntryService
+public class TrackEntryService : ITrackEntryService
 {
     private readonly string _connectionString;
     private readonly IConfiguration _config;
