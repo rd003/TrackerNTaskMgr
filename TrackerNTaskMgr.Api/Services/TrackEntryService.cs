@@ -109,6 +109,7 @@ public class TrackEntryService
                                          WokeUpAt=@WokeUpAt,
                                          NapInMinutes=@NapInMinutes,
                                          TotalWorkInMinutes=@TotalWorkInMinutes
+                                         Updated=getdate(),
                                          where TrackEntryId=@TrackEntryId
                                          ";
         await connection.ExecuteAsync(trackEntryQuery, trackEntryToUpdate);
@@ -130,5 +131,14 @@ public class TrackEntryService
         transactionScope.Complete();
     }
 
+    public async System.Threading.Tasks.Task DeleteTrackEntryAsync(int trackEntryId)
+    {
+        using IDbConnection connection = new SqlConnection(_connectionString);
+        string query = @"update TransactionEntries
+                         set Deleted=getdate() 
+                         where TrackEntryId=@trackEntryId";
+        // I have deleberately skip to soft delete the entry in TrackEntryRemarks                 
+        await connection.ExecuteAsync(query, new { trackEntryId });
+    }
 
 }
