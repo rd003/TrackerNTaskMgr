@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http.Features;
+using Scalar.AspNetCore;
 using TrackerNTaskMgr.Api.Exceptions;
 using TrackerNTaskMgr.Api.Services;
 
@@ -34,6 +35,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseExceptionHandler();

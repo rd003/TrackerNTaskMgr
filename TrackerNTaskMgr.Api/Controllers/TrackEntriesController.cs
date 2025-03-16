@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TrackerNTaskMgr.Api.DTOs;
+using TrackerNTaskMgr.Api.Entities;
+using TrackerNTaskMgr.Api.Exceptions;
 using TrackerNTaskMgr.Api.Services;
 
 namespace TrackerNTaskMgr.Controllers;
@@ -18,9 +20,21 @@ public class TrackEntriesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateTrackEntry(TrackEntryCreateDto trackEntryCreate)
+    public async Task<IActionResult> CreateTrackEntry(TrackEntryCreateDto trackEntryToCreate)
     {
-        return Ok();
+        TrackEntryReadDto? createdTrackEntry = await _trackEntryServcice.CreateTrackEntryAsync(trackEntryToCreate);
+        return CreatedAtRoute("GetTrackEntry", new { id = createdTrackEntry.TrackEntryId }, createdTrackEntry);
+    }
+
+    [HttpGet("{id}", Name = "GetTrackEntry")]
+    public async Task<IActionResult> GetTrackEntry(int id)
+    {
+        TrackEntryReadDto? trackEntry = await _trackEntryServcice.GetTrackEntryAsync(id);
+        if (trackEntry == null)
+        {
+            throw new NotFoundException("Track entry not found");
+        }
+        return Ok(trackEntry);
     }
 
 }
