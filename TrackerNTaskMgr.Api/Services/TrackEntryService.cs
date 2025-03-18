@@ -10,10 +10,11 @@ public class TrackEntryService : ITrackEntryService
 {
     private readonly string _connectionString;
     private readonly IConfiguration _config;
-    public TrackEntryService(string connectionString, IConfiguration config)
+    public TrackEntryService(IConfiguration config)
     {
-        _connectionString = connectionString;
         _config = config;
+        _connectionString = _config.GetConnectionString("Default");
+
     }
 
     public async Task<TrackEntryReadDto?> CreateTrackEntryAsync(TrackEntryCreateDto trackEntryToCreate)

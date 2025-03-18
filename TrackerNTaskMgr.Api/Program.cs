@@ -9,8 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+
+builder.Services.AddTransient<ITrackEntryService, TrackEntryService>();
+
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
-// Program.cs
 
 builder.Services.AddProblemDetails(options =>
 {
@@ -23,11 +25,6 @@ builder.Services.AddProblemDetails(options =>
         context.ProblemDetails.Extensions.TryAdd("traceId", activity.Id);
     };
 });
-
-
-
-// adding my services to DI container
-builder.Services.AddTransient<ITrackEntryService, TrackEntryService>();
 
 var app = builder.Build();
 

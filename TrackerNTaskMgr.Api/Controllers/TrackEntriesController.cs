@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using TrackerNTaskMgr.Api.DTOs;
-using TrackerNTaskMgr.Api.Entities;
 using TrackerNTaskMgr.Api.Exceptions;
 using TrackerNTaskMgr.Api.Services;
 
-namespace TrackerNTaskMgr.Controllers;
+namespace TrackerNTaskMgr.Api.Controllers;
 
 [ApiController]
-[Route("/api/{controller}/{id}")]
+[Route("/api/[controller]")]
 public class TrackEntriesController : ControllerBase
 {
     private readonly ILogger<TrackEntriesController> _logger;

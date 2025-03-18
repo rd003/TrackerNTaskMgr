@@ -7,7 +7,7 @@ public record TrackEntryReadDto
     DateTime SleptAt,
     DateTime WokeUpAt,
     short? NapInMinutes,
-    int? TotalSleep,
+    int? TotalSleepInMinutes,
     short TotalWorkInMinutes,
     TrackEntryRemarkReadDto? TrackEntryRemark
 );
