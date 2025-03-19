@@ -9,12 +9,10 @@ namespace TrackerNTaskMgr.Api.Controllers;
 [Route("/api/[controller]")]
 public class TrackEntriesController : ControllerBase
 {
-    private readonly ILogger<TrackEntriesController> _logger;
     private readonly ITrackEntryService _trackEntryServcice;
 
-    public TrackEntriesController(ILogger<TrackEntriesController> logger, ITrackEntryService trackEntryServcice)
+    public TrackEntriesController(ITrackEntryService trackEntryServcice)
     {
-        _logger = logger;
         _trackEntryServcice = trackEntryServcice;
     }
 

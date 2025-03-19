@@ -1,6 +1,22 @@
 @base_address = http://localhost:5054
 
-GET {{base_address}}/weatherforecast/
+POST {{base_address}}/api/trackentries
+Content-Type: application/json
+
+{
+  "entryDate": "2025-03-19",
+  "sleptAt": "2025-03-18T22:30",
+  "wokeUpAt": "2025-03-19T09:00",
+  "napInMinutes": null,
+  "totalWorkInMinutes": 180,
+  "remarks": "It was not a productive day at all"
+}
+###
+
+GET {{base_address}}/api/trackentries
 Accept: application/json
 
 ###
+
+GET {{base_address}}/api/trackentries/1
+Accept: application/json

@@ -1,8 +1,10 @@
 using System.Data;
+using System.Data.Common;
 using System.Transactions;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using TrackerNTaskMgr.Api.DTOs;
+using TrackerNTaskMgr.Api.Entities;
 
 namespace TrackerNTaskMgr.Api.Services;
 
@@ -20,20 +22,34 @@ public class TrackEntryService : ITrackEntryService
     public async Task<TrackEntryReadDto?> CreateTrackEntryAsync(TrackEntryCreateDto trackEntryToCreate)
     {
         using IDbConnection connection = new SqlConnection(_connectionString);
-        using var scope = new TransactionScope();
-        string trackEntryQuery = @"insert into TrackEntries(EntryDate,SleptAt,WokeUpAt,NapInMinutes,TotalWorkInMinutes)
+        connection.Open();
+        using var tran = connection.BeginTransaction();
+        int trackEntryId=0;
+        try
+        {
+            string trackEntryQuery = @"insert into TrackEntries(EntryDate,SleptAt,WokeUpAt,NapInMinutes,TotalWorkInMinutes)
                          values (@EntryDate,@SleptAt,@WokeUpAt,@NapInMinutes,@TotalWorkInMinutes);
                          select scope_identity();
                          ";
-        int trackEntryId = await connection.ExecuteScalarAsync<int>(trackEntryQuery, trackEntryToCreate);
+            trackEntryId = await connection.ExecuteScalarAsync<int>(trackEntryQuery, trackEntryToCreate,transaction:tran);
 
-        if (!string.IsNullOrWhiteSpace(trackEntryToCreate.Remarks))
-        {
-            string trackEntryRemarkQuery = @"insert into TrackEntryRemarks (TrackEntryId,Remarks)
-                                             values(@TrackEntryId,@Remarks);";
-            await connection.ExecuteAsync(trackEntryRemarkQuery, new { TrackEntryId = trackEntryId, trackEntryToCreate.Remarks });
+            if (!string.IsNullOrWhiteSpace(trackEntryToCreate.Remarks))
+            {
+                string trackEntryRemarkQuery = @"insert into TrackEntryRemarks (TrackEntryId,Remarks)
+                  values(@TrackEntryId,@Remarks);";
+                await connection.ExecuteAsync(trackEntryRemarkQuery, new { TrackEntryId = trackEntryId, trackEntryToCreate.Remarks},transaction:tran);
+            }
+            tran.Commit();
         }
-        scope.Complete();
+        catch
+        {
+            tran.Rollback();
+            throw;
+        }
+        if(trackEntryId==0)
+        {
+            throw new InvalidOperationException("Track entry id can not be 0");
+        }
         return await GetTrackEntryAsync(trackEntryId);
     }
 
@@ -46,14 +62,14 @@ public class TrackEntryService : ITrackEntryService
                          te.SleptAt,
                          te.WokeUpAt,
                          te.NapInMinutes,
-                         te.TotalSleep,
-                         te.TotalWorkInMinutes
+                         te.TotalSleepInMinutes,
+                         te.TotalWorkInMinutes,
                          tr.TrackEntryId,
                          tr.Remarks
                        from TrackEntries te
                        left join TrackEntryRemarks tr
                        on te.TrackEntryId = tr.TrackEntryId
-                       where te.Deleted is null te.TrackEntryId=@id
+                       where te.Deleted is null and te.TrackEntryId=@id
                        order by te.EntryDate desc
                         ";
         TrackEntryReadDto? trackEntry = (await connection.QueryAsync<TrackEntryReadDto, TrackEntryRemarkReadDto, TrackEntryReadDto>(
@@ -77,8 +93,8 @@ public class TrackEntryService : ITrackEntryService
                          te.SleptAt,
                          te.WokeUpAt,
                          te.NapInMinutes,
-                         te.TotalSleep,
-                         te.TotalWorkInMinutes
+                         te.TotalSleepInMinutes,
+                         te.TotalWorkInMinutes,
                          tr.TrackEntryId,
                          tr.Remarks
                        from TrackEntries te
