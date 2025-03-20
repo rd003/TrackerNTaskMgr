@@ -1,10 +1,8 @@
 using System.Data;
-using System.Data.Common;
 using System.Transactions;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using TrackerNTaskMgr.Api.DTOs;
-using TrackerNTaskMgr.Api.Entities;
 
 namespace TrackerNTaskMgr.Api.Services;
 
@@ -22,64 +20,43 @@ public class TrackEntryService : ITrackEntryService
     public async Task<TrackEntryReadDto?> CreateTrackEntryAsync(TrackEntryCreateDto trackEntryToCreate)
     {
         using IDbConnection connection = new SqlConnection(_connectionString);
-        connection.Open();
-        using var tran = connection.BeginTransaction();
-        int trackEntryId=0;
-        try
-        {
-            string trackEntryQuery = @"insert into TrackEntries(EntryDate,SleptAt,WokeUpAt,NapInMinutes,TotalWorkInMinutes)
-                         values (@EntryDate,@SleptAt,@WokeUpAt,@NapInMinutes,@TotalWorkInMinutes);
-                         select scope_identity();
-                         ";
-            trackEntryId = await connection.ExecuteScalarAsync<int>(trackEntryQuery, trackEntryToCreate,transaction:tran);
+        
+        var parameters = new DynamicParameters(trackEntryToCreate);
+        // Input params
+        parameters.Add("@EntryDate", trackEntryToCreate.EntryDate);
+        parameters.Add("@SleptAt", trackEntryToCreate.SleptAt);
+        parameters.Add("@WokeUpAt", trackEntryToCreate.WokeUpAt);
+        parameters.Add("@NapInMinutes", trackEntryToCreate.NapInMinutes);
+        parameters.Add("@TotalWorkInMinutes", trackEntryToCreate.TotalWorkInMinutes);
+        parameters.Add("@Remarks", trackEntryToCreate.Remarks);
+        
+        // output params
+        parameters.Add("@TrackEntryId", dbType: DbType.Int32, direction: ParameterDirection.Output);
+        
+        await connection.ExecuteAsync("CreateTrackEntry", parameters,commandType:CommandType.StoredProcedure);
 
-            if (!string.IsNullOrWhiteSpace(trackEntryToCreate.Remarks))
-            {
-                string trackEntryRemarkQuery = @"insert into TrackEntryRemarks (TrackEntryId,Remarks)
-                  values(@TrackEntryId,@Remarks);";
-                await connection.ExecuteAsync(trackEntryRemarkQuery, new { TrackEntryId = trackEntryId, trackEntryToCreate.Remarks},transaction:tran);
-            }
-            tran.Commit();
-        }
-        catch
-        {
-            tran.Rollback();
-            throw;
-        }
-        if(trackEntryId==0)
-        {
-            throw new InvalidOperationException("Track entry id can not be 0");
-        }
+        int trackEntryId = parameters.Get<int>("@TrackEntryId");
+        
+        // I could get CreatedTrackEntry from the stored procedure. It does the job in one single database call.
+        // But I have deliberately chosen this approach. I am good with multiple db roundtrips for the sake of consitency and code duplication.
+        // It would be hard to maintain if parameter increases or decreases in future, I have to change it in two places. That is why I am doing this
+        
         return await GetTrackEntryAsync(trackEntryId);
     }
 
     public async Task<TrackEntryReadDto?> GetTrackEntryAsync(int id)
     {
         using IDbConnection connection = new SqlConnection(_connectionString);
-        string sql = @"select  
-                         te.TrackEntryId,
-                         te.EntryDate,
-                         te.SleptAt,
-                         te.WokeUpAt,
-                         te.NapInMinutes,
-                         te.TotalSleepInMinutes,
-                         te.TotalWorkInMinutes,
-                         tr.TrackEntryId,
-                         tr.Remarks
-                       from TrackEntries te
-                       left join TrackEntryRemarks tr
-                       on te.TrackEntryId = tr.TrackEntryId
-                       where te.Deleted is null and te.TrackEntryId=@id
-                       order by te.EntryDate desc
-                        ";
         TrackEntryReadDto? trackEntry = (await connection.QueryAsync<TrackEntryReadDto, TrackEntryRemarkReadDto, TrackEntryReadDto>(
-             sql: sql,
+             sql: "GetTrackEntryById",
              map: (entry, remark) =>
              {
-                 return entry with { TrackEntryRemark = remark }; // TrackEntryRemark is a Record we can't mutate it directly
+                 entry.TrackEntryRemark = remark;
+                 return entry; 
              },
-             param: new { id },
-             splitOn: "TrackEntryId"
+             param: new { TrackEntryId=id },
+             splitOn: "TrackEntryId",
+             commandType:CommandType.StoredProcedure
              )).FirstOrDefault();
         return trackEntry;
     }
@@ -107,7 +84,8 @@ public class TrackEntryService : ITrackEntryService
              sql: sql,
              map: (entry, remark) =>
              {
-                 return entry with { TrackEntryRemark = remark }; // TrackEntryRemark is a Record we can't mutate it directly
+                 entry.TrackEntryRemark = remark;
+                 return entry;
              },
              splitOn: "TrackEntryId"
              );
