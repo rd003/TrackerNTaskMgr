@@ -47,6 +47,7 @@ public class TrackEntryService : ITrackEntryService
     public async Task<TrackEntryReadDto?> GetTrackEntryAsync(int id)
     {
         using IDbConnection connection = new SqlConnection(_connectionString);
+
         TrackEntryReadDto? trackEntry = (await connection.QueryAsync<TrackEntryReadDto, TrackEntryRemarkReadDto, TrackEntryReadDto>(
              sql: "GetTrackEntryById",
              map: (entry, remark) =>
@@ -95,34 +96,7 @@ public class TrackEntryService : ITrackEntryService
     public async System.Threading.Tasks.Task UpdateTrackEntryAsync(TrackEntryUpdateDto trackEntryToUpdate)
     {
         using IDbConnection connection = new SqlConnection(_connectionString);
-        using var transactionScope = new TransactionScope();
-        // updating TrackEntry
-        string trackEntryQuery = @"Update TrasactionEntries set 
-                                         EntryDate=@EntryDate,
-                                         SleptAt=@SleptAt,
-                                         WokeUpAt=@WokeUpAt,
-                                         NapInMinutes=@NapInMinutes,
-                                         TotalWorkInMinutes=@TotalWorkInMinutes
-                                         Updated=getdate(),
-                                         where TrackEntryId=@TrackEntryId
-                                         ";
-        await connection.ExecuteAsync(trackEntryQuery, trackEntryToUpdate);
-
-        // Updating TrackEntryRemark
-        if (!string.IsNullOrWhiteSpace(trackEntryToUpdate.Remarks))
-        {
-            string trackEntryRemarkQuery = @"Update TrackEntryRemarks 
-                                         set Remarks=@Remarks 
-                                         where TrackEntryId=@TrackEntryId";
-            await connection.ExecuteAsync(trackEntryRemarkQuery,
-                                          new
-                                          {
-                                              TrackEntryId = trackEntryToUpdate.TrackEntryId,
-                                              Remarks = trackEntryToUpdate.Remarks
-                                          });
-        }
-
-        transactionScope.Complete();
+        await connection.ExecuteAsync("UpdateTrackEntry", trackEntryToUpdate, commandType: CommandType.StoredProcedure);
     }
 
     public async System.Threading.Tasks.Task DeleteTrackEntryAsync(int trackEntryId)

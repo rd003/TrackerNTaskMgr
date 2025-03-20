@@ -4,12 +4,12 @@ POST {{base_address}}/api/trackentries
 Content-Type: application/json
 
 {
-  "entryDate": "2025-03-19",
-  "sleptAt": "2025-03-18T22:30",
-  "wokeUpAt": "2025-03-19T09:00",
-  "napInMinutes": null,
-  "totalWorkInMinutes": 180,
-  "remarks": "It was not a productive day at all"
+  "entryDate": "2025-03-20",
+  "sleptAt": "2025-03-20T00:00",
+  "wokeUpAt": "2025-03-20T07:00",
+  "napInMinutes": 30,
+  "totalWorkInMinutes": 0,
+  "remarks": "I have installed additional ram to a laptop. It took quiet a time. I am not counting that time in productivity."
 }
 ###
 
@@ -20,3 +20,17 @@ Accept: application/json
 
 GET {{base_address}}/api/trackentries/9
 Accept: application/json
+
+###
+
+PUT {{base_address}}/api/trackentries
+Content-Type: application/json
+
+{
+  "entryDate": "2025-03-20",
+  "sleptAt": "2025-03-20T00:00",
+  "wokeUpAt": "2025-03-20T07:00",
+  "napInMinutes": 30,
+  "totalWorkInMinutes": 0,
+  "remarks": "I have installed additional ram to a laptop. It took quiet a time. I am not counting that time in productivity."
+}
