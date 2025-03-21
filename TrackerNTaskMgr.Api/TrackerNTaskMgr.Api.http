@@ -27,11 +27,11 @@ PUT {{base_address}}/api/trackentries/11
 Content-Type: application/json
 
 {
-  "trackEntryId":11
+  "trackEntryId":11,
   "entryDate": "2025-03-20",
   "sleptAt": "2025-03-20T00:00",
   "wokeUpAt": "2025-03-20T07:00",
   "napInMinutes": 30,
   "totalWorkInMinutes": 270,
-  "remarks": "I have installed additional ram to a laptop. It took quiet a time. I am not counting that time in productivity.But that is okay."
+  "remarks": "I have installed additional ram to a laptop. It took quiet a time. I am not counting that time in productivity"
 }

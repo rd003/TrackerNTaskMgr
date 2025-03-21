@@ -53,4 +53,9 @@ public class TrackEntriesController : ControllerBase
         return NoContent();
     }
 
+    public async Task<IActionResult> GetTrackEntries([FromQuery]GetTrackEntriesParams parameters)
+    {
+        
+        return Ok();
+    }
 }

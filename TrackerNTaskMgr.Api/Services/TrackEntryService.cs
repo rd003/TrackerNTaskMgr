@@ -1,5 +1,4 @@
 using System.Data;
-using System.Transactions;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using TrackerNTaskMgr.Api.DTOs;
@@ -13,7 +12,7 @@ public class TrackEntryService : ITrackEntryService
     public TrackEntryService(IConfiguration config)
     {
         _config = config;
-        _connectionString = _config.GetConnectionString("Default");
+        _connectionString = _config.GetConnectionString("Default")!;
 
     }
 
@@ -62,33 +61,20 @@ public class TrackEntryService : ITrackEntryService
         return trackEntry;
     }
 
-    public async Task<IEnumerable<TrackEntryReadDto>> GetTrackEntiesAsync()
+    public async Task<IEnumerable<TrackEntryReadDto>> GetTrackEntiesAsync(GetTrackEntriesParams parameters)
     {
         using IDbConnection connection = new SqlConnection(_connectionString);
-        string sql = @"select  
-                         te.TrackEntryId,
-                         te.EntryDate,
-                         te.SleptAt,
-                         te.WokeUpAt,
-                         te.NapInMinutes,
-                         te.TotalSleepInMinutes,
-                         te.TotalWorkInMinutes,
-                         tr.TrackEntryId,
-                         tr.Remarks
-                       from TrackEntries te
-                       left join TrackEntryRemarks tr
-                       on te.TrackEntryId = tr.TrackEntryId
-                       where te.Deleted is null
-                       order by te.EntryDate desc
-                        ";
+        
         IEnumerable<TrackEntryReadDto> trackEntries = await connection.QueryAsync<TrackEntryReadDto, TrackEntryRemarkReadDto, TrackEntryReadDto>(
-             sql: sql,
+             sql: "GetTrackEntries",
+             param: parameters,
              map: (entry, remark) =>
              {
                  entry.TrackEntryRemark = remark;
                  return entry;
              },
-             splitOn: "TrackEntryId"
+             splitOn: "TrackEntryId",
+             commandType: CommandType.Text
              );
         return trackEntries;
     }
