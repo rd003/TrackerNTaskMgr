@@ -1,6 +1,4 @@
-﻿using TrackerNTaskMgr.Api.Entities;
-
-namespace TrackerNTaskMgr.Api.DTOs;
+﻿namespace TrackerNTaskMgr.Api.DTOs;
 
 public record TrackEntryUpdateDto
 (

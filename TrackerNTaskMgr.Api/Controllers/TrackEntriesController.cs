@@ -34,4 +34,23 @@ public class TrackEntriesController : ControllerBase
         return Ok(trackEntry);
     }
 
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateTrackEntry(int id, [FromBody]TrackEntryUpdateDto trackEntryToUpdate)
+    {
+        if(id!=trackEntryToUpdate.TrackEntryId)
+        {
+            throw new BadRequestException("Ids mismatch");
+        }
+
+        TrackEntryReadDto? trackEntry = await _trackEntryServcice.GetTrackEntryAsync(id);
+        
+        if (trackEntry == null)
+        {
+            throw new NotFoundException("Track entry not found");
+        }
+
+        await _trackEntryServcice.UpdateTrackEntryAsync(trackEntryToUpdate);
+        return NoContent();
+    }
+
 }
