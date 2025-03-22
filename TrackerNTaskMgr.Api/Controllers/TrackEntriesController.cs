@@ -53,9 +53,10 @@ public class TrackEntriesController : ControllerBase
         return NoContent();
     }
 
+    [HttpGet]
     public async Task<IActionResult> GetTrackEntries([FromQuery]GetTrackEntriesParams parameters)
     {
-        
-        return Ok();
+        var trackEntries = await _trackEntryServcice.GetTrackEntiesAsync(parameters);
+        return Ok(trackEntries);
     }
 }

@@ -4,34 +4,37 @@ POST {{base_address}}/api/trackentries
 Content-Type: application/json
 
 {
-  "entryDate": "2025-03-20",
-  "sleptAt": "2025-03-20T00:00",
-  "wokeUpAt": "2025-03-20T07:00",
-  "napInMinutes": 30,
-  "totalWorkInMinutes": 0,
-  "remarks": "I have installed additional ram to a laptop. It took quiet a time. I am not counting that time in productivity."
+  "entryDate": "2025-03-22",
+  "sleptAt": "2025-03-22T02:00",
+  "wokeUpAt": "2025-03-22T07:00",
+  "napInMinutes": 45,
+  "totalWorkInMinutes": 360,
+  "remarks": null
 }
 ###
 
-GET {{base_address}}/api/trackentries
+GET {{base_address}}/api/trackentries?limit=2&sortDirection=DESC&lastEntryDate=2025-03-21
+
 Accept: application/json
 
 ###
 
-GET {{base_address}}/api/trackentries/11
+GET {{base_address}}/api/trackentries/13
 Accept: application/json
 
 ###
 
-PUT {{base_address}}/api/trackentries/11
+PUT {{base_address}}/api/trackentries/13
 Content-Type: application/json
 
 {
-  "trackEntryId":11,
-  "entryDate": "2025-03-20",
-  "sleptAt": "2025-03-20T00:00",
-  "wokeUpAt": "2025-03-20T07:00",
-  "napInMinutes": 30,
-  "totalWorkInMinutes": 270,
-  "remarks": "I have installed additional ram to a laptop. It took quiet a time. I am not counting that time in productivity"
+  "trackEntryId": 13,
+  "entryDate": "2025-03-22",
+  "sleptAt": "2025-03-22T02:00",
+  "wokeUpAt": "2025-03-22T07:00",
+  "napInMinutes": 45,
+  "totalWorkInMinutes": 360,
+  "remarks": null
 }
+###
+DELETE PUT {{base_address}}/api/trackentries/14

@@ -1,4 +1,5 @@
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using TrackerNTaskMgr.Api.DTOs;
@@ -61,7 +62,7 @@ public class TrackEntryService : ITrackEntryService
         return trackEntry;
     }
 
-    public async Task<IEnumerable<TrackEntryReadDto>> GetTrackEntiesAsync(GetTrackEntriesParams parameters)
+   public async Task<IEnumerable<TrackEntryReadDto>> GetTrackEntiesAsync(GetTrackEntriesParams parameters)
     {
         using IDbConnection connection = new SqlConnection(_connectionString);
         
@@ -74,7 +75,7 @@ public class TrackEntryService : ITrackEntryService
                  return entry;
              },
              splitOn: "TrackEntryId",
-             commandType: CommandType.Text
+             commandType: CommandType.StoredProcedure
              );
         return trackEntries;
     }

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Scalar.AspNetCore;
 using TrackerNTaskMgr.Api.Exceptions;
 using TrackerNTaskMgr.Api.Services;
+using TrackerNTaskMgr.Api.TypeHandlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,8 @@ builder.Services.AddProblemDetails(options =>
         context.ProblemDetails.Extensions.TryAdd("traceId", activity.Id);
     };
 });
+
+Dapper.SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
 
 var app = builder.Build();
 
