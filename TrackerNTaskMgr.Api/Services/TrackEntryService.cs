@@ -89,11 +89,7 @@ public class TrackEntryService : ITrackEntryService
     public async System.Threading.Tasks.Task DeleteTrackEntryAsync(int trackEntryId)
     {
         using IDbConnection connection = new SqlConnection(_connectionString);
-        string query = @"update TransactionEntries
-                         set Deleted=getdate() 
-                         where TrackEntryId=@trackEntryId";
-        // I have deleberately skip to soft delete the entry in TrackEntryRemarks                 
-        await connection.ExecuteAsync(query, new { trackEntryId });
+        await connection.ExecuteAsync("DeleteTrackEntry", new { TrackEntryId=trackEntryId },commandType:CommandType.StoredProcedure);
     }
 
 }

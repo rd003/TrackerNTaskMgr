@@ -27,6 +27,7 @@ public class TrackEntriesController : ControllerBase
     public async Task<IActionResult> GetTrackEntry(int id)
     {
         TrackEntryReadDto? trackEntry = await _trackEntryServcice.GetTrackEntryAsync(id);
+        
         if (trackEntry == null)
         {
             throw new NotFoundException("Track entry not found");
@@ -58,5 +59,19 @@ public class TrackEntriesController : ControllerBase
     {
         var trackEntries = await _trackEntryServcice.GetTrackEntiesAsync(parameters);
         return Ok(trackEntries);
+    }
+
+    [HttpDelete("{trackEntryId}")]
+    public async Task<IActionResult> DeleteTrackEntry(int trackEntryId)
+    {
+        TrackEntryReadDto? trackEntry = await _trackEntryServcice.GetTrackEntryAsync(trackEntryId);
+
+        if (trackEntry == null)
+        {
+            throw new NotFoundException("Track entry not found");
+        }
+
+        await _trackEntryServcice.DeleteTrackEntryAsync(trackEntryId);
+        return NoContent();
     }
 }
