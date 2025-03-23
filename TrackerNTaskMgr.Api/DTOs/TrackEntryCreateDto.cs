@@ -1,9 +1,7 @@
-using TrackerNTaskMgr.Api.Entities;
-
 namespace TrackerNTaskMgr.Api.DTOs;
 public record TrackEntryCreateDto
 (
-    DateTime EntryDate,
+    DateOnly EntryDate,
     DateTime SleptAt,
     DateTime WokeUpAt,
     short? NapInMinutes,

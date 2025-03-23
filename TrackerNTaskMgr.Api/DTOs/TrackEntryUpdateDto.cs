@@ -3,7 +3,7 @@
 public record TrackEntryUpdateDto
 (
 int TrackEntryId,
-DateTime EntryDate,
+DateOnly EntryDate,
 DateTime SleptAt,
 DateTime WokeUpAt,
 short? NapInMinutes,

@@ -14,7 +14,7 @@ Content-Type: application/json
 
 ###
 
-GET {{base_address}}/api/trackentries?limit=2&sortDirection=ASC
+GET {{base_address}}/api/trackentries?limit=10&sortDirection=ASC
 
 Accept: application/json
 
@@ -38,4 +38,7 @@ Content-Type: application/json
   "remarks": null
 }
 ###
-DELETE PUT {{base_address}}/api/trackentries/14
+DELETE {{base_address}}/api/trackentries/14
+
+### Bulk insert : track entries
+POST {{base_address}}/bulk-track-entries
