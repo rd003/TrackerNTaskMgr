@@ -1,6 +1,8 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using TrackerNTaskMgr.Api.DTOs;
 using TrackerNTaskMgr.Api.Exceptions;
+using TrackerNTaskMgr.Api.Extensions;
 using TrackerNTaskMgr.Api.Services;
 
 namespace TrackerNTaskMgr.Api.Controllers;
@@ -10,17 +12,26 @@ namespace TrackerNTaskMgr.Api.Controllers;
 public class TrackEntriesController : ControllerBase
 {
     private readonly ITrackEntryService _trackEntryServcice;
+    private readonly IValidator<TrackEntryCreateDto> _trackEntryCreateValidator;
 
-    public TrackEntriesController(ITrackEntryService trackEntryServcice)
+    public TrackEntriesController(ITrackEntryService trackEntryServcice,IValidator<TrackEntryCreateDto> trackEntryCreateValidator)
     {
         _trackEntryServcice = trackEntryServcice;
+        _trackEntryCreateValidator = trackEntryCreateValidator;
     }
 
     [HttpPost]
     public async Task<IActionResult> CreateTrackEntry(TrackEntryCreateDto trackEntryToCreate)
     {
-        TrackEntryReadDto? createdTrackEntry = await _trackEntryServcice.CreateTrackEntryAsync(trackEntryToCreate);
-        return CreatedAtRoute("GetTrackEntry", new { id = createdTrackEntry.TrackEntryId }, createdTrackEntry);
+        var validationResult = await _trackEntryCreateValidator.ValidateAsync(trackEntryToCreate);
+        if(!validationResult.IsValid)
+        {
+            validationResult.AddToModelState(ModelState);
+            return UnprocessableEntity(ModelState);
+        }
+        //TrackEntryReadDto? createdTrackEntry = await _trackEntryServcice.CreateTrackEntryAsync(trackEntryToCreate);
+        //return CreatedAtRoute("GetTrackEntry", new { id = createdTrackEntry.TrackEntryId }, createdTrackEntry);
+        return Ok();
     }
 
     [HttpGet("{id}", Name = "GetTrackEntry")]

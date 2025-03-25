@@ -1,7 +1,9 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
 using Dapper;
+using FluentValidation;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc;
 using Scalar.AspNetCore;
 using System.Data;
 using System.Globalization;
@@ -9,6 +11,7 @@ using TrackerNTaskMgr.Api.DTOs;
 using TrackerNTaskMgr.Api.Exceptions;
 using TrackerNTaskMgr.Api.Services;
 using TrackerNTaskMgr.Api.TypeHandlers;
+using TrackerNTaskMgr.Api.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,7 +37,10 @@ builder.Services.AddProblemDetails(options =>
     };
 });
 
-Dapper.SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
+SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
+
+builder.Services.AddScoped<IValidator<TrackEntryCreateDto>, TrackEntryCreateDtoValidator>();
+
 
 var app = builder.Build();
 
