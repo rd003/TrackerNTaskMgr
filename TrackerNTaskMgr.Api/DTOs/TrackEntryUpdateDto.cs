@@ -2,11 +2,11 @@
 
 public record TrackEntryUpdateDto
 (
-int TrackEntryId,
-DateOnly EntryDate,
-DateTime SleptAt,
-DateTime WokeUpAt,
+int? TrackEntryId,
+DateOnly? EntryDate,
+DateTime? SleptAt,
+DateTime? WokeUpAt,
 short? NapInMinutes,
-short TotalWorkInMinutes,
+short? TotalWorkInMinutes,
 string? Remarks
 );

@@ -3,9 +3,7 @@ using CsvHelper.Configuration;
 using Dapper;
 using FluentValidation;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Mvc;
 using Scalar.AspNetCore;
-using System.Data;
 using System.Globalization;
 using TrackerNTaskMgr.Api.DTOs;
 using TrackerNTaskMgr.Api.Exceptions;
@@ -21,10 +19,11 @@ builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
 
+// registering servicer
 builder.Services.AddTransient<ITrackEntryService, TrackEntryService>();
 
+// Global exception handling
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
-
 builder.Services.AddProblemDetails(options =>
 {
     options.CustomizeProblemDetails = context =>
@@ -37,10 +36,15 @@ builder.Services.AddProblemDetails(options =>
     };
 });
 
+// registering DateOnly type, because dapper does not support DateOnly type out of the box
 SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
 
-builder.Services.AddScoped<IValidator<TrackEntryCreateDto>, TrackEntryCreateDtoValidator>();
+// registering validators
+//builder.Services.AddScoped<IValidator<TrackEntryCreateDto>, TrackEntryCreateDtoValidator>();
 
+//builder.Services.AddScoped<IValidator<TrackEntryUpdateDto>, TrackEntryUpdateValidator>();
+
+//builder.Services.AddValidatorsFromAssemblyContaining<TrackEntryCreateDtoValidator>();
 
 var app = builder.Build();
 
@@ -66,7 +70,6 @@ app.MapPost("/bulk-track-entries", async (ITrackEntryService trackEntryService) 
 
 await app.RunAsync();
 
-
 static async Task InsertTrackEntries(ITrackEntryService trackEntryService)
 {
     string filePath = "C:\\Users\\RD\\Desktop\\track-entries.csv";
@@ -77,11 +80,9 @@ static async Task InsertTrackEntries(ITrackEntryService trackEntryService)
 
     // 📝 writing records to database
     // I know their is a better approaches for bulk insert. But I do not want to waste time here. I will rarely use this feature. Even I use this, there won't be more than 10 records.
-    // Since I have built in procedure for single track entry, I am goint to use it.
+    // Since I have built in procedure for single track entry, I am going to use it.
     foreach(TrackEntryCreateDto trackEntry in trackEntries)
     {
         await trackEntryService.CreateTrackEntryAsync(trackEntry);
     }
-    
 }
-

@@ -25,17 +25,17 @@ Accept: application/json
 
 ###
 
-PUT {{base_address}}/api/trackentries/17
+PUT {{base_address}}/api/trackentries/57
 Content-Type: application/json
 
 {
-  "trackEntryId": 17,
+  "trackEntryId": 57,
   "entryDate": "2025-03-23",
   "sleptAt": "2025-03-23T03:15",
   "wokeUpAt": "2025-03-23T07:45",
   "napInMinutes": 0,
   "totalWorkInMinutes": 0,
-  "remarks": null
+  "remarks": "adfasdf"
 }
 ###
 DELETE {{base_address}}/api/trackentries/14

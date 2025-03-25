@@ -13,11 +13,13 @@ public class TrackEntriesController : ControllerBase
 {
     private readonly ITrackEntryService _trackEntryServcice;
     private readonly IValidator<TrackEntryCreateDto> _trackEntryCreateValidator;
+    private readonly IValidator<TrackEntryUpdateDto> _trackEntryUpdateValidator;
 
-    public TrackEntriesController(ITrackEntryService trackEntryServcice,IValidator<TrackEntryCreateDto> trackEntryCreateValidator)
+    public TrackEntriesController(ITrackEntryService trackEntryServcice, IValidator<TrackEntryCreateDto> trackEntryCreateValidator, IValidator<TrackEntryUpdateDto> trackEntryUpdateValidator)
     {
         _trackEntryServcice = trackEntryServcice;
         _trackEntryCreateValidator = trackEntryCreateValidator;
+        _trackEntryUpdateValidator = trackEntryUpdateValidator;
     }
 
     [HttpPost]
@@ -29,9 +31,8 @@ public class TrackEntriesController : ControllerBase
             validationResult.AddToModelState(ModelState);
             return UnprocessableEntity(ModelState);
         }
-        //TrackEntryReadDto? createdTrackEntry = await _trackEntryServcice.CreateTrackEntryAsync(trackEntryToCreate);
-        //return CreatedAtRoute("GetTrackEntry", new { id = createdTrackEntry.TrackEntryId }, createdTrackEntry);
-        return Ok();
+        TrackEntryReadDto? createdTrackEntry = await _trackEntryServcice.CreateTrackEntryAsync(trackEntryToCreate);
+        return CreatedAtRoute("GetTrackEntry", new { id = createdTrackEntry.TrackEntryId }, createdTrackEntry);
     }
 
     [HttpGet("{id}", Name = "GetTrackEntry")]
@@ -49,19 +50,26 @@ public class TrackEntriesController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateTrackEntry(int id, [FromBody]TrackEntryUpdateDto trackEntryToUpdate)
     {
-        if(id!=trackEntryToUpdate.TrackEntryId)
+        var validationResult = await _trackEntryUpdateValidator.ValidateAsync(trackEntryToUpdate);
+        if(!validationResult.IsValid)
         {
-            throw new BadRequestException("Ids mismatch");
+           validationResult.AddToModelState(ModelState);
+           return UnprocessableEntity(ModelState);
         }
 
-        TrackEntryReadDto? trackEntry = await _trackEntryServcice.GetTrackEntryAsync(id);
+        //if(id!=trackEntryToUpdate.TrackEntryId)
+        //{
+        //    throw new BadRequestException("Ids mismatch");
+        //}
+
+        //TrackEntryReadDto? trackEntry = await _trackEntryServcice.GetTrackEntryAsync(id);
         
-        if (trackEntry == null)
-        {
-            throw new NotFoundException("Track entry not found");
-        }
+        //if (trackEntry == null)
+        //{
+        //    throw new NotFoundException("Track entry not found");
+        //}
 
-        await _trackEntryServcice.UpdateTrackEntryAsync(trackEntryToUpdate);
+        //await _trackEntryServcice.UpdateTrackEntryAsync(trackEntryToUpdate);
         return NoContent();
     }
 
