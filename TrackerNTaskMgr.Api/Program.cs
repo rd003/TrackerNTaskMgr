@@ -44,7 +44,7 @@ SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
 
 //builder.Services.AddScoped<IValidator<TrackEntryUpdateDto>, TrackEntryUpdateValidator>();
 
-//builder.Services.AddValidatorsFromAssemblyContaining<TrackEntryCreateDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<TrackEntryCreateDtoValidator>();
 
 var app = builder.Build();
 
