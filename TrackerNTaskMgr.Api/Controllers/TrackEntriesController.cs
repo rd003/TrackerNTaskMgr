@@ -57,17 +57,17 @@ public class TrackEntriesController : ControllerBase
            return UnprocessableEntity(ModelState);
         }
 
-        //if(id!=trackEntryToUpdate.TrackEntryId)
-        //{
-        //    throw new BadRequestException("Ids mismatch");
-        //}
+        if (id != trackEntryToUpdate.TrackEntryId)
+        {
+            throw new BadRequestException("Ids mismatch");
+        }
 
-        //TrackEntryReadDto? trackEntry = await _trackEntryServcice.GetTrackEntryAsync(id);
-        
-        //if (trackEntry == null)
-        //{
-        //    throw new NotFoundException("Track entry not found");
-        //}
+        TrackEntryReadDto? trackEntry = await _trackEntryServcice.GetTrackEntryAsync(id);
+
+        if (trackEntry == null)
+        {
+            throw new NotFoundException("Track entry not found");
+        }
 
         //await _trackEntryServcice.UpdateTrackEntryAsync(trackEntryToUpdate);
         return NoContent();

@@ -1,2 +1,5 @@
-EntryDate,SleptAt,WokeUpAt,NapInMinutest,WorkInMinutes,Remarks
+EntryDate,SleptAt,WokeUpAt,NapInMinutes,TotalWorkInMinutes,Remarks
+2025-03-24,2025-03-23T11:30,2025-03-24T07:15,null,360,null
+2025-03-25,2025-03-25T01:15,2025-03-25T07:30,null,375,null
+2025-03-26,2025-03-25T01:15,2025-03-25T07:30,null,375,null
 2025-03-27,2025-03-25T23:30:00,2025-03-26T06:00:00,15,360,null

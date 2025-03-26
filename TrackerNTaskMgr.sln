@@ -5,8 +5,6 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackerNTaskMgr.Api", "TrackerNTaskMgr.Api\TrackerNTaskMgr.Api.csproj", "{DD8EFE3E-D0FB-4585-B9B7-E05DF46749B8}"
 EndProject
-Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "TrackerNTaskMgr.Database", "TrackerNTaskMgr.Database\TrackerNTaskMgr.Database.sqlproj", "{2FA10AA5-A40E-47EB-89C4-69B93B736542}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,24 +27,6 @@ Global
 		{DD8EFE3E-D0FB-4585-B9B7-E05DF46749B8}.Release|x64.Build.0 = Release|Any CPU
 		{DD8EFE3E-D0FB-4585-B9B7-E05DF46749B8}.Release|x86.ActiveCfg = Release|Any CPU
 		{DD8EFE3E-D0FB-4585-B9B7-E05DF46749B8}.Release|x86.Build.0 = Release|Any CPU
-		{2FA10AA5-A40E-47EB-89C4-69B93B736542}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2FA10AA5-A40E-47EB-89C4-69B93B736542}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2FA10AA5-A40E-47EB-89C4-69B93B736542}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{2FA10AA5-A40E-47EB-89C4-69B93B736542}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{2FA10AA5-A40E-47EB-89C4-69B93B736542}.Debug|x64.Build.0 = Debug|Any CPU
-		{2FA10AA5-A40E-47EB-89C4-69B93B736542}.Debug|x64.Deploy.0 = Debug|Any CPU
-		{2FA10AA5-A40E-47EB-89C4-69B93B736542}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{2FA10AA5-A40E-47EB-89C4-69B93B736542}.Debug|x86.Build.0 = Debug|Any CPU
-		{2FA10AA5-A40E-47EB-89C4-69B93B736542}.Debug|x86.Deploy.0 = Debug|Any CPU
-		{2FA10AA5-A40E-47EB-89C4-69B93B736542}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2FA10AA5-A40E-47EB-89C4-69B93B736542}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2FA10AA5-A40E-47EB-89C4-69B93B736542}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{2FA10AA5-A40E-47EB-89C4-69B93B736542}.Release|x64.ActiveCfg = Release|Any CPU
-		{2FA10AA5-A40E-47EB-89C4-69B93B736542}.Release|x64.Build.0 = Release|Any CPU
-		{2FA10AA5-A40E-47EB-89C4-69B93B736542}.Release|x64.Deploy.0 = Release|Any CPU
-		{2FA10AA5-A40E-47EB-89C4-69B93B736542}.Release|x86.ActiveCfg = Release|Any CPU
-		{2FA10AA5-A40E-47EB-89C4-69B93B736542}.Release|x86.Build.0 = Release|Any CPU
-		{2FA10AA5-A40E-47EB-89C4-69B93B736542}.Release|x86.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
