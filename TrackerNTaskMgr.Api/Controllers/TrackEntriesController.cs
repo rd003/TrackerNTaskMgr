@@ -93,4 +93,11 @@ public class TrackEntriesController : ControllerBase
         await _trackEntryServcice.DeleteTrackEntryAsync(trackEntryId);
         return NoContent();
     }
+
+    public void Something()
+    {
+      var a =5;
+      var b=10;
+     int c=a+b;
+    }
 }
