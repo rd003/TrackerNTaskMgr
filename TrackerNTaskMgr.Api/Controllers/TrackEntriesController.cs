@@ -94,10 +94,4 @@ public class TrackEntriesController : ControllerBase
         return NoContent();
     }
 
-    public void Something()
-    {
-      var a =5;
-      var b=10;
-     int c=a+b;
-    }
 }
