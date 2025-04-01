@@ -1,10 +1,16 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
+
 using Dapper;
+
 using FluentValidation;
+
 using Microsoft.AspNetCore.Http.Features;
+
 using Scalar.AspNetCore;
+
 using System.Globalization;
+
 using TrackerNTaskMgr.Api.DTOs;
 using TrackerNTaskMgr.Api.Exceptions;
 using TrackerNTaskMgr.Api.Services;
@@ -63,7 +69,8 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapPost("/bulk-track-entries", async (ITrackEntryService trackEntryService) => {
+app.MapPost("/bulk-track-entries", async (ITrackEntryService trackEntryService) =>
+{
     await InsertTrackEntries(trackEntryService);
     return Results.Ok();
 });
@@ -74,14 +81,14 @@ static async Task InsertTrackEntries(ITrackEntryService trackEntryService)
 {
     string filePath = "C:\\Users\\RD\\Desktop\\track-entries.csv";
     var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture);
-    using StreamReader streamReader = new (filePath);
-    using CsvReader csvReader = new (streamReader, csvConfig);
+    using StreamReader streamReader = new(filePath);
+    using CsvReader csvReader = new(streamReader, csvConfig);
     var trackEntries = csvReader.GetRecords<TrackEntryCreateDto>().ToList();
 
     // 📝 writing records to database
     // I know their is a better approaches for bulk insert. But I do not want to waste time here. I will rarely use this feature. Even I use this, there won't be more than 10 records.
     // Since I have built in procedure for single track entry, I am going to use it.
-    foreach(TrackEntryCreateDto trackEntry in trackEntries)
+    foreach (TrackEntryCreateDto trackEntry in trackEntries)
     {
         await trackEntryService.CreateTrackEntryAsync(trackEntry);
     }
