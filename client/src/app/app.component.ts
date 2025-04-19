@@ -1,16 +1,17 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { MainLayoutComponent } from "./main-layout.component";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [MainLayoutComponent],
   template: `
-    <h1>Welcome to {{title}}!</h1>
-
-    <router-outlet />
+  <!-- I have created separate component for layout, so the I can easily put in if block of logged user-->
+  <!-- The layout will only show if admin is logged in -->
+  <app-main-layout/>
   `,
-  styles: [],
+  styles: [``]
 })
+
 export class AppComponent {
-  title = 'client';
 }
