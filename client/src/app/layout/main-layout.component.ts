@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { RouterOutlet } from '@angular/router';
+import { NavComponent } from "./nav.component";
 
 @Component({
  selector:"app-main-layout",
@@ -19,8 +20,9 @@ import { RouterOutlet } from '@angular/router';
     MatIconModule,
     MatButtonModule,
     MatCardModule,
-    RouterOutlet
-  ],
+    RouterOutlet,
+    NavComponent
+],
  template:`<div class="dashboard-container">
  <mat-toolbar color="primary" class="toolbar">
    <button mat-icon-button (click)="sidenav.toggle()">
@@ -37,24 +39,7 @@ import { RouterOutlet } from '@angular/router';
 
  <mat-sidenav-container class="sidenav-container">
    <mat-sidenav #sidenav mode="side" opened class="sidenav">
-     <mat-nav-list>
-       <a mat-list-item routerLink="/dashboard">
-         <mat-icon>dashboard</mat-icon>
-         <span class="nav-link-text">Dashboard</span>
-       </a>
-       <a mat-list-item routerLink="/users">
-         <mat-icon>people</mat-icon>
-         <span class="nav-link-text">Users</span>
-       </a>
-       <a mat-list-item routerLink="/reports">
-         <mat-icon>assessment</mat-icon>
-         <span class="nav-link-text">Reports</span>
-       </a>
-       <a mat-list-item routerLink="/settings">
-         <mat-icon>settings</mat-icon>
-         <span class="nav-link-text">Settings</span>
-       </a>
-     </mat-nav-list>
+       <app-nav-component/>
    </mat-sidenav>
 
    <mat-sidenav-content class="content-container">
