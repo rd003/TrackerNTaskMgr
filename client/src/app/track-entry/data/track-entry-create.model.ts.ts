@@ -6,3 +6,7 @@ export interface TrackEntryCreateModel {
     totalWorkInMinutes: number;
     remarks: string | null;
 }
+
+export interface TrackEntryUpdateModel extends TrackEntryCreateModel {
+   id: number
+}
