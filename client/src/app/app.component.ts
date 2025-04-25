@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { MainLayoutComponent } from "./layout/main-layout.component";
 
 @Component({
@@ -10,7 +10,8 @@ import { MainLayoutComponent } from "./layout/main-layout.component";
   <!-- The layout will only show if admin is logged in -->
   <app-main-layout/>
   `,
-  styles: [``]
+  styles: [``],
+  changeDetection: ChangeDetectionStrategy.OnPush, 
 })
 
 export class AppComponent {

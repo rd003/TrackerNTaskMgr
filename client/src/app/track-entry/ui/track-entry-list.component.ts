@@ -1,9 +1,10 @@
-import { Component, EventEmitter, Input, Output } from "@angular/core";
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from "@angular/core";
 import { MatTableModule } from "@angular/material/table";
 import { TrackEntryReadModel } from "../data/track-entry-read.model";
 import { MatButtonModule } from "@angular/material/button";
-import { getMatIconFailedToSanitizeUrlError, MatIconModule } from "@angular/material/icon";
+import { MatIconModule } from "@angular/material/icon";
 import { DatePipe } from "@angular/common";
+import { TrackEntryUpdateModel } from "../data/track-entry-create.model";
 
 @Component({
     selector:'app-track-entry-list',
@@ -61,10 +62,10 @@ import { DatePipe } from "@angular/common";
 <ng-container matColumnDef="action">
   <th mat-header-cell *matHeaderCellDef> Actions </th>
   <td mat-cell *matCellDef="let element" style="display: flex;gap:7px;"> 
-  <button mat-mini-fab aria-label="edit-entry">
+  <button mat-mini-fab aria-label="edit-entry" (click)="this.editTrackEntry.emit(element);">
      <mat-icon>edit</mat-icon>
   </button>
-  <button mat-mini-fab aria-label="delete-entry">
+  <button mat-mini-fab aria-label="delete-entry" (click)="onEdit(element)">
      <mat-icon>delete</mat-icon>
   </button>  
   </td>
@@ -74,21 +75,21 @@ import { DatePipe } from "@angular/common";
 <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 </table>
     `,
-    styles:[]
+    styles:[],
+    changeDetection: ChangeDetectionStrategy.OnPush, 
 })
 
 export class TrackEntryListComponent
 {
   displayedColumns = ["entryDate","sleptAt","wokeUpAt","napInMinutes","totalSleepInMinutes","totalWorkInMinutes","trackEntryRemark","action"];
   @Input({required:true}) dataSource!:TrackEntryReadModel[];
-  @Output() editTrackEntry = new EventEmitter<TrackEntryReadModel>(); 
+  @Output() editTrackEntry = new EventEmitter<TrackEntryUpdateModel>(); 
   @Output() deleteTrackEntry = new EventEmitter<TrackEntryReadModel>(); 
 
-  onTrackEntryEdit(data:TrackEntryReadModel){
-      this.editTrackEntry.emit(data);
-  }
-
-  onTrackEntryDelete(data:TrackEntryReadModel){
-    this.deleteTrackEntry.emit(data);
+  onEdit(trackEntry:TrackEntryReadModel)
+  {
+    const trackEntryUpdate:TrackEntryUpdateModel = {...trackEntry,
+      remarks:trackEntry.trackEntryRemark};
+    this.editTrackEntry.emit(trackEntryUpdate)
   }
 }

@@ -1,19 +1,39 @@
-import { Component } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { TrackEntryReadModel } from "./data/track-entry-read.model";
 import { TrackEntryListComponent } from "./ui/track-entry-list.component";
+import { MatDialog, MatDialogModule } from "@angular/material/dialog";
+import { TrackEntryUpdateModel } from "./data/track-entry-create.model";
+import { TrackEntryDialogComponent } from "./ui/track-entry-dialog.component";
+import { Subject, takeUntil } from "rxjs";
+import { MatButtonModule } from "@angular/material/button";
 
 @Component({
   selector: 'app-track-entry',
   standalone:true,
-  imports: [TrackEntryListComponent],
+  imports: [TrackEntryListComponent, MatDialogModule,MatButtonModule],
   template:`
-   <app-track-entry-list [dataSource]="trackEntries" (editTrackEntry)="onEdit($event)" (deleteTrackEntry)="onDelete($event)"/>
+  <h1>Track Entries</h1>
+  <p>
+      <button
+        type="button"
+        (click)="onAddUpdate('Add', null)"
+        mat-raised-button
+        color="accent"
+      >
+        +
+      </button>
+  </p>
+   <app-track-entry-list [dataSource]="trackEntries" (editTrackEntry)="onAddUpdate('Edit', $event)" (deleteTrackEntry)="onDelete($event)"/>
   `,
-  styles:[] 
+  styles:[],
+  changeDetection: ChangeDetectionStrategy.OnPush, 
 })
 
 export class TrackEntryComponent
 {
+    dialog = inject(MatDialog);
+    destroyed$ = new Subject<boolean>();
+    
     trackEntries:TrackEntryReadModel[] = [
         {
             trackEntryId:1,
@@ -37,9 +57,26 @@ export class TrackEntryComponent
         }
     ];
 
-   onEdit(trackEntryRead:TrackEntryReadModel){
-       console.log(trackEntryRead);
-   } 
+    onAddUpdate(action: string, trackEntry: TrackEntryUpdateModel | null = null) {
+        const dialogRef = this.dialog.open(TrackEntryDialogComponent, {
+          data: { trackEntry, title: action + " TrackEntry" },
+        });
+    
+        dialogRef.componentInstance.sumbit
+          .pipe(takeUntil(this.destroyed$))
+          .subscribe((submittedBook) => {
+            if (!submittedBook) return;
+            if (submittedBook.trackEntryId) {
+              // update book
+            } else {
+                // AddBook
+            }
+            // TODO: lines below only executed, when we have added books successfully
+            dialogRef.componentInstance.form.reset();
+            dialogRef.componentInstance.onCanceled();
+          });
+      }
+
 
    onDelete(trackEntryRead:TrackEntryReadModel){
      console.log(trackEntryRead);
