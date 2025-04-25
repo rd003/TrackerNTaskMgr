@@ -130,9 +130,11 @@ var _RecycleViewRepeaterStrategy = class {
 };
 
 export {
+  DataSource,
   isDataSource,
   ArrayDataSource,
+  _ViewRepeaterOperation,
   _VIEW_REPEATER_STRATEGY,
   _RecycleViewRepeaterStrategy
 };
-//# sourceMappingURL=chunk-NMUE7DXU.js.map
+//# sourceMappingURL=chunk-DTDRELNT.js.map

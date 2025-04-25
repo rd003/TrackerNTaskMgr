@@ -1,6 +1,6 @@
 import {
   isPlatformBrowser
-} from "./chunk-Z3HYYZL2.js";
+} from "./chunk-MD7UGXE5.js";
 import {
   ElementRef,
   Injectable,
@@ -88,6 +88,7 @@ function coerceElement(elementOrRef) {
 export {
   Platform,
   coerceNumberProperty,
+  _isNumberValue,
   coerceElement
 };
-//# sourceMappingURL=chunk-YNZ4ZUQH.js.map
+//# sourceMappingURL=chunk-OP7VMUUY.js.map

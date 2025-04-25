@@ -1,6 +1,7 @@
 import { Component } from "@angular/core";
 import { MatIconModule } from "@angular/material/icon";
 import { MatListModule } from "@angular/material/list";
+import { RouterModule } from "@angular/router";
 
 @Component({
     selector:"app-nav-component",
@@ -8,6 +9,7 @@ import { MatListModule } from "@angular/material/list";
     imports:[
     MatIconModule,
     MatListModule,
+    RouterModule
     ],
     template:`
     <mat-nav-list>
@@ -15,13 +17,9 @@ import { MatListModule } from "@angular/material/list";
          <mat-icon>dashboard</mat-icon>
          <span class="nav-link-text">Dashboard</span>
        </a>
-       <a mat-list-item routerLink="/users">
-         <mat-icon>people</mat-icon>
-         <span class="nav-link-text">Users</span>
-       </a>
-       <a mat-list-item routerLink="/reports">
+       <a mat-list-item routerLink="/track-entry">
          <mat-icon>assessment</mat-icon>
-         <span class="nav-link-text">Reports</span>
+         <span class="nav-link-text">Track Entry</span>
        </a>
        <a mat-list-item routerLink="/settings">
          <mat-icon>settings</mat-icon>

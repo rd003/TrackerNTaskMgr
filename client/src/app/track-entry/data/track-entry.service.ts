@@ -3,7 +3,7 @@ import { environment } from "../../../environments/environment.development";
 import { HttpClient } from "@angular/common/http";
 import { TrackEntryReadModel } from "./track-entry-read.model";
 import { Observable } from "rxjs";
-import { TrackEntryCreateModel, TrackEntryUpdateModel } from "./track-entry-create.model.ts";
+import { TrackEntryCreateModel, TrackEntryUpdateModel } from "./track-entry-create.model";
 
 @Injectable({
  providedIn:"root"
