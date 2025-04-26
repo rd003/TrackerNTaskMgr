@@ -1,9 +1,9 @@
 export interface TrackEntryReadModel
 {
     trackEntryId: number,
-    entryDate : string,
-    sleptAt : string,
-    wokeUpAt : string,
+    entryDate : Date,
+    sleptAt : Date,
+    wokeUpAt : Date,
     napInMinutes: number|null,
     totalSleepInMinutes: number,
     totalWorkInMinutes:number,

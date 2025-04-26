@@ -40,9 +40,9 @@ export class TrackEntryComponent
             totalSleepInMinutes:480,
             totalWorkInMinutes:300,
             napInMinutes:null,
-            entryDate:"2025-04-12",
-            sleptAt:"2025-04-11T23:00",
-            wokeUpAt:"2025-04-12T08:00",
+            entryDate:new Date("2025-04-12"),
+            sleptAt:new Date("2025-04-11T23:00"),
+            wokeUpAt:new Date("2025-04-12T08:00"),
             trackEntryRemark:null,
         },
         {
@@ -50,9 +50,9 @@ export class TrackEntryComponent
             totalSleepInMinutes:420,
             totalWorkInMinutes:360,
             napInMinutes:null,
-            entryDate:"2025-04-13",
-            sleptAt:"2025-04-12T22:39",
-            wokeUpAt:"2025-04-13T08:00",
+            entryDate:new Date("2025-04-13"),
+            sleptAt:new Date("2025-04-12T22:39"),
+            wokeUpAt:new Date("2025-04-13T08:00"),
             trackEntryRemark:"something",
         }
     ];
@@ -64,9 +64,10 @@ export class TrackEntryComponent
     
         dialogRef.componentInstance.sumbit
           .pipe(takeUntil(this.destroyed$))
-          .subscribe((submittedBook) => {
-            if (!submittedBook) return;
-            if (submittedBook.trackEntryId) {
+          .subscribe((submittedData) => {
+            console.log(submittedData);
+            if (!submittedData) return;
+            if (submittedData.trackEntryId) {
               // update book
             } else {
                 // AddBook
