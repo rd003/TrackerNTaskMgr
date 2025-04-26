@@ -57,15 +57,19 @@ export class TrackEntryComponent
         }
     ];
 
-    onAddUpdate(action: string, trackEntry: TrackEntryUpdateModel | null = null) {
+    onAddUpdate(action: string, trackEntry: TrackEntryReadModel | null = null) {
+        let trackEntryUpdate:TrackEntryUpdateModel|null=null;
+        if(trackEntry!=null)
+        {
+           trackEntryUpdate = {...trackEntry,remarks:trackEntry.trackEntryRemark};
+        }
         const dialogRef = this.dialog.open(TrackEntryDialogComponent, {
-          data: { trackEntry, title: action + " TrackEntry" },
+          data: { trackEntry:trackEntryUpdate, title: action + " TrackEntry" },
         });
     
         dialogRef.componentInstance.sumbit
           .pipe(takeUntil(this.destroyed$))
           .subscribe((submittedData) => {
-            console.log(submittedData);
             if (!submittedData) return;
             if (submittedData.trackEntryId) {
               // update book

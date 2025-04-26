@@ -4,7 +4,6 @@ import { TrackEntryReadModel } from "../data/track-entry-read.model";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 import { DatePipe } from "@angular/common";
-import { TrackEntryUpdateModel } from "../data/track-entry-create.model";
 
 @Component({
     selector:'app-track-entry-list',
@@ -62,10 +61,10 @@ import { TrackEntryUpdateModel } from "../data/track-entry-create.model";
 <ng-container matColumnDef="action">
   <th mat-header-cell *matHeaderCellDef> Actions </th>
   <td mat-cell *matCellDef="let element" style="display: flex;gap:7px;"> 
-  <button mat-mini-fab aria-label="edit-entry" (click)="this.editTrackEntry.emit(element);">
+  <button mat-mini-fab aria-label="edit-entry" (click)="onEdit(element);">
      <mat-icon>edit</mat-icon>
   </button>
-  <button mat-mini-fab aria-label="delete-entry" (click)="onEdit(element)">
+  <button mat-mini-fab aria-label="delete-entry" (click)="this.deleteTrackEntry.emit(element)">
      <mat-icon>delete</mat-icon>
   </button>  
   </td>
@@ -83,13 +82,11 @@ export class TrackEntryListComponent
 {
   displayedColumns = ["entryDate","sleptAt","wokeUpAt","napInMinutes","totalSleepInMinutes","totalWorkInMinutes","trackEntryRemark","action"];
   @Input({required:true}) dataSource!:TrackEntryReadModel[];
-  @Output() editTrackEntry = new EventEmitter<TrackEntryUpdateModel>(); 
+  @Output() editTrackEntry = new EventEmitter<TrackEntryReadModel>(); 
   @Output() deleteTrackEntry = new EventEmitter<TrackEntryReadModel>(); 
 
   onEdit(trackEntry:TrackEntryReadModel)
   {
-    const trackEntryUpdate:TrackEntryUpdateModel = {...trackEntry,
-      remarks:trackEntry.trackEntryRemark};
-    this.editTrackEntry.emit(trackEntryUpdate)
+    this.editTrackEntry.emit(trackEntry)
   }
 }

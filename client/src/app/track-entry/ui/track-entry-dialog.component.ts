@@ -61,14 +61,14 @@ import { CdkTextareaAutosize, TextFieldModule } from "@angular/cdk/text-field";
   
           <!-- SleptAt -->
           <mat-form-field>
-            <mat-label>SleptAt(date)</mat-label>
+            <mat-label>SleepDate</mat-label>
             <input matInput [matDatepicker]="sleptDatePicker" formControlName="sleptAt" placeholder="Choose date">
             <mat-datepicker-toggle matIconSuffix [for]="sleptDatePicker"></mat-datepicker-toggle>
             <mat-datepicker #sleptDatePicker></mat-datepicker>
           </mat-form-field>
 
           <mat-form-field>
-            <mat-label>SleptAt(time)</mat-label>
+            <mat-label>SleepTime</mat-label>
             <input matInput [matTimepicker]="sleptTimePicker" formControlName="sleptAt" >
             <mat-timepicker-toggle matIconSuffix [for]="sleptTimePicker"/>
             <mat-timepicker #sleptTimePicker/>
@@ -76,14 +76,14 @@ import { CdkTextareaAutosize, TextFieldModule } from "@angular/cdk/text-field";
           
           <!-- Woke up at -->
           <mat-form-field>
-            <mat-label>WokeUpAt(date)</mat-label>
+            <mat-label>WokeUpDate</mat-label>
             <input matInput [matDatepicker]="wokeUpDatePicker" formControlName="wokeUpAt" placeholder="Choose date">
             <mat-datepicker-toggle matIconSuffix [for]="wokeUpDatePicker"></mat-datepicker-toggle>
             <mat-datepicker #wokeUpDatePicker></mat-datepicker>
           </mat-form-field>
 
           <mat-form-field>
-            <mat-label>WokeUpAt(time)</mat-label>
+            <mat-label>WokeUpTime</mat-label>
             <input matInput [matTimepicker]="wokeUpTimePicker" formControlName="wokeUpAt" >
             <mat-timepicker-toggle matIconSuffix [for]="wokeUpTimePicker"/>
             <mat-timepicker #wokeUpTimePicker/>
@@ -91,18 +91,17 @@ import { CdkTextareaAutosize, TextFieldModule } from "@angular/cdk/text-field";
   
           <mat-form-field appearance="fill">
             <mat-label>Nap(minutes)</mat-label>
-            <input matInput placeholder="price" formControlName="napInMinutes" />
+            <input matInput placeholder="Nap(minutes)" formControlName="napInMinutes" />
           </mat-form-field>
   
           <mat-form-field appearance="fill">
             <mat-label>TotalWork(minutes)</mat-label>
-            <input matInput placeholder="year" formControlName="totalWorkInMinutes" />
+            <input matInput placeholder="TotalWork" formControlName="totalWorkInMinutes" />
           </mat-form-field>
   
           <mat-form-field appearance="fill">
             <mat-label>Remarks</mat-label>
-            <input matInput placeholder="country" formControlName="remarks" />
-            <textarea matInput
+            <textarea matInput formControlName="remarks" 
             cdkTextareaAutosize
             #autosize="cdkTextareaAutosize"
             cdkAutosizeMinRows="1"
@@ -187,6 +186,7 @@ import { CdkTextareaAutosize, TextFieldModule } from "@angular/cdk/text-field";
       public dialogRef: MatDialogRef<TrackEntryDialogComponent>,
       @Inject(MAT_DIALOG_DATA) public data: { trackEntry: TrackEntryUpdateModel | null; title: string }
     ) {
+
       if (data.trackEntry != null) {
         this.form.patchValue(data.trackEntry);
       }
