@@ -4,13 +4,16 @@ import { TrackEntryListComponent } from "./ui/track-entry-list.component";
 import { MatDialog, MatDialogModule } from "@angular/material/dialog";
 import { TrackEntryUpdateModel } from "./data/track-entry-create.model";
 import { TrackEntryDialogComponent } from "./ui/track-entry-dialog.component";
-import { Subject, takeUntil } from "rxjs";
+import { Observable, Subject, takeUntil } from "rxjs";
 import { MatButtonModule } from "@angular/material/button";
+import { TrackEntryStore } from "./store/track-entry.store";
+import { AsyncPipe } from "@angular/common";
 
 @Component({
   selector: 'app-track-entry',
   standalone:true,
-  imports: [TrackEntryListComponent, MatDialogModule,MatButtonModule],
+  imports: [TrackEntryListComponent, MatDialogModule,MatButtonModule,AsyncPipe],
+  providers:[TrackEntryStore],
   template:`
   <h1>Track Entries</h1>
   <p>
@@ -23,7 +26,7 @@ import { MatButtonModule } from "@angular/material/button";
         +
       </button>
   </p>
-   <app-track-entry-list [dataSource]="trackEntries" (editTrackEntry)="onAddUpdate('Edit', $event)" (deleteTrackEntry)="onDelete($event)"/>
+   <app-track-entry-list [dataSource]="(trackEntries$|async)??[]" (editTrackEntry)="onAddUpdate('Edit', $event)" (deleteTrackEntry)="onDelete($event)"/>
   `,
   styles:[],
   changeDetection: ChangeDetectionStrategy.OnPush, 
@@ -33,35 +36,14 @@ export class TrackEntryComponent
 {
     dialog = inject(MatDialog);
     destroyed$ = new Subject<boolean>();
-    
-    trackEntries:TrackEntryReadModel[] = [
-        {
-            trackEntryId:1,
-            totalSleepInMinutes:480,
-            totalWorkInMinutes:300,
-            napInMinutes:null,
-            entryDate:new Date("2025-04-12"),
-            sleptAt:new Date("2025-04-11T23:00"),
-            wokeUpAt:new Date("2025-04-12T08:00"),
-            trackEntryRemark:null,
-        },
-        {
-            trackEntryId:2,
-            totalSleepInMinutes:420,
-            totalWorkInMinutes:360,
-            napInMinutes:null,
-            entryDate:new Date("2025-04-13"),
-            sleptAt:new Date("2025-04-12T22:39"),
-            wokeUpAt:new Date("2025-04-13T08:00"),
-            trackEntryRemark:"something",
-        }
-    ];
-
+    store = inject(TrackEntryStore);
+    trackEntries$:Observable<readonly TrackEntryReadModel[]> = this.store.entries$;
+  
     onAddUpdate(action: string, trackEntry: TrackEntryReadModel | null = null) {
         let trackEntryUpdate:TrackEntryUpdateModel|null=null;
         if(trackEntry!=null)
         {
-           trackEntryUpdate = {...trackEntry,remarks:trackEntry.trackEntryRemark};
+           trackEntryUpdate = {...trackEntry,remarks:trackEntry.trackEntryRemark?.remarks??""};
         }
         const dialogRef = this.dialog.open(TrackEntryDialogComponent, {
           data: { trackEntry:trackEntryUpdate, title: action + " TrackEntry" },
@@ -76,7 +58,6 @@ export class TrackEntryComponent
             } else {
                 // AddBook
             }
-            // TODO: lines below only executed, when we have added books successfully
             dialogRef.componentInstance.form.reset();
             dialogRef.componentInstance.onCanceled();
           });

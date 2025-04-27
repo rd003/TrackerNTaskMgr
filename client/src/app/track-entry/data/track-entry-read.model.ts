@@ -7,5 +7,10 @@ export interface TrackEntryReadModel
     napInMinutes: number|null,
     totalSleepInMinutes: number,
     totalWorkInMinutes:number,
-    trackEntryRemark: string|null
+    trackEntryRemark: TrackEntryRemarkModel|null
+}
+
+export interface TrackEntryRemarkModel{
+    trackEntryId:number,
+    remarks:string
 }

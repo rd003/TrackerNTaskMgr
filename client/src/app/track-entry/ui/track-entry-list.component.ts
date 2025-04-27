@@ -53,7 +53,7 @@ import { DatePipe } from "@angular/common";
 
 <ng-container matColumnDef="trackEntryRemark">
   <th mat-header-cell *matHeaderCellDef> Remarks </th>
-  <td mat-cell *matCellDef="let element"> {{element.trackEntryRemark}} </td>
+  <td mat-cell *matCellDef="let element"> {{element.trackEntryRemark?.remarks}} </td>
 </ng-container>
 
 <!-- Actions -->
@@ -81,7 +81,7 @@ import { DatePipe } from "@angular/common";
 export class TrackEntryListComponent
 {
   displayedColumns = ["entryDate","sleptAt","wokeUpAt","napInMinutes","totalSleepInMinutes","totalWorkInMinutes","trackEntryRemark","action"];
-  @Input({required:true}) dataSource!:TrackEntryReadModel[];
+  @Input({required:true}) dataSource!:readonly TrackEntryReadModel[];
   @Output() editTrackEntry = new EventEmitter<TrackEntryReadModel>(); 
   @Output() deleteTrackEntry = new EventEmitter<TrackEntryReadModel>(); 
 
@@ -89,4 +89,6 @@ export class TrackEntryListComponent
   {
     this.editTrackEntry.emit(trackEntry)
   }
+
+  
 }

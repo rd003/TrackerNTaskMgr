@@ -32,7 +32,7 @@ export class TrackEntryService
 
    updateEntry(entryData:TrackEntryUpdateModel) : Observable<void>
    {
-    return this.http.put<void>(`${this.url}/${entryData.id}`,entryData);
+    return this.http.put<void>(`${this.url}/${entryData.trackEntryId}`,entryData);
    }
 
    deleteEntry(id:number) : Observable<void>

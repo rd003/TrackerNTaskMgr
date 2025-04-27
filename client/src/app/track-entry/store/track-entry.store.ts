@@ -30,7 +30,7 @@ export class TrackEntryStore
        
    }
    
-   loadTrackEntries()
+   private loadTrackEntries()
    {
     this.setLoading();
       this._trackEntryService.getEntries()
@@ -54,7 +54,6 @@ export class TrackEntryStore
      this._state$.next({
         ...this._state$.value,
         error
-
      });
      return of(error);
    }
