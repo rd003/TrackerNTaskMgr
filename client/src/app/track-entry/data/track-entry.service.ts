@@ -38,9 +38,18 @@ export class TrackEntryService
      return this.http.post<TrackEntryReadModel>(this.url,formattedData);
    }
 
-   updateEntry(entryData:TrackEntryUpdateModel) : Observable<void>
+   updateEntry(entryData:TrackEntryUpdateModel) : Observable<TrackEntryReadModel>
    {
-    return this.http.put<void>(`${this.url}/${entryData.trackEntryId}`,entryData);
+    const formattedData= {
+      trackEntryId:entryData.trackEntryId,
+      entryDate: entryData.entryDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
+      sleptAt: entryData.sleptAt.toISOString(),
+      wokeUpAt: entryData.wokeUpAt.toISOString(),
+      napInMinutes: Number(entryData.napInMinutes), // Ensure it's a number
+      totalWorkInMinutes: Number(entryData.totalWorkInMinutes), // Ensure it's a number
+      remarks: entryData.remarks || null
+    };
+    return this.http.put<void>(`${this.url}/${entryData.trackEntryId}`,formattedData);
    }
 
    deleteEntry(id:number) : Observable<void>

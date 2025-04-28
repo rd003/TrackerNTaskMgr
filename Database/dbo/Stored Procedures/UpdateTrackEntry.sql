@@ -1,4 +1,4 @@
-﻿CREATE   procedure [dbo].[UpdateTrackEntry]
+﻿CREATE OR ALTER  PROCEDURE [dbo].[UpdateTrackEntry]
   @TrackEntryId INT,
   @EntryDate DATE,
   @SleptAt DATETIME2,

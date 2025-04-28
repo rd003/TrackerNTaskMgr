@@ -17,6 +17,8 @@ using TrackerNTaskMgr.Api.Services;
 using TrackerNTaskMgr.Api.TypeHandlers;
 using TrackerNTaskMgr.Api.Validators;
 
+var  MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -25,7 +27,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
 
-// registering servicer
+// registering services
 builder.Services.AddTransient<ITrackEntryService, TrackEntryService>();
 
 // Global exception handling
@@ -52,6 +54,20 @@ SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
 
 builder.Services.AddValidatorsFromAssemblyContaining<TrackEntryCreateDtoValidator>();
 
+// cors
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy  =>
+                      {
+                          policy.WithOrigins("http://localhost:4200")
+                                .AllowAnyHeader()
+				.AllowAnyMethod();
+                      });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -64,6 +80,8 @@ if (app.Environment.IsDevelopment())
 app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
+
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthorization();
 

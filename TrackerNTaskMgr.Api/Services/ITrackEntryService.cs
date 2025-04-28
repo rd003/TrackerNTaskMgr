@@ -4,9 +4,9 @@ namespace TrackerNTaskMgr.Api.Services;
 
 public interface ITrackEntryService
 {
-    Task<TrackEntryReadDto?> CreateTrackEntryAsync(TrackEntryCreateDto trackEntryToCreate);
-    Task DeleteTrackEntryAsync(int trackEntryId);
-    Task<IEnumerable<TrackEntryReadDto>> GetTrackEntiesAsync(GetTrackEntriesParams parameters);
-    Task<TrackEntryReadDto?> GetTrackEntryAsync(int id);
-    Task UpdateTrackEntryAsync(TrackEntryUpdateDto trackEntryToUpdate);
+    System.Threading.Tasks.Task<TrackEntryReadDto?> CreateTrackEntryAsync(TrackEntryCreateDto trackEntryToCreate);
+    System.Threading.Tasks.Task DeleteTrackEntryAsync(int trackEntryId);
+    System.Threading.Tasks.Task<IEnumerable<TrackEntryReadDto>> GetTrackEntiesAsync(GetTrackEntriesParams parameters);
+    System.Threading.Tasks.Task<TrackEntryReadDto?> GetTrackEntryAsync(int id);
+    System.Threading.Tasks.Task UpdateTrackEntryAsync(TrackEntryUpdateDto trackEntryToUpdate);
 }

@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from "@angular/common/http";
 import { TrackEntryReadModel } from "../data/track-entry-read.model";
 import { BehaviorSubject, catchError, map, Observable, of, tap } from "rxjs";
-import { TrackEntryCreateModel } from "../data/track-entry-create.model";
+import { TrackEntryCreateModel, TrackEntryUpdateModel } from "../data/track-entry-create.model";
 import { inject } from "@angular/core";
 import { TrackEntryService } from "../data/track-entry.service";
 
@@ -41,6 +41,23 @@ export class TrackEntryStore
        .subscribe();
    }
    
+   updateEntry(entry:TrackEntryUpdateModel)
+   {
+      this.setLoading();
+      this._trackEntryService.updateEntry(entry)
+      .pipe(
+         tap((_)=>{
+            this._state$.next({
+               ...this._state$.value,
+               loading:false,
+               trackEntries: this._state$.value.trackEntries.map(en=>en.trackEntryId==entry.trackEntryId?entry:en)
+            })
+         }),
+         catchError(this.handleFailure)
+      )
+      .subscribe();
+   }
+
    private loadTrackEntries()
    {
       this.setLoading();

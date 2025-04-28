@@ -69,8 +69,12 @@ public class TrackEntriesController : ControllerBase
             throw new NotFoundException("Track entry not found");
         }
 
-        //await _trackEntryServcice.UpdateTrackEntryAsync(trackEntryToUpdate);
-        return NoContent();
+        await _trackEntryServcice.UpdateTrackEntryAsync(trackEntryToUpdate);
+
+        // Bad engineering: It is bad practice. It should be done in UpdateTrackEntry stored proc. It would save an additional roundtrip
+
+        TrackEntryReadDto? trackEntryUpdate = await _trackEntryServcice.GetTrackEntryAsync(id);
+        return Ok(trackEntry);
     }
 
     [HttpGet]
