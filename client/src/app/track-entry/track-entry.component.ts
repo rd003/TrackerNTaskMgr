@@ -4,15 +4,15 @@ import { TrackEntryListComponent } from "./ui/track-entry-list.component";
 import { MatDialog, MatDialogModule } from "@angular/material/dialog";
 import { TrackEntryUpdateModel } from "./data/track-entry-create.model";
 import { TrackEntryDialogComponent } from "./ui/track-entry-dialog.component";
-import { Observable, Subject, takeUntil } from "rxjs";
+import { Subject, takeUntil } from "rxjs";
 import { MatButtonModule } from "@angular/material/button";
 import { TrackEntryStore } from "./store/track-entry.store";
-import { AsyncPipe } from "@angular/common";
+import { AsyncPipe, NgIf } from "@angular/common";
 
 @Component({
   selector: 'app-track-entry',
   standalone:true,
-  imports: [TrackEntryListComponent, MatDialogModule,MatButtonModule,AsyncPipe],
+  imports: [TrackEntryListComponent, MatDialogModule,MatButtonModule,AsyncPipe,NgIf],
   providers:[TrackEntryStore],
   template:`
   <h1>Track Entries</h1>
@@ -26,19 +26,24 @@ import { AsyncPipe } from "@angular/common";
         +
       </button>
   </p>
-   <app-track-entry-list [dataSource]="(trackEntries$|async)??[]" (editTrackEntry)="onAddUpdate('Edit', $event)" (deleteTrackEntry)="onDelete($event)"/>
+   <div *ngIf="store.loading$ | async">loading...</div>
+
+   <div *ngIf="store.error$|async as error" style="color:red">
+      Something went wrong    
+   </div>
+
+   <app-track-entry-list [dataSource]="(store.entries$|async)??[]" (editTrackEntry)= "onAddUpdate('Edit', $event)" (deleteTrackEntry)="onDelete($event)"/>
   `,
   styles:[],
   changeDetection: ChangeDetectionStrategy.OnPush, 
 })
 
-export class TrackEntryComponent
+export class TrackEntryComponent 
 {
     dialog = inject(MatDialog);
     destroyed$ = new Subject<boolean>();
     store = inject(TrackEntryStore);
-    trackEntries$:Observable<readonly TrackEntryReadModel[]> = this.store.entries$;
-  
+    
     onAddUpdate(action: string, trackEntry: TrackEntryReadModel | null = null) {
         let trackEntryUpdate:TrackEntryUpdateModel|null=null;
         if(trackEntry!=null)
@@ -57,6 +62,7 @@ export class TrackEntryComponent
               // update book
             } else {
                 // AddBook
+                this.store.addEntry(submittedData);
             }
             dialogRef.componentInstance.form.reset();
             dialogRef.componentInstance.onCanceled();
@@ -66,5 +72,13 @@ export class TrackEntryComponent
 
    onDelete(trackEntryRead:TrackEntryReadModel){
      console.log(trackEntryRead);
+   }
+
+   constructor()
+   {
+    this.store.error$.subscribe({
+      next:console.log,
+      error:console.log
+    })
    }
 }

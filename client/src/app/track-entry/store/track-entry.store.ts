@@ -26,13 +26,25 @@ export class TrackEntryStore
    loading$ = this._state$.pipe(map(a=>a.loading));
    error$ = this._state$.pipe(map(a=>a.error));
 
-   addEntryState(entry:TrackEntryCreateModel){
-       
+   addEntry(entry:TrackEntryCreateModel){
+       this.setLoading();
+       this._trackEntryService.createEntry(entry)
+       .pipe(
+         tap((createdEntry)=>{
+            this._state$.next({...this._state$.value,
+               trackEntries:[...this._state$.value.trackEntries,createdEntry],
+               loading:false
+            })
+         }),
+         catchError(error=>this.handleFailure(error))
+       )       
+       .subscribe();
    }
    
    private loadTrackEntries()
    {
-    this.setLoading();
+      this.setLoading();
+      
       this._trackEntryService.getEntries()
       .pipe(
         tap(trackEntries=>{

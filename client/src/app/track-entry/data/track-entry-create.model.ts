@@ -1,7 +1,7 @@
 export interface TrackEntryCreateModel {
-    entryDate: Date;         // ISO date: 'YYYY-MM-DD'
-    sleptAt: Date;           // ISO datetime: 'YYYY-MM-DDTHH:mm'
-    wokeUpAt: Date;          // ISO datetime: 'YYYY-MM-DDTHH:mm'
+    entryDate: Date;       
+    sleptAt: Date;          
+    wokeUpAt: Date;      
     napInMinutes: number|null;
     totalWorkInMinutes: number;
     remarks: string | null;
