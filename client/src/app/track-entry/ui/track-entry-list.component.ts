@@ -15,19 +15,19 @@ import { DatePipe } from "@angular/common";
 <!-- Date Column -->
 <ng-container matColumnDef="entryDate">
   <th mat-header-cell *matHeaderCellDef> Date </th>
-  <td mat-cell *matCellDef="let element"> {{element.entryDate}} </td>
+  <td mat-cell *matCellDef="let element"> {{element.entryDate | date:'dd-MMM-yyyy'}} </td>
 </ng-container>
 
 <!-- SleptAt Column -->
 <ng-container matColumnDef="sleptAt">
   <th mat-header-cell *matHeaderCellDef> SleptAt </th>
-  <td mat-cell *matCellDef="let element"> {{element.sleptAt | date:'medium'}} </td>
+  <td mat-cell *matCellDef="let element"> {{element.sleptAt | date:'dd-MMM-yyyy h:mm:ss a'}} </td>
 </ng-container>
 
 <!-- WokeUpAt Column -->
 <ng-container matColumnDef="wokeUpAt">
   <th mat-header-cell *matHeaderCellDef> WokeUpAt </th>
-  <td mat-cell *matCellDef="let element"> {{element.wokeUpAt | date:'medium'}} </td>
+  <td mat-cell *matCellDef="let element"> {{element.wokeUpAt | date:'dd-MMM-yyyy h:mm:ss a'}} </td>
 </ng-container>
 
 <!-- Nap In Minutes Column -->
