@@ -1,4 +1,4 @@
-﻿CREATE OR ALTER  PROCEDURE [dbo].[UpdateTrackEntry]
+﻿CREATE OR ALTER   procedure [dbo].[UpdateTrackEntry]
   @TrackEntryId INT,
   @EntryDate DATE,
   @SleptAt DATETIME2,
@@ -11,6 +11,7 @@ begin
   set nocount on;
   begin try
    -- updating track entry
+    BEGIN TRANSACTION;
     Update TrackEntries set 
        EntryDate=@EntryDate,
        SleptAt=@SleptAt,
@@ -54,3 +55,4 @@ begin
     throw;
   end catch
 end
+GO
