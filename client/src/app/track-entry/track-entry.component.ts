@@ -11,10 +11,10 @@ import { AsyncPipe, NgIf } from "@angular/common";
 
 @Component({
   selector: 'app-track-entry',
-  standalone:true,
-  imports: [TrackEntryListComponent, MatDialogModule,MatButtonModule,AsyncPipe,NgIf],
-  providers:[TrackEntryStore],
-  template:`
+  standalone: true,
+  imports: [TrackEntryListComponent, MatDialogModule, MatButtonModule, AsyncPipe, NgIf],
+  providers: [TrackEntryStore],
+  template: `
   <h1>Track Entries</h1>
   <p>
       <button
@@ -34,53 +34,52 @@ import { AsyncPipe, NgIf } from "@angular/common";
 
    <app-track-entry-list [dataSource]="(store.entries$|async)??[]" (editTrackEntry)= "onAddUpdate('Edit', $event)" (deleteTrackEntry)="onDelete($event)"/>
   `,
-  styles:[],
-  changeDetection: ChangeDetectionStrategy.OnPush, 
+  styles: [],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class TrackEntryComponent 
-{
-    dialog = inject(MatDialog);
-    destroyed$ = new Subject<boolean>();
-    store = inject(TrackEntryStore);
-    
-    onAddUpdate(action: string, trackEntry: TrackEntryReadModel | null = null) {
-        let trackEntryUpdate:TrackEntryUpdateModel|null=null;
-        if(trackEntry!=null)
-        {
-           trackEntryUpdate = {...trackEntry,remarks:trackEntry.trackEntryRemark?.remarks??""};
+export class TrackEntryComponent {
+  dialog = inject(MatDialog);
+  destroyed$ = new Subject<boolean>();
+  store = inject(TrackEntryStore);
+
+  onAddUpdate(action: string, trackEntry: TrackEntryReadModel | null = null) {
+    let trackEntryUpdate: TrackEntryUpdateModel | null = null;
+    if (trackEntry != null) {
+      trackEntryUpdate = { ...trackEntry, remarks: trackEntry.trackEntryRemark?.remarks ?? "" };
+    }
+    const dialogRef = this.dialog.open(TrackEntryDialogComponent, {
+      data: { trackEntry: trackEntryUpdate, title: action + " TrackEntry" },
+    });
+
+    dialogRef.componentInstance.sumbit
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe((submittedData) => {
+        if (!submittedData) return;
+
+        if (submittedData.trackEntryId) {
+          // update book
+          this.store.updateEntry(submittedData);
+        } else {
+          // AddBook
+          this.store.addEntry(submittedData);
         }
-        const dialogRef = this.dialog.open(TrackEntryDialogComponent, {
-          data: { trackEntry:trackEntryUpdate, title: action + " TrackEntry" },
-        });
-    
-        dialogRef.componentInstance.sumbit
-          .pipe(takeUntil(this.destroyed$))
-          .subscribe((submittedData) => {
-            if (!submittedData) return;
-
-            if (submittedData.trackEntryId) {
-              // update book
-              this.store.updateEntry(submittedData);
-            } else {
-                // AddBook
-              this.store.addEntry(submittedData);
-            }
-            dialogRef.componentInstance.form.reset();
-            dialogRef.componentInstance.onCanceled();
-          });
-      }
+        dialogRef.componentInstance.form.reset();
+        dialogRef.componentInstance.onCanceled();
+      });
+  }
 
 
-   onDelete(trackEntryRead:TrackEntryReadModel){
-     console.log(trackEntryRead);
-   }
+  onDelete(trackEntryRead: TrackEntryReadModel) {
+    if (window.confirm(`Are you sure to delete the record for: ${trackEntryRead.entryDate}?`)) {
+      this.store.deleteTrackEntry(trackEntryRead.trackEntryId);
+    }
+  }
 
-   constructor()
-   {
+  constructor() {
     this.store.error$.subscribe({
-      next:console.log,
-      error:console.log
+      next: console.log,
+      error: console.log
     })
-   }
+  }
 }
