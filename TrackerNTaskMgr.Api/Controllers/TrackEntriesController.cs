@@ -35,7 +35,7 @@ public class TrackEntriesController : ControllerBase
         return CreatedAtRoute("GetTrackEntry", new { id = createdTrackEntry.TrackEntryId }, createdTrackEntry);
     }
 
-    [HttpGet("{id}", Name = "GetTrackEntry")]
+    [HttpGet("{id:int}", Name = "GetTrackEntry")]
     public async Task<IActionResult> GetTrackEntry(int id)
     {
         TrackEntryReadDto? trackEntry = await _trackEntryServcice.GetTrackEntryAsync(id);
@@ -47,7 +47,7 @@ public class TrackEntriesController : ControllerBase
         return Ok(trackEntry);
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     public async Task<IActionResult> UpdateTrackEntry(int id, [FromBody]TrackEntryUpdateDto trackEntryToUpdate)
     {
         var validationResult = await _trackEntryUpdateValidator.ValidateAsync(trackEntryToUpdate);
@@ -84,7 +84,7 @@ public class TrackEntriesController : ControllerBase
         return Ok(trackEntries);
     }
 
-    [HttpDelete("{trackEntryId}")]
+    [HttpDelete("{trackEntryId:int}")]
     public async Task<IActionResult> DeleteTrackEntry(int trackEntryId)
     {
         TrackEntryReadDto? trackEntry = await _trackEntryServcice.GetTrackEntryAsync(trackEntryId);

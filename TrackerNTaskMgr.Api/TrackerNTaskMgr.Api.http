@@ -14,29 +14,30 @@ Content-Type: application/json
 
 ###
 
-GET {{base_address}}/api/trackentries?limit=10&sortDirection=ASC
+GET {{base_address}}/api/trackentries?limit=12&sortDirection=DESC
 
 Accept: application/json
 
 ###
 
-GET {{base_address}}/api/trackentries/14
+GET {{base_address}}/api/trackentries/1001
 Accept: application/json
 
 ###
 
-PUT {{base_address}}/api/trackentries/57
+PUT {{base_address}}/api/trackentries/1001
 Content-Type: application/json
 
 {
-  "trackEntryId": 57,
-  "entryDate": "2025-03-23",
-  "sleptAt": "2025-03-23T03:15",
-  "wokeUpAt": "2025-03-23T07:45",
-  "napInMinutes": 0,
-  "totalWorkInMinutes": 0,
-  "remarks": "adfasdf"
-}
+ "trackEntryId": 1001,
+ "entryDate": "2025-04-28",
+ "sleptAt": "2025-04-28T00:10:00.000Z",
+ "wokeUpAt": "2025-04-28T21:00:00.000Z",
+ "napInMinutes": 0,
+ "totalWorkInMinutes": 195,
+ "remarks": null
+ }
+
 ###
 DELETE {{base_address}}/api/trackentries/14
 
