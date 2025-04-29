@@ -13,18 +13,15 @@ Content-Type: application/json
 }
 
 ###
-
 GET {{base_address}}/api/trackentries?limit=12&sortDirection=DESC
 
 Accept: application/json
 
 ###
-
 GET {{base_address}}/api/trackentries/1001
 Accept: application/json
 
 ###
-
 PUT {{base_address}}/api/trackentries/1001
 Content-Type: application/json
 

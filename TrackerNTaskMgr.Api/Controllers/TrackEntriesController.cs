@@ -74,7 +74,7 @@ public class TrackEntriesController : ControllerBase
         // Bad engineering: It is bad practice. It should be done in UpdateTrackEntry stored proc. It would save an additional roundtrip
 
         TrackEntryReadDto? trackEntryUpdate = await _trackEntryServcice.GetTrackEntryAsync(id);
-        return Ok(trackEntry);
+        return Ok(trackEntryUpdate);
     }
 
     [HttpGet]
