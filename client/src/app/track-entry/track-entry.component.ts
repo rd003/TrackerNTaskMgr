@@ -26,7 +26,7 @@ import { AsyncPipe, NgIf } from "@angular/common";
         +
       </button>
   </p>
-   <div *ngIf="store.loading$ | async">loading...</div>
+   <div *ngIf="store.loading$ | async as loading"> loading... </div>
 
    <div *ngIf="store.error$|async as error" style="color:red">
       Something went wrong    
@@ -58,11 +58,13 @@ export class TrackEntryComponent
           .pipe(takeUntil(this.destroyed$))
           .subscribe((submittedData) => {
             if (!submittedData) return;
+
             if (submittedData.trackEntryId) {
               // update book
+              this.store.updateEntry(submittedData);
             } else {
                 // AddBook
-                this.store.addEntry(submittedData);
+              this.store.addEntry(submittedData);
             }
             dialogRef.componentInstance.form.reset();
             dialogRef.componentInstance.onCanceled();

@@ -31,7 +31,7 @@ Content-Type: application/json
  "sleptAt": "2025-04-28T00:10:00.000Z",
  "wokeUpAt": "2025-04-28T21:00:00.000Z",
  "napInMinutes": 0,
- "totalWorkInMinutes": 195,
+ "totalWorkInMinutes": 194,
  "remarks": null
  }
 

@@ -25,9 +25,11 @@ import {
   import { MatInputModule } from "@angular/material/input";
   import { TrackEntryUpdateModel } from "../data/track-entry-create.model";
 import { MatDatepickerModule } from "@angular/material/datepicker";
-import { provideNativeDateAdapter } from "@angular/material/core";
+import { MAT_DATE_LOCALE, provideNativeDateAdapter } from "@angular/material/core";
 import { MatTimepickerModule } from "@angular/material/timepicker";
 import { CdkTextareaAutosize, TextFieldModule } from "@angular/cdk/text-field";
+import { combineDateAndTime } from "../../shared/services/date.util";
+
   @Component({
     selector: "app-track-entry-dialog",
     standalone: true,
@@ -41,14 +43,14 @@ import { CdkTextareaAutosize, TextFieldModule } from "@angular/cdk/text-field";
       MatTimepickerModule,
       TextFieldModule
     ],
-    providers: [provideNativeDateAdapter()],
+    providers: [provideNativeDateAdapter(),{provide: MAT_DATE_LOCALE, useValue: 'en-IN'}],
     template: `
       <h1 mat-dialog-title>
         {{ data.title }}
       </h1>
       <div mat-dialog-content>
         <form [formGroup]="form" class="frm">
-          <input formControlName="id" type="hidden" />
+          <input formControlName="trackEntryId" type="hidden" />
         
           <mat-form-field>
           <mat-label>EntryDate</mat-label>
@@ -62,29 +64,29 @@ import { CdkTextareaAutosize, TextFieldModule } from "@angular/cdk/text-field";
           <!-- SleptAt -->
           <mat-form-field>
             <mat-label>SleepDate</mat-label>
-            <input matInput [matDatepicker]="sleptDatePicker" formControlName="sleptAt" placeholder="Choose date">
-            <mat-datepicker-toggle matIconSuffix [for]="sleptDatePicker"></mat-datepicker-toggle>
-            <mat-datepicker #sleptDatePicker></mat-datepicker>
+            <input matInput [matDatepicker]="sleepDatePicker" formControlName="sleepDate" placeholder="Choose date">
+            <mat-datepicker-toggle matIconSuffix [for]="sleepDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #sleepDatePicker></mat-datepicker>
           </mat-form-field>
 
           <mat-form-field>
             <mat-label>SleepTime</mat-label>
-            <input matInput [matTimepicker]="sleptTimePicker" formControlName="sleptAt" >
-            <mat-timepicker-toggle matIconSuffix [for]="sleptTimePicker"/>
-            <mat-timepicker #sleptTimePicker/>
+            <input matInput [matTimepicker]="sleetTimePicker" formControlName="sleepTime" >
+            <mat-timepicker-toggle matIconSuffix [for]="sleetTimePicker"/>
+            <mat-timepicker #sleetTimePicker/>
           </mat-form-field>
           
           <!-- Woke up at -->
           <mat-form-field>
             <mat-label>WokeUpDate</mat-label>
-            <input matInput [matDatepicker]="wokeUpDatePicker" formControlName="wokeUpAt" placeholder="Choose date">
+            <input matInput [matDatepicker]="wokeUpDatePicker" formControlName="wokeUpDate" placeholder="Choose date">
             <mat-datepicker-toggle matIconSuffix [for]="wokeUpDatePicker"></mat-datepicker-toggle>
             <mat-datepicker #wokeUpDatePicker></mat-datepicker>
           </mat-form-field>
 
           <mat-form-field>
             <mat-label>WokeUpTime</mat-label>
-            <input matInput [matTimepicker]="wokeUpTimePicker" formControlName="wokeUpAt" >
+            <input matInput [matTimepicker]="wokeUpTimePicker" formControlName="wokeUpTime" >
             <mat-timepicker-toggle matIconSuffix [for]="wokeUpTimePicker"/>
             <mat-timepicker #wokeUpTimePicker/>
           </mat-form-field>
@@ -162,10 +164,12 @@ import { CdkTextareaAutosize, TextFieldModule } from "@angular/cdk/text-field";
   }
     
     form = new FormGroup({
-      id: new FormControl<number>(0),
+      trackEntryId: new FormControl<number>(0),
       entryDate: new FormControl<Date|null>(null, Validators.required),
-      sleptAt: new FormControl<Date|null>(null, Validators.required),
-      wokeUpAt: new FormControl<Date|null>(null, Validators.required),
+      sleepDate: new FormControl<Date|null>(null, Validators.required),
+      sleepTime: new FormControl<Date|null>(null, Validators.required),
+      wokeUpDate: new FormControl<Date|null>(null, Validators.required),
+      wokeUpTime: new FormControl<Date|null>(null, Validators.required),
       napInMinutes: new FormControl<number>(0),
       totalWorkInMinutes: new FormControl<number>(0, Validators.required),
       remarks: new FormControl<string>("")
@@ -177,7 +181,27 @@ import { CdkTextareaAutosize, TextFieldModule } from "@angular/cdk/text-field";
 
     onSubmit() {
       if (this.form.valid) {
-        const entryData:TrackEntryUpdateModel = Object.assign(this.form.value);
+        const formValues = this.form.value;
+
+        // Convert string values to Date objects
+        const sleepDate = new Date(formValues.sleepDate!);
+        const sleepTime = new Date(formValues.sleepTime!);
+        const wokeUpDate = new Date(formValues.wokeUpDate!);
+        const wokeUpTime = new Date(formValues.wokeUpTime!);
+        
+        // Combine date and time fields
+        const sleptAt = combineDateAndTime(sleepDate,sleepTime);        
+        const wokeUpAt = combineDateAndTime(wokeUpDate,wokeUpTime);
+
+        const entryData: TrackEntryUpdateModel = {
+          trackEntryId: formValues.trackEntryId as number,
+          entryDate: formValues.entryDate as Date,
+          sleptAt: sleptAt as Date,
+          wokeUpAt: wokeUpAt as Date,
+          napInMinutes: formValues.napInMinutes as number,
+          totalWorkInMinutes: formValues.totalWorkInMinutes as number,
+          remarks: formValues.remarks as string
+        };
         this.sumbit.emit(entryData);
       }
     }
@@ -188,7 +212,18 @@ import { CdkTextareaAutosize, TextFieldModule } from "@angular/cdk/text-field";
     ) {
 
       if (data.trackEntry != null) {
-        this.form.patchValue(data.trackEntry);
+        this.form.patchValue({
+          trackEntryId: data.trackEntry.trackEntryId,
+          entryDate: data.trackEntry.entryDate,
+          sleepDate: data.trackEntry.sleptAt,
+          sleepTime: data.trackEntry.sleptAt,
+          wokeUpDate: data.trackEntry.wokeUpAt,
+          wokeUpTime: data.trackEntry.wokeUpAt,
+          napInMinutes: data.trackEntry.napInMinutes,
+          totalWorkInMinutes: data.trackEntry.totalWorkInMinutes,
+          remarks: data.trackEntry.remarks
+        });
       }
     }
+  
   }

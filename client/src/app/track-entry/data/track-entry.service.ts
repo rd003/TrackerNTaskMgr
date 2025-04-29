@@ -4,6 +4,7 @@ import { HttpClient } from "@angular/common/http";
 import { TrackEntryReadModel } from "./track-entry-read.model";
 import { Observable } from "rxjs";
 import { TrackEntryCreateModel, TrackEntryUpdateModel } from "./track-entry-create.model";
+import { formatDateToLocalISOString } from "../../shared/services/date.util";
 
 @Injectable({
  providedIn:"root"
@@ -27,34 +28,31 @@ export class TrackEntryService
 
    createEntry(entryData: TrackEntryCreateModel):Observable<TrackEntryReadModel>
    {
-     const formattedData= {
-      entryDate: entryData.entryDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
-      sleptAt: entryData.sleptAt.toISOString(),
-      wokeUpAt: entryData.wokeUpAt.toISOString(),
-      napInMinutes: Number(entryData.napInMinutes), // Ensure it's a number
-      totalWorkInMinutes: Number(entryData.totalWorkInMinutes), // Ensure it's a number
-      remarks: entryData.remarks || null
-    };
-     return this.http.post<TrackEntryReadModel>(this.url,formattedData);
+     return this.http.post<TrackEntryReadModel>(this.url,this.formatSubmittedData(entryData));
    }
 
    updateEntry(entryData:TrackEntryUpdateModel) : Observable<TrackEntryReadModel>
    {
-    const formattedData= {
-      trackEntryId:entryData.trackEntryId,
-      entryDate: entryData.entryDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
-      sleptAt: entryData.sleptAt.toISOString(),
-      wokeUpAt: entryData.wokeUpAt.toISOString(),
-      napInMinutes: Number(entryData.napInMinutes), // Ensure it's a number
-      totalWorkInMinutes: Number(entryData.totalWorkInMinutes), // Ensure it's a number
-      remarks: entryData.remarks || null
-    };
-    return this.http.put<void>(`${this.url}/${entryData.trackEntryId}`,formattedData);
+       const formattedData=this.formatSubmittedData(entryData);
+       return this.http.put<TrackEntryReadModel>(`${this.url}/${entryData.trackEntryId}`,formattedData);
    }
 
    deleteEntry(id:number) : Observable<void>
    {
     return this.http.delete<void>(`${this.url}/${id}`);
+   }
+
+   private formatSubmittedData(entryData:any)
+   {
+    return {
+      trackEntryId: entryData.trackEntryId,
+      entryDate: formatDateToLocalISOString(new Date(entryData.entryDate)).split('T')[0],
+      sleptAt: formatDateToLocalISOString(new Date(entryData.sleptAt)),
+      wokeUpAt: formatDateToLocalISOString(new Date(entryData.wokeUpAt)),
+      napInMinutes: Number(entryData.napInMinutes), // Ensure it's a number
+      totalWorkInMinutes: Number(entryData.totalWorkInMinutes), // Ensure it's a number
+      remarks: entryData.remarks || null
+    };
    }
    
 }

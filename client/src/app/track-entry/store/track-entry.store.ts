@@ -46,11 +46,12 @@ export class TrackEntryStore
       this.setLoading();
       this._trackEntryService.updateEntry(entry)
       .pipe(
-         tap((_)=>{
+         tap((updatedEntry)=>{
+            console.log(updatedEntry)
             this._state$.next({
                ...this._state$.value,
                loading:false,
-               trackEntries: this._state$.value.trackEntries.map(en=>en.trackEntryId==entry.trackEntryId?entry:en)
+               trackEntries: this._state$.value.trackEntries.map(en=>en.trackEntryId==entry.trackEntryId?updatedEntry:en)
             })
          }),
          catchError(this.handleFailure)
@@ -82,6 +83,7 @@ export class TrackEntryStore
    {
      this._state$.next({
         ...this._state$.value,
+        loading:false,
         error
      });
      return of(error);
