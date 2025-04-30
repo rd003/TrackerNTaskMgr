@@ -1,6 +1,6 @@
 import { inject, Injectable } from "@angular/core";
 import { environment } from "../../../environments/environment.development";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { TrackEntryReadModel } from "./track-entry-read.model";
 import { Observable } from "rxjs";
 import { TrackEntryCreateModel, TrackEntryUpdateModel } from "./track-entry-create.model";
@@ -15,8 +15,21 @@ export class TrackEntryService {
   private readonly url = environment.baseUrl + "/trackentries";
   private readonly http = inject(HttpClient);
 
-  getEntries(limit: number = 10, sortDirection: string = 'asc'): Observable<TrackEntryReadModel[]> {
-    return this.http.get<TrackEntryReadModel[]>(this.url);
+  getEntries(startDate: string | null = null, endDate: string | null = null, lastEntryDate: string | null = null, limit: number = 10, sortDirection: string = 'desc')
+    : Observable<TrackEntryReadModel[]> {
+    let params = new HttpParams();
+    params = params.set("limit", limit);
+    params = params.set("sortDirection", sortDirection);
+    if (startDate) {
+      params = params.set("startDate", startDate);
+    }
+    if (endDate) {
+      params = params.set("endDate", endDate);
+    }
+    if (lastEntryDate) {
+      params = params.set("lastEntryDate", lastEntryDate);
+    }
+    return this.http.get<TrackEntryReadModel[]>(this.url, { params: params });
   }
 
   getEntry(id: number): Observable<TrackEntryReadModel> {

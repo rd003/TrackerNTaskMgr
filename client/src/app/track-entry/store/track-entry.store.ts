@@ -1,12 +1,15 @@
 import { HttpErrorResponse } from "@angular/common/http";
 import { TrackEntryReadModel } from "../data/track-entry-read.model";
-import { BehaviorSubject, catchError, map, Observable, of, tap } from "rxjs";
+import { BehaviorSubject, catchError, combineLatest, distinctUntilChanged, map, Observable, of, tap } from "rxjs";
 import { TrackEntryCreateModel, TrackEntryUpdateModel } from "../data/track-entry-create.model";
 import { inject } from "@angular/core";
 import { TrackEntryService } from "../data/track-entry.service";
+import { SortDirection } from "@angular/material/sort";
 
 export interface TrackEntryState {
    trackEntries: readonly TrackEntryReadModel[],
+   sortDirection: SortDirection,
+   lastEntryDate: string | null,
    loading: boolean,
    error: HttpErrorResponse | null
 }
@@ -14,6 +17,8 @@ export interface TrackEntryState {
 export class TrackEntryStore {
    private readonly _initialState: TrackEntryState = {
       trackEntries: [],
+      sortDirection: "desc",
+      lastEntryDate: null,
       loading: false,
       error: null
    }
@@ -24,6 +29,10 @@ export class TrackEntryStore {
    entries$ = this._state$.pipe(map(a => a.trackEntries));
    loading$ = this._state$.pipe(map(a => a.loading));
    error$ = this._state$.pipe(map(a => a.error));
+
+   setSortDirection(sortDir: SortDirection) {
+      this._state$.next({ ...this._state$.value, sortDirection: sortDir })
+   }
 
    addEntry(entry: TrackEntryCreateModel) {
       this.setLoading();
@@ -73,10 +82,8 @@ export class TrackEntryStore {
          .subscribe()
    }
 
-   private loadTrackEntries() {
-      this.setLoading();
-
-      this._trackEntryService.getEntries()
+   private loadTrackEntries(startDate: string | null = null, endDate: string | null = null, lastEntryDate: string | null = null, limit: number, sortDirection: string) {
+      this._trackEntryService.getEntries(startDate, endDate, lastEntryDate, limit, sortDirection)
          .pipe(
             tap(trackEntries => {
                this._state$.next({
@@ -109,6 +116,13 @@ export class TrackEntryStore {
    }
 
    constructor() {
-      this.loadTrackEntries();
+      combineLatest([
+         this._state$.pipe(map(s => s.sortDirection), distinctUntilChanged()),
+         this._state$.pipe(map(s => s.lastEntryDate), distinctUntilChanged())
+      ]).pipe(
+         tap(([sortDirection, lastEntryDate]) => {
+            this.loadTrackEntries(null, null, lastEntryDate, 10, sortDirection);
+         })
+      ).subscribe();
    }
 }

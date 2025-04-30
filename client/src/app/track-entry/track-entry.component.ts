@@ -8,6 +8,7 @@ import { Subject, takeUntil } from "rxjs";
 import { MatButtonModule } from "@angular/material/button";
 import { TrackEntryStore } from "./store/track-entry.store";
 import { AsyncPipe, NgIf } from "@angular/common";
+import { SortDirection } from "@angular/material/sort";
 
 @Component({
   selector: 'app-track-entry',
@@ -32,7 +33,7 @@ import { AsyncPipe, NgIf } from "@angular/common";
       Something went wrong    
    </div>
 
-   <app-track-entry-list [dataSource]="(store.entries$|async)??[]" (editTrackEntry)= "onAddUpdate('Edit', $event)" (deleteTrackEntry)="onDelete($event)"/>
+   <app-track-entry-list [dataSource]="(store.entries$|async)??[]" (editTrackEntry)= "onAddUpdate('Edit', $event)" (deleteTrackEntry)="onDelete($event)" (sort)="onSort($event)"/>
   `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -74,6 +75,10 @@ export class TrackEntryComponent {
     if (window.confirm(`Are you sure to delete the record for: ${trackEntryRead.entryDate}?`)) {
       this.store.deleteTrackEntry(trackEntryRead.trackEntryId);
     }
+  }
+
+  onSort(sortDirection: SortDirection) {
+    this.store.setSortDirection(sortDirection);
   }
 
   constructor() {
