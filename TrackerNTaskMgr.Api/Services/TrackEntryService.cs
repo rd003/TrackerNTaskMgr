@@ -1,6 +1,9 @@
 using System.Data;
+
 using Dapper;
+
 using Microsoft.Data.SqlClient;
+
 using TrackerNTaskMgr.Api.DTOs;
 
 namespace TrackerNTaskMgr.Api.Services;
@@ -19,7 +22,7 @@ public class TrackEntryService : ITrackEntryService
     public async Task<TrackEntryReadDto?> CreateTrackEntryAsync(TrackEntryCreateDto trackEntryToCreate)
     {
         using IDbConnection connection = new SqlConnection(_connectionString);
-        
+
         var parameters = new DynamicParameters(trackEntryToCreate);
         // Input params
         parameters.Add("@EntryDate", trackEntryToCreate.EntryDate);
@@ -28,18 +31,18 @@ public class TrackEntryService : ITrackEntryService
         parameters.Add("@NapInMinutes", trackEntryToCreate.NapInMinutes);
         parameters.Add("@TotalWorkInMinutes", trackEntryToCreate.TotalWorkInMinutes);
         parameters.Add("@Remarks", trackEntryToCreate.Remarks);
-        
+
         // output params
         parameters.Add("@TrackEntryId", dbType: DbType.Int32, direction: ParameterDirection.Output);
-        
-        await connection.ExecuteAsync("CreateTrackEntry", parameters,commandType:CommandType.StoredProcedure);
+
+        await connection.ExecuteAsync("CreateTrackEntry", parameters, commandType: CommandType.StoredProcedure);
 
         int trackEntryId = parameters.Get<int>("@TrackEntryId");
-        
+
         // I could get CreatedTrackEntry from the stored procedure. It does the job in one single database call.
         // But I have deliberately chosen this approach. I am good with multiple db roundtrips for the sake of consitency and code duplication.
         // It would be hard to maintain if parameter increases or decreases in future, I have to change it in two places. That is why I am doing this
-        
+
         return await GetTrackEntryAsync(trackEntryId);
     }
 
@@ -52,19 +55,20 @@ public class TrackEntryService : ITrackEntryService
              map: (entry, remark) =>
              {
                  entry.TrackEntryRemark = remark;
-                 return entry; 
+                 return entry;
              },
-             param: new { TrackEntryId=id },
+             param: new { TrackEntryId = id },
              splitOn: "TrackEntryId",
-             commandType:CommandType.StoredProcedure
+             commandType: CommandType.StoredProcedure
              )).FirstOrDefault();
         return trackEntry;
     }
 
-   public async Task<IEnumerable<TrackEntryReadDto>> GetTrackEntiesAsync(GetTrackEntriesParams parameters)
+    public async Task<IEnumerable<TrackEntryReadDto>> GetTrackEntiesAsync(GetTrackEntriesParams parameters)
     {
+        Console.WriteLine(parameters);
         using IDbConnection connection = new SqlConnection(_connectionString);
-        
+
         IEnumerable<TrackEntryReadDto> trackEntries = await connection.QueryAsync<TrackEntryReadDto, TrackEntryRemarkReadDto, TrackEntryReadDto>(
              sql: "GetTrackEntries",
              param: parameters,
@@ -88,8 +92,8 @@ public class TrackEntryService : ITrackEntryService
     public async System.Threading.Tasks.Task DeleteTrackEntryAsync(int trackEntryId)
     {
         using IDbConnection connection = new SqlConnection(_connectionString);
-        await connection.ExecuteAsync("DeleteTrackEntry", new { TrackEntryId=trackEntryId },commandType:CommandType.StoredProcedure);
+        await connection.ExecuteAsync("DeleteTrackEntry", new { TrackEntryId = trackEntryId }, commandType: CommandType.StoredProcedure);
     }
 
-  
+
 }

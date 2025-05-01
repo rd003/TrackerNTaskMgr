@@ -1,10 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject, OnDestroy } from "@angular/core";
 import { TrackEntryReadModel } from "./data/track-entry-read.model";
 import { TrackEntryListComponent } from "./ui/track-entry-list.component";
 import { MatDialog, MatDialogModule } from "@angular/material/dialog";
 import { TrackEntryUpdateModel } from "./data/track-entry-create.model";
 import { TrackEntryDialogComponent } from "./ui/track-entry-dialog.component";
-import { Subject, takeUntil } from "rxjs";
+import { catchError, map, of, Subject, takeUntil, tap } from "rxjs";
 import { MatButtonModule } from "@angular/material/button";
 import { TrackEntryStore } from "./store/track-entry.store";
 import { AsyncPipe, NgIf } from "@angular/common";
@@ -34,12 +34,17 @@ import { SortDirection } from "@angular/material/sort";
    </div>
 
    <app-track-entry-list [dataSource]="(store.entries$|async)??[]" (editTrackEntry)= "onAddUpdate('Edit', $event)" (deleteTrackEntry)="onDelete($event)" (sort)="onSort($event)"/>
+
+   <div class="paginator" style="display:flex;gap:5px;margin:15px 0px">
+   <button (click)="onPaginate(false)">Previous</button>
+   <button (click)="onPaginate()">Next</button>
+   </div>
   `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class TrackEntryComponent {
+export class TrackEntryComponent implements OnDestroy {
   dialog = inject(MatDialog);
   destroyed$ = new Subject<boolean>();
   store = inject(TrackEntryStore);
@@ -77,14 +82,39 @@ export class TrackEntryComponent {
     }
   }
 
+  onPaginate(next: boolean = true) {
+    // logic: 1. sort entries by lastEntryDate asc(for next) or desc(for prev) order
+    // 2. Take first element
+    // 3. pass this entry to track entry store to update the lastEntryDate
+    this.store.entries$.pipe(
+      map(entries => {
+        const sortableEntries = [...entries];
+        return sortableEntries.sort((a, b) => {
+          const dateA = new Date(a.entryDate);
+          const dateB = new Date(b.entryDate);
+          return next ? dateA.getTime() - dateB.getTime()
+            : dateB.getTime() - dateA.getTime();
+        });
+      }),
+      tap((entries) => {
+        if (entries.length <= 0) return;
+        console.log(entries[0].entryDate);
+      }),
+      catchError((error) => {
+        console.log(error);
+        return of(error);
+      }),
+      takeUntil(this.destroyed$)
+    ).subscribe();
+  }
+
   onSort(sortDirection: SortDirection) {
     this.store.setSortDirection(sortDirection);
   }
 
-  constructor() {
-    this.store.error$.subscribe({
-      next: console.log,
-      error: console.log
-    })
+  ngOnDestroy(): void {
+    this.destroyed$.next(true);
+    this.destroyed$.unsubscribe();
   }
+
 }

@@ -1,8 +1,9 @@
-﻿CREATE    procedure [dbo].[GetTrackEntries]
+﻿CREATE or alter procedure [dbo].[GetTrackEntries]
   @StartDate date null=null,
   @EndDate date null=null,
   @Limit int = 10,
   @LastEntryDate date null=null,
+  @PageDirection NVARCHAR(4)="NEXT",
   @SortDirection varchar(4) = 'DESC'
 as
 begin
@@ -10,6 +11,9 @@ begin
 
   if (UPPER(@SortDirection) NOT IN ('ASC','DESC'))
      throw 50000,'SortDirection can only be ''asc'' or ''desc''',1;
+   
+  if(UPPER(@PageDirection) NOT IN ('NEXT','PREV'))
+     throw 50001,'PageDirection can only be ''next'' or ''prev''',1;
 
   declare @sql nvarchar(max);
 
@@ -46,11 +50,23 @@ begin
 
   else
   begin
+    if(UPPER(@PageDirection)='NEXT')
+    begin 
       if (upper(@SortDirection))='ASC'
          set @sql += ' and te.EntryDate>@LastEntryDate order by te.EntryDate';
   
       else if (upper(@SortDirection))='DESC'
          set @sql += ' and te.EntryDate<@LastEntryDate order by te.EntryDate desc';
+    end
+   -- else page direction is previous 
+    else
+      begin
+        if (upper(@SortDirection))='ASC'
+         set @sql += ' and te.EntryDate<@LastEntryDate order by te.EntryDate desc';
+  
+      else if (upper(@SortDirection))='DESC'
+         set @sql += ' and te.EntryDate>@LastEntryDate order by te.EntryDate';
+      end     
   end
   execute sp_executesql @sql, N'@StartDate date,@EndDate date,@Limit int,@LastEntryDate date,@SortDirection varchar(4)', @StartDate,@EndDate,@Limit,@LastEntryDate,@SortDirection
 end

@@ -1,5 +1,7 @@
 using FluentValidation;
+
 using Microsoft.AspNetCore.Mvc;
+
 using TrackerNTaskMgr.Api.DTOs;
 using TrackerNTaskMgr.Api.Exceptions;
 using TrackerNTaskMgr.Api.Extensions;
@@ -26,7 +28,7 @@ public class TrackEntriesController : ControllerBase
     public async Task<IActionResult> CreateTrackEntry(TrackEntryCreateDto trackEntryToCreate)
     {
         var validationResult = await _trackEntryCreateValidator.ValidateAsync(trackEntryToCreate);
-        if(!validationResult.IsValid)
+        if (!validationResult.IsValid)
         {
             validationResult.AddToModelState(ModelState);
             return UnprocessableEntity(ModelState);
@@ -39,7 +41,7 @@ public class TrackEntriesController : ControllerBase
     public async Task<IActionResult> GetTrackEntry(int id)
     {
         TrackEntryReadDto? trackEntry = await _trackEntryServcice.GetTrackEntryAsync(id);
-        
+
         if (trackEntry == null)
         {
             throw new NotFoundException("Track entry not found");
@@ -48,13 +50,13 @@ public class TrackEntriesController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> UpdateTrackEntry(int id, [FromBody]TrackEntryUpdateDto trackEntryToUpdate)
+    public async Task<IActionResult> UpdateTrackEntry(int id, [FromBody] TrackEntryUpdateDto trackEntryToUpdate)
     {
         var validationResult = await _trackEntryUpdateValidator.ValidateAsync(trackEntryToUpdate);
-        if(!validationResult.IsValid)
+        if (!validationResult.IsValid)
         {
-           validationResult.AddToModelState(ModelState);
-           return UnprocessableEntity(ModelState);
+            validationResult.AddToModelState(ModelState);
+            return UnprocessableEntity(ModelState);
         }
 
         if (id != trackEntryToUpdate.TrackEntryId)
@@ -78,8 +80,9 @@ public class TrackEntriesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetTrackEntries([FromQuery]GetTrackEntriesParams parameters)
+    public async Task<IActionResult> GetTrackEntries([FromQuery] GetTrackEntriesParams parameters)
     {
+        ValidateGetTrackEntryParams(parameters);
         var trackEntries = await _trackEntryServcice.GetTrackEntiesAsync(parameters);
         return Ok(trackEntries);
     }
@@ -96,6 +99,19 @@ public class TrackEntriesController : ControllerBase
 
         await _trackEntryServcice.DeleteTrackEntryAsync(trackEntryId);
         return NoContent();
+    }
+
+    private void ValidateGetTrackEntryParams(GetTrackEntriesParams parameters)
+    {
+        if (!new string[] { "ASC", "DESC" }.Contains(parameters.SortDirection.ToUpper()))
+        {
+            throw new BadRequestException("SortDirection only accepts 'ASC' or 'DESC'");
+        }
+
+        if (!new string[] { "NEXT", "PREV" }.Contains(parameters.PageDirection.ToUpper()))
+        {
+            throw new BadRequestException("PageDirection only accepts 'NEXT' or 'PREV'");
+        }
     }
 
 }
