@@ -1,4 +1,4 @@
-﻿CREATE procedure [dbo].[GetTrackEntryById]
+﻿CREATE PROCEDURE [dbo].[GetTrackEntryById]
   @TrackEntryId int
 As
 Begin

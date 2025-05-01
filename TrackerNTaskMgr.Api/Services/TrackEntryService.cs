@@ -66,7 +66,6 @@ public class TrackEntryService : ITrackEntryService
 
     public async Task<IEnumerable<TrackEntryReadDto>> GetTrackEntiesAsync(GetTrackEntriesParams parameters)
     {
-        Console.WriteLine(parameters);
         using IDbConnection connection = new SqlConnection(_connectionString);
 
         IEnumerable<TrackEntryReadDto> trackEntries = await connection.QueryAsync<TrackEntryReadDto, TrackEntryRemarkReadDto, TrackEntryReadDto>(

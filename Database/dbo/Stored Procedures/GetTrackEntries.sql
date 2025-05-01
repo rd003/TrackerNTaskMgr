@@ -53,10 +53,10 @@ begin
     if(UPPER(@PageDirection)='NEXT')
     begin 
       if (upper(@SortDirection))='ASC'
-         set @sql += ' and te.EntryDate > @LastEntryDate order by te.EntryDate desc';
+         set @sql += ' and te.EntryDate > @LastEntryDate order by te.EntryDate';
   
       else if (upper(@SortDirection))='DESC'
-         set @sql += ' and te.EntryDate < @LastEntryDate order by te.EntryDate';
+         set @sql += ' and te.EntryDate < @LastEntryDate order by te.EntryDate desc';
     end
    -- else page direction is previous 
     else
