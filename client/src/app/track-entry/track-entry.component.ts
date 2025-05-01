@@ -4,11 +4,13 @@ import { TrackEntryListComponent } from "./ui/track-entry-list.component";
 import { MatDialog, MatDialogModule } from "@angular/material/dialog";
 import { TrackEntryUpdateModel } from "./data/track-entry-create.model";
 import { TrackEntryDialogComponent } from "./ui/track-entry-dialog.component";
-import { catchError, map, of, Subject, takeUntil, tap } from "rxjs";
+import { catchError, map, of, Subject, take, takeUntil, tap } from "rxjs";
 import { MatButtonModule } from "@angular/material/button";
 import { TrackEntryStore } from "./store/track-entry.store";
 import { AsyncPipe, NgIf } from "@angular/common";
 import { SortDirection } from "@angular/material/sort";
+import { formatDateToLocalISOString } from "../shared/services/date.util";
+import { PageDirection } from "../shared/page-direction";
 
 @Component({
   selector: 'app-track-entry',
@@ -36,8 +38,8 @@ import { SortDirection } from "@angular/material/sort";
    <app-track-entry-list [dataSource]="(store.entries$|async)??[]" (editTrackEntry)= "onAddUpdate('Edit', $event)" (deleteTrackEntry)="onDelete($event)" (sort)="onSort($event)"/>
 
    <div class="paginator" style="display:flex;gap:5px;margin:15px 0px">
-   <button (click)="onPaginate(false)">Previous</button>
-   <button (click)="onPaginate()">Next</button>
+   <button (click)="onPaginate('PREV')">Previous</button>
+   <button (click)="onPaginate('NEXT')">Next</button>
    </div>
   `,
   styles: [],
@@ -82,23 +84,28 @@ export class TrackEntryComponent implements OnDestroy {
     }
   }
 
-  onPaginate(next: boolean = true) {
+  onPaginate(pageDirection: PageDirection) {
     // logic: 1. sort entries by lastEntryDate asc(for next) or desc(for prev) order
     // 2. Take first element
     // 3. pass this entry to track entry store to update the lastEntryDate
     this.store.entries$.pipe(
+      take(1),
       map(entries => {
         const sortableEntries = [...entries];
         return sortableEntries.sort((a, b) => {
           const dateA = new Date(a.entryDate);
           const dateB = new Date(b.entryDate);
-          return next ? dateA.getTime() - dateB.getTime()
+          return pageDirection == "NEXT" ? dateA.getTime() - dateB.getTime()
             : dateB.getTime() - dateA.getTime();
         });
       }),
       tap((entries) => {
         if (entries.length <= 0) return;
-        console.log(entries[0].entryDate);
+        const lastEntryDate = new Date(entries[0].entryDate);
+        const formattedLastEntryDate = formatDateToLocalISOString(lastEntryDate).split('T')[0];
+        // console.log(formattedLastEntryDate);
+        this.store.setLastEntryDate(formattedLastEntryDate);
+        this.store.setPageDirection(pageDirection);
       }),
       catchError((error) => {
         console.log(error);

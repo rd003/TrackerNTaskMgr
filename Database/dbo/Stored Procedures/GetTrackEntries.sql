@@ -1,4 +1,4 @@
-﻿CREATE or alter procedure [dbo].[GetTrackEntries]
+CREATE OR ALTER PROCEDURE [dbo].[GetTrackEntries]
   @StartDate date null=null,
   @EndDate date null=null,
   @Limit int = 10,
@@ -53,20 +53,20 @@ begin
     if(UPPER(@PageDirection)='NEXT')
     begin 
       if (upper(@SortDirection))='ASC'
-         set @sql += ' and te.EntryDate>@LastEntryDate order by te.EntryDate';
+         set @sql += ' and te.EntryDate > @LastEntryDate order by te.EntryDate desc';
   
       else if (upper(@SortDirection))='DESC'
-         set @sql += ' and te.EntryDate<@LastEntryDate order by te.EntryDate desc';
+         set @sql += ' and te.EntryDate < @LastEntryDate order by te.EntryDate';
     end
    -- else page direction is previous 
     else
       begin
         if (upper(@SortDirection))='ASC'
-         set @sql += ' and te.EntryDate<@LastEntryDate order by te.EntryDate desc';
+         set @sql += ' and te.EntryDate < @LastEntryDate order by te.EntryDate desc';
   
       else if (upper(@SortDirection))='DESC'
-         set @sql += ' and te.EntryDate>@LastEntryDate order by te.EntryDate';
+         set @sql += ' and te.EntryDate > @LastEntryDate order by te.EntryDate';
       end     
   end
   execute sp_executesql @sql, N'@StartDate date,@EndDate date,@Limit int,@LastEntryDate date,@SortDirection varchar(4)', @StartDate,@EndDate,@Limit,@LastEntryDate,@SortDirection
-end
+end;

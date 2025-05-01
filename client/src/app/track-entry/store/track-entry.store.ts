@@ -5,11 +5,14 @@ import { TrackEntryCreateModel, TrackEntryUpdateModel } from "../data/track-entr
 import { inject } from "@angular/core";
 import { TrackEntryService } from "../data/track-entry.service";
 import { SortDirection } from "@angular/material/sort";
+import { PageDirection } from "../../shared/page-direction";
 
 export interface TrackEntryState {
    trackEntries: readonly TrackEntryReadModel[],
    sortDirection: SortDirection,
    lastEntryDate: string | null,
+   pageDirection: PageDirection,
+   limit: number,
    loading: boolean,
    error: HttpErrorResponse | null
 }
@@ -19,6 +22,8 @@ export class TrackEntryStore {
       trackEntries: [],
       sortDirection: "desc",
       lastEntryDate: null,
+      pageDirection: "NEXT",
+      limit: 7,
       loading: false,
       error: null
    }
@@ -30,9 +35,6 @@ export class TrackEntryStore {
    loading$ = this._state$.pipe(map(a => a.loading));
    error$ = this._state$.pipe(map(a => a.error));
 
-   setSortDirection(sortDir: SortDirection) {
-      this._state$.next({ ...this._state$.value, sortDirection: sortDir })
-   }
 
    addEntry(entry: TrackEntryCreateModel) {
       this.setLoading();
@@ -82,8 +84,8 @@ export class TrackEntryStore {
          .subscribe()
    }
 
-   private loadTrackEntries(startDate: string | null = null, endDate: string | null = null, lastEntryDate: string | null = null, limit: number, sortDirection: string) {
-      this._trackEntryService.getEntries(startDate, endDate, lastEntryDate, limit, sortDirection)
+   private loadTrackEntries(startDate: string | null, endDate: string | null, lastEntryDate: string | null, pageDirection: PageDirection, limit: number, sortDirection: SortDirection) {
+      this._trackEntryService.getEntries(startDate, endDate, lastEntryDate, pageDirection, limit, sortDirection)
          .pipe(
             tap(trackEntries => {
                this._state$.next({
@@ -97,6 +99,18 @@ export class TrackEntryStore {
             })
          )
          .subscribe();
+   }
+
+   setSortDirection(sortDir: SortDirection) {
+      this._state$.next({ ...this._state$.value, sortDirection: sortDir })
+   }
+
+   setLastEntryDate(lastEntryDate: string) {
+      this._state$.next({ ...this._state$.value, lastEntryDate });
+   }
+
+   setPageDirection(pageDirection: PageDirection) {
+      this._state$.next({ ...this._state$.value, pageDirection });
    }
 
    private handleFailure(error: HttpErrorResponse): Observable<HttpErrorResponse> {
@@ -118,10 +132,12 @@ export class TrackEntryStore {
    constructor() {
       combineLatest([
          this._state$.pipe(map(s => s.sortDirection), distinctUntilChanged()),
-         this._state$.pipe(map(s => s.lastEntryDate), distinctUntilChanged())
+         this._state$.pipe(map(s => s.lastEntryDate), distinctUntilChanged()),
+         this._state$.pipe(map(s => s.pageDirection), distinctUntilChanged()),
+         this._state$.pipe(map(s => s.limit), distinctUntilChanged()),
       ]).pipe(
-         tap(([sortDirection, lastEntryDate]) => {
-            this.loadTrackEntries(null, null, lastEntryDate, 10, sortDirection);
+         tap(([sortDirection, lastEntryDate, pageDirection, limit]) => {
+            this.loadTrackEntries(null, null, lastEntryDate, pageDirection, limit, sortDirection);
          })
       ).subscribe();
    }

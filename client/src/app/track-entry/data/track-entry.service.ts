@@ -5,6 +5,8 @@ import { TrackEntryReadModel } from "./track-entry-read.model";
 import { Observable } from "rxjs";
 import { TrackEntryCreateModel, TrackEntryUpdateModel } from "./track-entry-create.model";
 import { formatDateToLocalISOString } from "../../shared/services/date.util";
+import { PageDirection } from "../../shared/page-direction";
+import { SortDirection } from "@angular/material/sort";
 
 @Injectable({
   providedIn: "root"
@@ -15,7 +17,7 @@ export class TrackEntryService {
   private readonly url = environment.baseUrl + "/trackentries";
   private readonly http = inject(HttpClient);
 
-  getEntries(startDate: string | null = null, endDate: string | null = null, lastEntryDate: string | null = null, limit: number = 10, sortDirection: string = 'desc')
+  getEntries(startDate: string | null, endDate: string | null, lastEntryDate: string | null, pageDirection: PageDirection = "NEXT", limit: number = 7, sortDirection: SortDirection = 'desc')
     : Observable<TrackEntryReadModel[]> {
     let params = new HttpParams();
     params = params.set("limit", limit);
@@ -28,6 +30,9 @@ export class TrackEntryService {
     }
     if (lastEntryDate) {
       params = params.set("lastEntryDate", lastEntryDate);
+    }
+    if (pageDirection) {
+      params = params.set("pageDirection", pageDirection);
     }
     return this.http.get<TrackEntryReadModel[]>(this.url, { params: params });
   }

@@ -84,6 +84,13 @@ public class TrackEntriesController : ControllerBase
     {
         ValidateGetTrackEntryParams(parameters);
         var trackEntries = await _trackEntryServcice.GetTrackEntiesAsync(parameters);
+        // Note: Bad practice
+        // Problem: When handling 'prev' + 'desc', the data is coming in asc order, I am reordering them here
+        if (parameters.LastEntryDate != null && parameters.SortDirection == "DESC" && parameters.PageDirection == "PREV")
+        {
+            // arrange list in desc order by date
+            trackEntries = trackEntries.OrderByDescending(a => a.EntryDate).ToList();
+        }
         return Ok(trackEntries);
     }
 
