@@ -4,7 +4,7 @@ import { TrackEntryListComponent } from "./ui/track-entry-list.component";
 import { MatDialog, MatDialogModule } from "@angular/material/dialog";
 import { TrackEntryUpdateModel } from "./data/track-entry-create.model";
 import { TrackEntryDialogComponent } from "./ui/track-entry-dialog.component";
-import { catchError, map, of, Subject, take, takeUntil, tap } from "rxjs";
+import { catchError, combineLatest, distinctUntilChanged, map, of, Subject, take, takeUntil, tap } from "rxjs";
 import { MatButtonModule } from "@angular/material/button";
 import { TrackEntryStore } from "./store/track-entry.store";
 import { AsyncPipe, NgIf } from "@angular/common";
@@ -85,34 +85,48 @@ export class TrackEntryComponent implements OnDestroy {
   }
 
   onPaginate(pageDirection: PageDirection) {
-    // logic: 1. sort entries by lastEntryDate asc(for next) or desc(for prev) order
+    // logic: 
+    // 1.1 if items are in desc order (Which is default). next: sort by lastEntryDate asc, prev: desc order
+    // 1.2 if items are in asc order. next: sort lastEntry by desc, prev: sort by asc
     // 2. Take first element
     // 3. pass this entry to track entry store to update the lastEntryDate
-    this.store.entries$.pipe(
+    combineLatest([
+      this.store.entries$.pipe(distinctUntilChanged()),
+      this.store.sortDirection$.pipe(distinctUntilChanged())
+    ]).pipe(
       take(1),
-      map(entries => {
+      map(([entries, sortDirection]) => {
         const sortableEntries = [...entries];
         return sortableEntries.sort((a, b) => {
           const dateA = new Date(a.entryDate);
           const dateB = new Date(b.entryDate);
-          return pageDirection == "NEXT" ? dateA.getTime() - dateB.getTime()
-            : dateB.getTime() - dateA.getTime();
+          if (sortDirection == 'asc') {
+            return pageDirection == "NEXT" ? dateB.getTime() - dateA.getTime()
+              : dateA.getTime() - dateB.getTime();
+          }
+          else {
+            return pageDirection == "NEXT" ? dateA.getTime() - dateB.getTime()
+              : dateB.getTime() - dateA.getTime();
+          }
         });
       }),
       tap((entries) => {
         if (entries.length <= 0) return;
         const lastEntryDate = new Date(entries[0].entryDate);
         const formattedLastEntryDate = formatDateToLocalISOString(lastEntryDate).split('T')[0];
-        // console.log(formattedLastEntryDate);
-        this.store.setLastEntryDate(formattedLastEntryDate);
-        this.store.setPageDirection(pageDirection);
+        console.log(formattedLastEntryDate);
+        this.store.setPaginationParams(formattedLastEntryDate, pageDirection);
+        // this.store.setLastEntryDate(formattedLastEntryDate);
+        // this.store.setPageDirection(pageDirection);
       }),
-      catchError((error) => {
+      catchError(error => {
         console.log(error);
         return of(error);
       }),
       takeUntil(this.destroyed$)
-    ).subscribe();
+    )
+      .subscribe();
+
   }
 
   onSort(sortDirection: SortDirection) {

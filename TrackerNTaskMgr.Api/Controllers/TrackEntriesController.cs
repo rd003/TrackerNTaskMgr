@@ -83,13 +83,19 @@ public class TrackEntriesController : ControllerBase
     public async Task<IActionResult> GetTrackEntries([FromQuery] GetTrackEntriesParams parameters)
     {
         ValidateGetTrackEntryParams(parameters);
+        // Console.WriteLine($"====> logged at: {DateTime.Now.ToString("dd-mm-yyy hh:mm:ss")}");
+        // Console.WriteLine(parameters);
         var trackEntries = await _trackEntryServcice.GetTrackEntiesAsync(parameters);
         // Note: Bad practice
-        // Problem: When handling 'prev' + 'desc', the data is coming in asc order, I am reordering them here
-        // if (parameters.LastEntryDate != null && parameters.SortDirection == "DESC" && parameters.PageDirection == "PREV")
+        // Problem: When handling 'prev' + 'desc', the data is coming in asc order, I am reordering them here. Same goes for prev+asc, we need to manually convert data to asc order.
         // TODO: Refactor this
+        if (parameters.LastEntryDate != null && parameters.SortDirection.ToUpper() == "DESC" && parameters.PageDirection.ToUpper() == "PREV")
         {
-            trackEntries = trackEntries.OrderByDescending(a => a.EntryDate).ToList();
+            trackEntries = [.. trackEntries.OrderByDescending(a => a.EntryDate)];
+        }
+        if (parameters.LastEntryDate != null && parameters.SortDirection.ToUpper() == "ASC" && parameters.PageDirection.ToUpper() == "PREV")
+        {
+            trackEntries = [.. trackEntries.OrderBy(a => a.EntryDate)];
         }
         return Ok(trackEntries);
     }

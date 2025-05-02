@@ -13,7 +13,7 @@ Content-Type: application/json
 }
 
 ###
-GET {{base_address}}/api/trackentries?limit=5&sortDirection=DESC&pageDirection=prev&lastEntryDate=2025-03-14
+GET {{base_address}}/api/trackentries?limit=3&sortDirection=ASC&pageDirection=prev&lastEntryDate=2025-02-16
 
 Accept: application/json
 

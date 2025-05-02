@@ -20,7 +20,7 @@ export interface TrackEntryState {
 export class TrackEntryStore {
    private readonly _initialState: TrackEntryState = {
       trackEntries: [],
-      sortDirection: "desc",
+      sortDirection: "asc",
       lastEntryDate: null,
       pageDirection: "NEXT",
       limit: 7,
@@ -34,6 +34,7 @@ export class TrackEntryStore {
    entries$ = this._state$.pipe(map(a => a.trackEntries));
    loading$ = this._state$.pipe(map(a => a.loading));
    error$ = this._state$.pipe(map(a => a.error));
+   sortDirection$ = this._state$.pipe(map(a => a.sortDirection));
 
 
    addEntry(entry: TrackEntryCreateModel) {
@@ -105,12 +106,21 @@ export class TrackEntryStore {
       this._state$.next({ ...this._state$.value, sortDirection: sortDir })
    }
 
-   setLastEntryDate(lastEntryDate: string) {
-      this._state$.next({ ...this._state$.value, lastEntryDate });
-   }
+   // setLastEntryDate(lastEntryDate: string) {
+   //    this._state$.next({ ...this._state$.value, lastEntryDate });
+   // }
 
-   setPageDirection(pageDirection: PageDirection) {
-      this._state$.next({ ...this._state$.value, pageDirection });
+   // setPageDirection(pageDirection: PageDirection) {
+   //    this._state$.next({ ...this._state$.value, pageDirection });
+   // }
+
+   // NEW: Combined setter for atomic updates
+   setPaginationParams(lastEntryDate: string, pageDirection: PageDirection) {
+      this._state$.next({
+         ...this._state$.value,
+         lastEntryDate,
+         pageDirection
+      });
    }
 
    private handleFailure(error: HttpErrorResponse): Observable<HttpErrorResponse> {
