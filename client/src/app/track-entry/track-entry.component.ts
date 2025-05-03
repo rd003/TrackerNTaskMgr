@@ -11,11 +11,12 @@ import { AsyncPipe, NgIf } from "@angular/common";
 import { SortDirection } from "@angular/material/sort";
 import { formatDateToLocalISOString } from "../shared/services/date.util";
 import { PageDirection } from "../shared/page-direction";
+import { TrackEntryFilterComponent } from "./ui/track-entry-filter.component";
 
 @Component({
   selector: 'app-track-entry',
   standalone: true,
-  imports: [TrackEntryListComponent, MatDialogModule, MatButtonModule, AsyncPipe, NgIf],
+  imports: [TrackEntryListComponent, MatDialogModule, MatButtonModule, AsyncPipe, NgIf, TrackEntryFilterComponent],
   providers: [TrackEntryStore],
   template: `
   <h1>Track Entries</h1>
@@ -34,6 +35,9 @@ import { PageDirection } from "../shared/page-direction";
    <div *ngIf="store.error$|async as error" style="color:red">
       Something went wrong    
    </div>
+
+   <!-- filter -->
+    <app-track-entry-filter (filterByEntryDate)="onEntryDateSelect($event)" (clearFilter)="onClearFilter()"/>
 
    <app-track-entry-list [dataSource]="(store.entries$|async)??[]" (editTrackEntry)= "onAddUpdate('Edit', $event)" (deleteTrackEntry)="onDelete($event)" (sort)="onSort($event)"/>
 
@@ -115,9 +119,10 @@ export class TrackEntryComponent implements OnDestroy {
         const lastEntryDate = new Date(entries[0].entryDate);
         const formattedLastEntryDate = formatDateToLocalISOString(lastEntryDate).split('T')[0];
         console.log(formattedLastEntryDate);
-        this.store.setPaginationParams(formattedLastEntryDate, pageDirection);
-        // this.store.setLastEntryDate(formattedLastEntryDate);
-        // this.store.setPageDirection(pageDirection);
+        // Ensure atomic state update by batching after this observable completes
+        setTimeout(() => {
+          this.store.setPaginationParams(formattedLastEntryDate, pageDirection);
+        }, 0);
       }),
       catchError(error => {
         console.log(error);
@@ -131,6 +136,19 @@ export class TrackEntryComponent implements OnDestroy {
 
   onSort(sortDirection: SortDirection) {
     this.store.setSortDirection(sortDirection);
+  }
+
+  onClearFilter() {
+    // this.store.dispatch(userOrderActions.setStartDate({ startDate: null }));
+    // this.store.dispatch(userOrderActions.setEndDate({ endDate: null }));
+  }
+
+  onEntryDateSelect(range: { dateFrom: string | null; dateTo: string | null; }) {
+    console.log(range);
+    const { dateFrom, dateTo } = range;
+    if (dateFrom && dateTo) {
+
+    }
   }
 
   ngOnDestroy(): void {

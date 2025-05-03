@@ -20,7 +20,7 @@ export interface TrackEntryState {
 export class TrackEntryStore {
    private readonly _initialState: TrackEntryState = {
       trackEntries: [],
-      sortDirection: "asc",
+      sortDirection: "desc",
       lastEntryDate: null,
       pageDirection: "NEXT",
       limit: 7,
@@ -106,15 +106,6 @@ export class TrackEntryStore {
       this._state$.next({ ...this._state$.value, sortDirection: sortDir })
    }
 
-   // setLastEntryDate(lastEntryDate: string) {
-   //    this._state$.next({ ...this._state$.value, lastEntryDate });
-   // }
-
-   // setPageDirection(pageDirection: PageDirection) {
-   //    this._state$.next({ ...this._state$.value, pageDirection });
-   // }
-
-   // NEW: Combined setter for atomic updates
    setPaginationParams(lastEntryDate: string, pageDirection: PageDirection) {
       this._state$.next({
          ...this._state$.value,
