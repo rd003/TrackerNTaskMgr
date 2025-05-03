@@ -81,7 +81,7 @@ export class TrackEntryFilterComponent {
             });
           }
         }),
-        takeUntilDestroyed() //  👉 you just need this line to unsubscribe an observable
+        takeUntilDestroyed()
       )
       .subscribe();
   }

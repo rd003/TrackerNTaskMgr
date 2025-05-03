@@ -9,6 +9,8 @@ import { PageDirection } from "../../shared/page-direction";
 
 export interface TrackEntryState {
    trackEntries: readonly TrackEntryReadModel[],
+   startDate: string | null,
+   endDate: string | null,
    sortDirection: SortDirection,
    lastEntryDate: string | null,
    pageDirection: PageDirection,
@@ -22,6 +24,8 @@ export class TrackEntryStore {
       trackEntries: [],
       sortDirection: "desc",
       lastEntryDate: null,
+      startDate: null,
+      endDate: null,
       pageDirection: "NEXT",
       limit: 7,
       loading: false,
@@ -114,6 +118,14 @@ export class TrackEntryStore {
       });
    }
 
+   setDateParams(startDate: string | null, endDate: string | null) {
+      this._state$.next({
+         ...this._state$.value,
+         startDate,
+         endDate
+      });
+   }
+
    private handleFailure(error: HttpErrorResponse): Observable<HttpErrorResponse> {
       this._state$.next({
          ...this._state$.value,
@@ -136,9 +148,11 @@ export class TrackEntryStore {
          this._state$.pipe(map(s => s.lastEntryDate), distinctUntilChanged()),
          this._state$.pipe(map(s => s.pageDirection), distinctUntilChanged()),
          this._state$.pipe(map(s => s.limit), distinctUntilChanged()),
+         this._state$.pipe(map(s => s.startDate), distinctUntilChanged()),
+         this._state$.pipe(map(s => s.endDate), distinctUntilChanged()),
       ]).pipe(
-         tap(([sortDirection, lastEntryDate, pageDirection, limit]) => {
-            this.loadTrackEntries(null, null, lastEntryDate, pageDirection, limit, sortDirection);
+         tap(([sortDirection, lastEntryDate, pageDirection, limit, startDate, endDate]) => {
+            this.loadTrackEntries(startDate, endDate, lastEntryDate, pageDirection, limit, sortDirection);
          })
       ).subscribe();
    }

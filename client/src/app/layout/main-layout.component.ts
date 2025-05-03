@@ -10,9 +10,9 @@ import { RouterOutlet } from '@angular/router';
 import { NavComponent } from "./nav.component";
 
 @Component({
- selector:"app-main-layout",
- standalone:true,
- imports: [
+  selector: "app-main-layout",
+  standalone: true,
+  imports: [
     CommonModule,
     MatToolbarModule,
     MatSidenavModule,
@@ -22,8 +22,8 @@ import { NavComponent } from "./nav.component";
     MatCardModule,
     RouterOutlet,
     NavComponent
-],
- template:`<div class="dashboard-container">
+  ],
+  template: `<div class="dashboard-container">
  <mat-toolbar color="primary" class="toolbar">
    <button mat-icon-button (click)="sidenav.toggle()">
      <mat-icon>menu</mat-icon>
@@ -53,7 +53,7 @@ import { NavComponent } from "./nav.component";
    </mat-sidenav-content>
  </mat-sidenav-container>
 </div>`,
- styles:[`
+  styles: [`
     .dashboard-container {
       display: flex;
       flex-direction: column;
@@ -94,7 +94,7 @@ import { NavComponent } from "./nav.component";
     
     .content-container {
       padding: 20px;
-      background-color: #f5f5f5;
+      background-color:rgb(255, 255, 255);
     }
     
     .content {
@@ -103,7 +103,6 @@ import { NavComponent } from "./nav.component";
     }`]
 })
 
-export class MainLayoutComponent
-{
+export class MainLayoutComponent {
 
 }

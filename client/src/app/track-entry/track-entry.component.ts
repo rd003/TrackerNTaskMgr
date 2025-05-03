@@ -12,11 +12,12 @@ import { SortDirection } from "@angular/material/sort";
 import { formatDateToLocalISOString } from "../shared/services/date.util";
 import { PageDirection } from "../shared/page-direction";
 import { TrackEntryFilterComponent } from "./ui/track-entry-filter.component";
+import { MatIconModule } from "@angular/material/icon";
 
 @Component({
   selector: 'app-track-entry',
   standalone: true,
-  imports: [TrackEntryListComponent, MatDialogModule, MatButtonModule, AsyncPipe, NgIf, TrackEntryFilterComponent],
+  imports: [TrackEntryListComponent, MatDialogModule, MatButtonModule, AsyncPipe, NgIf, TrackEntryFilterComponent, MatIconModule],
   providers: [TrackEntryStore],
   template: `
   <h1>Track Entries</h1>
@@ -24,10 +25,10 @@ import { TrackEntryFilterComponent } from "./ui/track-entry-filter.component";
       <button
         type="button"
         (click)="onAddUpdate('Add', null)"
-        mat-raised-button
+        mat-fab
         color="accent"
       >
-        +
+        <mat-icon>add</mat-icon>
       </button>
   </p>
    <div *ngIf="store.loading$ | async as loading"> loading... </div>
@@ -42,8 +43,12 @@ import { TrackEntryFilterComponent } from "./ui/track-entry-filter.component";
    <app-track-entry-list [dataSource]="(store.entries$|async)??[]" (editTrackEntry)= "onAddUpdate('Edit', $event)" (deleteTrackEntry)="onDelete($event)" (sort)="onSort($event)"/>
 
    <div class="paginator" style="display:flex;gap:5px;margin:15px 0px">
-   <button (click)="onPaginate('PREV')">Previous</button>
-   <button (click)="onPaginate('NEXT')">Next</button>
+   <button mat-mini-fab (click)="onPaginate('PREV')">
+   <mat-icon>keyboard_arrow_left</mat-icon>
+   </button>
+   <button mat-mini-fab (click)="onPaginate('NEXT')">
+   <mat-icon>keyboard_arrow_right</mat-icon>
+   </button>
    </div>
   `,
   styles: [],
@@ -139,15 +144,14 @@ export class TrackEntryComponent implements OnDestroy {
   }
 
   onClearFilter() {
-    // this.store.dispatch(userOrderActions.setStartDate({ startDate: null }));
-    // this.store.dispatch(userOrderActions.setEndDate({ endDate: null }));
+    this.store.setDateParams(null, null);
   }
 
   onEntryDateSelect(range: { dateFrom: string | null; dateTo: string | null; }) {
     console.log(range);
     const { dateFrom, dateTo } = range;
     if (dateFrom && dateTo) {
-
+      this.store.setDateParams(dateFrom, dateTo);
     }
   }
 

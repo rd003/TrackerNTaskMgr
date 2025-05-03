@@ -62,10 +62,10 @@ import { Sort, MatSortModule, SortDirection } from '@angular/material/sort';
 <ng-container matColumnDef="action">
   <th mat-header-cell *matHeaderCellDef> Actions </th>
   <td mat-cell *matCellDef="let element" style="display: flex;gap:7px;"> 
-  <button mat-mini-fab aria-label="edit-entry" (click)="onEdit(element);">
+  <button mat-mini-fab aria-label="edit-entry" color="accent" (click)="onEdit(element);">
      <mat-icon>edit</mat-icon>
   </button>
-  <button mat-mini-fab aria-label="delete-entry" (click)="this.deleteTrackEntry.emit(element)">
+  <button mat-mini-fab aria-label="delete-entry" color="warn" (click)="this.deleteTrackEntry.emit(element)">
      <mat-icon>delete</mat-icon>
   </button>  
   </td>

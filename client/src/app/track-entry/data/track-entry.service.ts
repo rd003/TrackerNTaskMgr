@@ -22,11 +22,9 @@ export class TrackEntryService {
     let params = new HttpParams();
     params = params.set("limit", limit);
     params = params.set("sortDirection", sortDirection);
-    if (startDate) {
-      params = params.set("startDate", startDate);
-    }
-    if (endDate) {
-      params = params.set("endDate", endDate);
+    if (startDate && endDate) {
+      params = params.set("startDate", startDate.split('T')[0]);
+      params = params.set("endDate", endDate.split('T')[0]);
     }
     if (lastEntryDate) {
       params = params.set("lastEntryDate", lastEntryDate);
