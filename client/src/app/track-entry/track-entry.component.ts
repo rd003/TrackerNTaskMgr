@@ -4,7 +4,7 @@ import { TrackEntryListComponent } from "./ui/track-entry-list.component";
 import { MatDialog, MatDialogModule } from "@angular/material/dialog";
 import { TrackEntryUpdateModel } from "./data/track-entry-create.model";
 import { TrackEntryDialogComponent } from "./ui/track-entry-dialog.component";
-import { catchError, combineLatest, distinctUntilChanged, map, of, Subject, take, takeUntil, tap } from "rxjs";
+import { catchError, combineLatest, distinctUntilChanged, map, of, Subject, switchMap, take, takeUntil, tap } from "rxjs";
 import { MatButtonModule } from "@angular/material/button";
 import { TrackEntryStore } from "./store/track-entry.store";
 import { AsyncPipe, NgIf } from "@angular/common";
@@ -13,6 +13,7 @@ import { formatDateToLocalISOString } from "../shared/services/date.util";
 import { PageDirection } from "../shared/page-direction";
 import { TrackEntryFilterComponent } from "./ui/track-entry-filter.component";
 import { MatIconModule } from "@angular/material/icon";
+import { minutesToHoursMinutes } from "../shared/timeFormatter";
 
 @Component({
   selector: 'app-track-entry',
@@ -42,6 +43,29 @@ import { MatIconModule } from "@angular/material/icon";
 
    <app-track-entry-list [dataSource]="(store.entries$|async)??[]" (editTrackEntry)= "onAddUpdate('Edit', $event)" (deleteTrackEntry)="onDelete($event)" (sort)="onSort($event)"/>
 
+   <!-- total sleep, work etc -->
+   
+   <div *ngIf="total$ | async as total" 
+     style="display: flex; gap: 24px; margin: 16px 0; padding: 16px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9;">
+
+  <div>
+    <strong>Total Sleep:</strong>
+    {{ total.totalSleep }} min
+  </div>
+
+  <div>
+    <strong>Average Sleep:</strong>
+    {{ total.averageSleepInMinutes }} min <span style="color: #666;">({{ total.averageSleepFormatted }})</span>
+  </div>
+
+  <div>
+    <strong>Total Work:</strong>
+    {{ total.totalWork }} min <span style="color: #666;">({{ total.totalWorkFormatted }})</span>
+  </div>
+
+</div>
+
+
    <div class="paginator" style="display:flex;gap:5px;margin:15px 0px">
    <button mat-mini-fab (click)="onPaginate('PREV')">
    <mat-icon>keyboard_arrow_left</mat-icon>
@@ -59,6 +83,30 @@ export class TrackEntryComponent implements OnDestroy {
   dialog = inject(MatDialog);
   destroyed$ = new Subject<boolean>();
   store = inject(TrackEntryStore);
+
+  totalWork$ = this.store.entries$.pipe(map(e => e.reduce((a, c) => a + c.totalWorkInMinutes, 0)));
+
+  totalWorkFormatted$ = this.totalWork$.pipe(map((totalWork) => minutesToHoursMinutes(totalWork)));
+
+  totalSleep$ = this.store.entries$.pipe(map(e => e.reduce((a, c) => a + c.totalSleepInMinutes, 0)));
+
+  averageSleepInMinutes$ = combineLatest([this.store.entries$, this.totalSleep$]).pipe(
+    map(([entries, totalSleep]) => {
+      const averageSleep = entries.length > 0 ? totalSleep / entries.length : 0;
+      return Math.round(averageSleep * 100) / 100;
+    })
+  );
+
+  averageSleepFormatted$ = this.averageSleepInMinutes$.pipe(map((avgMinutes) => minutesToHoursMinutes(avgMinutes)
+  ));
+
+  total$ = combineLatest({
+    totalSleep: this.totalSleep$,
+    averageSleepInMinutes: this.averageSleepInMinutes$,
+    averageSleepFormatted: this.averageSleepFormatted$,
+    totalWork: this.totalWork$,
+    totalWorkFormatted: this.totalWorkFormatted$
+  });
 
   onAddUpdate(action: string, trackEntry: TrackEntryReadModel | null = null) {
     let trackEntryUpdate: TrackEntryUpdateModel | null = null;
