@@ -13,8 +13,7 @@ create or alter procedure CreateTask
 
     -- SubTasks and Tags parameters (as TVPs - Table Valued Parameters)
     @SubTasks [dbo].[typSubTask] READONLY,
-    @StringTags [dbo].[typTagString] READONLY,
-    @TagIds [dbo].[typTagId] READONLY,
+    @Tags [dbo].[typTags] READONLY,
 
     @TaskId INT OUTPUT
 AS
@@ -64,45 +63,35 @@ BEGIN
             SubTaskUri
         FROM @SubTasks;
     END
+     
+    -- How to insert values in TaskTags?
+    -- We are getting list of TagName in @Tags
+    -- Some of the tagName are present in the Tags table but some may not be
+    -- We need to insert tagNames in Tags table, if they do not exist.
+    -- Then We need to insert data in TaskTags table (TaskId,TagId)
+    -- For that need to find ids of TagNames which were present in @Tags
 
-        -- CASE: When TagId is present in the DB 
-        IF EXISTS (SELECT 1
-    FROM @TagIds)
-        BEGIN
-        INSERT INTO TaskTags
-            (TaskId,TagId)
-        SELECT @TaskId, TagId
-        FROM @TagIds;
-    END
+    -- Inserting tags if not exists
 
-        -- Case: When TagId is not present in the DB
-        -- We need to insert tag in the Tags table, then insert it's id in the TaskTags table.
-        -- But how to do that?
-        IF EXISTS (SELECT 1
-    FROM @StringTags)
-        BEGIN
-        DECLARE @NewTagIds TABLE (TagId INT);
+       INSERT INTO Tags
+        (TagName)
+    SELECT DISTINCT t.TagName
+    FROM @Tags t
+        LEFT JOIN Tags et
+        ON t.TagName = et.TagName
+    WHERE et.TagId IS NULL;
 
-        INSERT INTO Tags
-            (TagName)
-        OUTPUT inserted.TagId INTO @NewTagIds
-        SELECT DISTINCT st.TagName
-        FROM @StringTags st
-            LEFT JOIN Tags t
-            ON st.TagName = t.TagName
-        WHERE t.TagId IS NULL;
-        -- We are making sure that tag is not present in the DB
+    -- Inserting TaskTags
 
-        -- Now inert tagIds in TaskTags table
-
-        INSERT INTO TaskTags
-            (TaskId,TagId)
-        SELECT @TaskId, TagId
-        FROM @NewTagIds;
-    END
+    INSERT INTO TaskTags
+        (TaskId,TagId)
+    SELECT @TaskId, t.TagId
+    FROM Tags t
+        INNER JOIN @Tags inputTag
+        ON t.TagName = inputTag.TagName;   
 
 
-        COMMIT TRANSACTION;
+       COMMIT TRANSACTION;
     END TRY 
 
     BEGIN CATCH
