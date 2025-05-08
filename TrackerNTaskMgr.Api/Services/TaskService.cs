@@ -8,7 +8,7 @@ using TrackerNTaskMgr.Api.DTOs;
 
 namespace TrackerNTaskMgr.Api.Services;
 
-public class TaskService
+public class TaskService : ITaskService
 {
     private readonly IConfiguration _configuration;
     private readonly string _connectionString;
@@ -28,7 +28,7 @@ public class TaskService
 
         foreach (var tag in taskCreate.Tags)
         {
-            tags.Rows.Add(tag);
+            tags.Rows.Add(tag.ToLower());
         }
 
         DataTable subTasks = new();
@@ -59,3 +59,4 @@ public class TaskService
     }
 
 }
+

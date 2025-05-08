@@ -1,0 +1,30 @@
+@base_address = http://localhost:5054
+
+POST {{base_address}}/api/tasks
+Content-Type: application/json
+
+{
+  "TaskHeaderId": 1,
+  "TaskTitle": "Task from api",
+  "TaskUri": "https://example.com/tasks/123",
+  "TaskPriorityId": 2,
+  "TaskStatusId": 1,
+  "Deadline": null,
+  "ScheduledAt": null,
+  "SubTasks": [
+    {
+      "SubTaskTitle": "Gather data",
+      "SubTaskUri": "https://example.com/subtasks/1"
+    },
+    {
+      "SubTaskTitle": "Write summary",
+      "SubTaskUri": "https://example.com/subtasks/2"
+    }
+  ],
+  "Tags": [
+    "blog",
+    "Csharp",
+    "programming"
+  ]
+}
+

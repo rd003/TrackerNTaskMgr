@@ -17,7 +17,7 @@ using TrackerNTaskMgr.Api.Services;
 using TrackerNTaskMgr.Api.TypeHandlers;
 using TrackerNTaskMgr.Api.Validators;
 
-var  MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +29,7 @@ builder.Services.AddOpenApi();
 
 // registering services
 builder.Services.AddTransient<ITrackEntryService, TrackEntryService>();
+builder.Services.AddTransient<ITaskService, TaskService>();
 
 // Global exception handling
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
@@ -60,11 +61,11 @@ builder.Services.AddValidatorsFromAssemblyContaining<TrackEntryCreateDtoValidato
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowSpecificOrigins,
-                      policy  =>
+                      policy =>
                       {
                           policy.WithOrigins("http://localhost:4200")
                                 .AllowAnyHeader()
-				.AllowAnyMethod();
+                .AllowAnyMethod();
                       });
 });
 
