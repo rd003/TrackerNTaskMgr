@@ -107,7 +107,8 @@ public class TaskService : ITaskService
 
     public async System.Threading.Tasks.Task DeleteTask(int taskId)
     {
-
+        using IDbConnection connection = new SqlConnection(_connectionString);
+        await connection.ExecuteAsync("DeleteTask", new { taskId }, commandType: CommandType.StoredProcedure);
     }
 
 }

@@ -1,7 +1,7 @@
 use TrackerNTaskMgt
 GO
 
-create procedure DeleteTask
+create or alter procedure DeleteTask
     @TaskId int
 as
 begin
@@ -12,6 +12,7 @@ begin
      begin transaction;
      update Tasks set Deleted=GETDATE() where TaskId=@TaskId;
      update SubTasks set Deleted=GETDATE() where TaskId=@TaskId;
+     update TaskTags set Deleted = GETDATE() where TaskId=@TaskId;
      commit transaction;
     end try 
     

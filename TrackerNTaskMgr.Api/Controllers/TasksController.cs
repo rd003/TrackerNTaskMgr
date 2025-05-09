@@ -3,6 +3,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 using TrackerNTaskMgr.Api.DTOs;
+using TrackerNTaskMgr.Api.Exceptions;
 using TrackerNTaskMgr.Api.Extensions;
 using TrackerNTaskMgr.Api.Services;
 
@@ -37,6 +38,30 @@ public class TasksController : ControllerBase
     [HttpGet("{taskId:int}", Name = nameof(GetTaskById))]
     public async Task<IActionResult> GetTaskById(int taskId)
     {
-        return Ok(await _taskService.GetTaskByTaskIdAsync(taskId));
+        var task = await _taskService.GetTaskByTaskIdAsync(taskId);
+        if (task == null)
+        {
+            throw new NotFoundException($"Task with TaskId:{taskId} does not found");
+        }
+        return Ok(task);
+    }
+
+    [HttpGet("/api/tags")]
+    public async Task<IActionResult> GetTags()
+    {
+        return Ok(await _taskService.GetAllTagsAsync());
+    }
+
+    // TODO : TEST this endpoint
+    [HttpDelete("{taskId:int}")]
+    public async Task<IActionResult> DeleteTask(int taskId)
+    {
+        var task = await _taskService.GetTaskByTaskIdAsync(taskId);
+        if (task == null)
+        {
+            throw new NotFoundException($"Task with TaskId:{taskId} does not found");
+        }
+        await _taskService.DeleteTask(taskId);
+        return NoContent();
     }
 }

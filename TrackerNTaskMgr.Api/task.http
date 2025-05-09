@@ -33,3 +33,7 @@ Content-Type: application/json
 }
 
 ###
+GET http://localhost:5054/api/tags
+
+###
+DELETE  {{base_address}}/2002
