@@ -29,8 +29,9 @@ public class TasksController : ControllerBase
             validationResult.AddToModelState(ModelState);
             return UnprocessableEntity(ModelState);
         }
-        // var createdId = await _taskService.CreateTaskAsync(taskToCreate);
-        return Ok();
+        var createdTaskId = await _taskService.CreateTaskAsync(taskToCreate);
+        var createdTask = await _taskService.GetTaskByTaskIdAsync(createdTaskId);
+        return CreatedAtRoute(nameof(GetTaskById), new { taskId = createdTaskId }, createdTask);
     }
 
     [HttpGet("{taskId:int}", Name = nameof(GetTaskById))]

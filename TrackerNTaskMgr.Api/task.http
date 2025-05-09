@@ -9,25 +9,25 @@ Content-Type: application/json
 
 {
   "TaskHeaderId": 1,
-  "TaskTitle": "Task from api",
-  "TaskUri": "https://example.com/tasks/123",
+  "TaskTitle": "New Task",
+  "TaskUri": "https://example.com/tasks/333",
   "TaskPriorityId": 2,
   "TaskStatusId": 1,
-  "Deadline": null,
-  "ScheduledAt": null,
+  "Deadline": "2025-05-15T00:15:00",
+  "ScheduledAt": "2025-05-20T10:00:00",
   "SubTasks": [
     {
-      "SubTaskTitle": "Gather data",
+      "SubTaskTitle": "Write blog",
       "SubTaskUri": "https://example.com/subtasks/1"
     },
     {
-      "SubTaskTitle": "Write summary",
+      "SubTaskTitle": "add it to medium too",
       "SubTaskUri": "https://example.com/subtasks/2"
     }
   ],
   "Tags": [
     "blog",
-    "Csharp",
+    "angular",
     "programming"
   ]
 }
