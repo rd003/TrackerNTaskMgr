@@ -97,5 +97,18 @@ public class TaskService : ITaskService
         return taskDict.Values.FirstOrDefault();
     }
 
+    public async Task<IEnumerable<TagReadDto>> GetAllTagsAsync()
+    {
+        using IDbConnection connection = new SqlConnection(_connectionString);
+        string sql = @"select TagId, TagName from Tags where deleted is null";
+        var tags = await connection.QueryAsync<TagReadDto>(sql);
+        return tags;
+    }
+
+    public async System.Threading.Tasks.Task DeleteTask(int taskId)
+    {
+
+    }
+
 }
 
