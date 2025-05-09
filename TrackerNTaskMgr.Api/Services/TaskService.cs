@@ -5,6 +5,7 @@ using Dapper;
 using Microsoft.Data.SqlClient;
 
 using TrackerNTaskMgr.Api.DTOs;
+using TrackerNTaskMgr.Api.Entities;
 
 namespace TrackerNTaskMgr.Api.Services;
 
@@ -21,7 +22,7 @@ public class TaskService : ITaskService
 
     public async Task<int> CreateTaskAsync(TaskCreateDTO taskCreate)
     {
-        IDbConnection connection = new SqlConnection(_connectionString);
+        using IDbConnection connection = new SqlConnection(_connectionString);
 
         DataTable tags = new();
         tags.Columns.Add("TagName", typeof(string));
@@ -58,9 +59,42 @@ public class TaskService : ITaskService
         return taskId;
     }
 
-    public async Task GetTaskByIdAsync(int id)
+    public async Task<TaskReadDTO?> GetTaskByTaskIdAsync(int taskId)
     {
+        using IDbConnection connection = new SqlConnection(_connectionString);
 
+        Dictionary<int, TaskReadDTO> taskDict = new();
+
+        await connection.QueryAsync<TaskReadDTO, TaskStatusReadDto, TaskPriorityReadDto, SubTaskReadDto, TagDto, TaskReadDTO>("GetTaskByTaskId", (task, taskStatus, taskPriority, subTask, tag) =>
+        {
+            if (!taskDict.TryGetValue(task.TaskId, out TaskReadDTO cachedTask))
+            {
+                cachedTask = task;
+                cachedTask.SubTasks = [];
+                cachedTask.Tags = [];
+                cachedTask.TaskStatus = taskStatus;
+                cachedTask.TaskPriority = taskPriority;
+                taskDict.Add(task.TaskId, cachedTask);
+
+            }
+
+            // Add the subtask if it's not null and not already in the list
+            if (subTask != null && subTask.SubTaskId != 0 && !cachedTask.SubTasks.Any(st => st.SubTaskId == subTask.SubTaskId))
+            {
+                cachedTask.SubTasks.Add(subTask);
+            }
+
+            // Add the tag if it's not null and not already in the list
+            if (tag != null && !string.IsNullOrEmpty(tag.TagName) && !cachedTask.Tags.Any(tg => tg == tag.TagName))
+            {
+                // TODO: tags[] is empty
+                cachedTask.Tags.Add(tag.TagName);
+            }
+
+            return cachedTask;
+        }, new { @TaskId = taskId }, splitOn: "TaskStatusName,TaskPriorityName,SubTaskId,TagName", commandType: CommandType.StoredProcedure);
+
+        return taskDict.Values.FirstOrDefault();
     }
 
 }

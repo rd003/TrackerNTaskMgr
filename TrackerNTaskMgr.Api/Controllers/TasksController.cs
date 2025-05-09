@@ -32,4 +32,10 @@ public class TasksController : ControllerBase
         // var createdId = await _taskService.CreateTaskAsync(taskToCreate);
         return Ok();
     }
+
+    [HttpGet("{taskId:int}", Name = nameof(GetTaskById))]
+    public async Task<IActionResult> GetTaskById(int taskId)
+    {
+        return Ok(await _taskService.GetTaskByTaskIdAsync(taskId));
+    }
 }

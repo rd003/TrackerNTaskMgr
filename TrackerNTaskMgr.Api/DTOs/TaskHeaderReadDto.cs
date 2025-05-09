@@ -3,5 +3,5 @@ public record TaskHeaderReadDto
 (
     int TaskHeaderId,
     string TaskHeaderTitle,
-    ICollection<TaskReadDto> Tasks
+    ICollection<TaskReadDTO> Tasks
 );

@@ -13,7 +13,7 @@ public class TaskReadDTO
     public string TaskHeaderTitle { get; set; } = string.Empty;
     public List<SubTaskReadDto> SubTasks { get; set; } = [];
     public TaskStatusReadDto TaskStatus { get; set; } = null!;
-    public TaskStatusReadDto TaskPriority { get; set; } = null!;
-    public List<TagDto> Tags { get; set; } = [];
+    public TaskPriorityReadDto TaskPriority { get; set; } = null!;
+    public List<string> Tags { get; set; } = [];
 }
 

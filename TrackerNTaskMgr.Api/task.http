@@ -1,6 +1,10 @@
-@base_address = http://localhost:5054
+@base_address = http://localhost:5054/api/tasks
 
-POST {{base_address}}/api/tasks
+GET {{base_address}}/1
+Accept: application/json
+
+###
+POST {{base_address}}
 Content-Type: application/json
 
 {
@@ -28,3 +32,4 @@ Content-Type: application/json
   ]
 }
 
+###
