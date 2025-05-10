@@ -59,7 +59,44 @@ public class TaskService : ITaskService
         return taskId;
     }
 
-    // TODO : Display at board property
+    public async Task UpdateSubTask(TaskUpdateDto taskToUpdate)
+    {
+        using IDbConnection connection = new SqlConnection(_connectionString);
+
+        DataTable subTasks = new();
+        subTasks.Columns.Add("@SubTaskId", typeof(int));
+        subTasks.Columns.Add("SubTaskTitle", typeof(string));
+        subTasks.Columns.Add("SubTaskUri", typeof(string));
+
+        foreach (var subTask in taskToUpdate.SubTasks)
+        {
+            subTasks.Rows.Add(subTask.SubTaskId, subTask.SubTaskTitle, subTask.SubTaskUri);
+        }
+
+        DataTable tags = new();
+        tags.Columns.Add("@TagName", typeof(string));
+
+        foreach (var tag in taskToUpdate.Tags)
+        {
+            tags.Rows.Add(tag);
+        }
+
+        var parameters = new DynamicParameters();
+        parameters.Add("@TaskId", taskToUpdate.TaskId, DbType.Int32);
+        parameters.Add("@TaskHeaderId", taskToUpdate.TaskHeaderId, DbType.Int32, ParameterDirection.Input);
+        parameters.Add("@TaskTitle", taskToUpdate.TaskTitle, DbType.String, ParameterDirection.Input);
+        parameters.Add("@TaskUri", taskToUpdate.TaskUri, DbType.String, ParameterDirection.Input);
+        parameters.Add("@TaskPriorityId", taskToUpdate.TaskPriorityId, DbType.Byte, ParameterDirection.Input);
+        parameters.Add("@TaskStatusId", taskToUpdate.TaskStatusId, DbType.Byte, ParameterDirection.Input);
+        parameters.Add("@Deadline", taskToUpdate.Deadline, DbType.DateTime2, ParameterDirection.Input);
+        parameters.Add("@ScheduledAt", taskToUpdate.ScheduledAt, DbType.DateTime2, ParameterDirection.Input);
+        parameters.Add("@DisplayAtBoard", taskToUpdate.DisplayAtBoard, DbType.Boolean);
+        parameters.Add("@SubTasks", subTasks, DbType.Object, ParameterDirection.Input);
+        parameters.Add("@Tags", tags, DbType.Object, ParameterDirection.Input);
+
+        await connection.ExecuteAsync("UpdateTask", parameters, commandType: CommandType.StoredProcedure);
+    }
+
     public async Task<TaskReadDTO?> GetTaskByTaskIdAsync(int taskId)
     {
         using IDbConnection connection = new SqlConnection(_connectionString);
