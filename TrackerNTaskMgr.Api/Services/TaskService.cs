@@ -59,7 +59,7 @@ public class TaskService : ITaskService
         return taskId;
     }
 
-    public async Task UpdateSubTask(TaskUpdateDto taskToUpdate)
+    public async Task UpdateTaskAsync(TaskUpdateDto taskToUpdate)
     {
         using IDbConnection connection = new SqlConnection(_connectionString);
 
