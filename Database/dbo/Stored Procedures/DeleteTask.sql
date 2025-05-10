@@ -30,7 +30,7 @@ begin
         @ErrorSeverity=ERROR_SEVERITY(),
         @ErrorState=ERROR_STATE();
 
-    RAISERROR(@ErrorMessage,@ErrorSeverity,@ErrorSeverity);
+    RAISERROR(@ErrorMessage,@ErrorSeverity,@ErrorState);
 
     end catch
 end
