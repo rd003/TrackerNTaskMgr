@@ -9,20 +9,17 @@ Content-Type: application/json
 
 {
   "TaskHeaderId": 1,
-  "TaskTitle": "New Task",
-  "TaskUri": "https://example.com/tasks/333",
+  "TaskTitle": "Video on global exception handling",
+  "TaskUri": null,
   "TaskPriorityId": 2,
   "TaskStatusId": 1,
-  "Deadline": "2025-05-15T00:15:00",
-  "ScheduledAt": "2025-05-20T10:00:00",
+  "Deadline": null,
+  "ScheduledAt": null,
+  "DisplayAtBoard":true,
   "SubTasks": [
     {
-      "SubTaskTitle": "Write blog",
-      "SubTaskUri": "https://example.com/subtasks/1"
-    },
-    {
-      "SubTaskTitle": "add it to medium too",
-      "SubTaskUri": "https://example.com/subtasks/2"
+      "SubTaskTitle": "Edit video",
+      "SubTaskUri": null
     }
   ],
   "Tags": [

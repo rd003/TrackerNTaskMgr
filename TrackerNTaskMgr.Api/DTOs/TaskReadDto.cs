@@ -10,6 +10,7 @@ public class TaskReadDTO
     public byte TaskStatusId { get; set; }
     public DateTime? Deadline { get; set; }
     public DateTime? ScheduledAt { get; set; }
+    public bool DisplayAtBoard { get; set; }
     public string TaskHeaderTitle { get; set; } = string.Empty;
     public List<SubTaskReadDto> SubTasks { get; set; } = [];
     public TaskStatusReadDto TaskStatus { get; set; } = null!;

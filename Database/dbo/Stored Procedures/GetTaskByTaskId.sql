@@ -13,6 +13,7 @@ BEGIN
         t.TaskPriorityId,
         t.TaskStatusId,
         t.ScheduledAt,
+        t.DisplayAtBoard,
         t.Deadline,
         th.TaskHeaderTitle,
         ts.TaskStatusName,

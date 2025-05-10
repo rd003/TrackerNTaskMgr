@@ -52,7 +52,6 @@ public class TasksController : ControllerBase
         return Ok(await _taskService.GetAllTagsAsync());
     }
 
-    // TODO : TEST this endpoint
     [HttpDelete("{taskId:int}")]
     public async Task<IActionResult> DeleteTask(int taskId)
     {

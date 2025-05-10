@@ -10,6 +10,7 @@ create or alter procedure CreateTask
     @TaskStatusId TINYINT,
     @Deadline DATETIME2(7) = NULL,
     @ScheduledAt DATETIME2(7) = NULL,
+    @DisplayAtBoard BIT,
 
     -- SubTasks and Tags parameters (as TVPs - Table Valued Parameters)
     @SubTasks [dbo].[typSubTask] READONLY,
@@ -34,7 +35,8 @@ BEGIN
         TaskPriorityId,
         TaskStatusId,
         Deadline,
-        ScheduledAt
+        ScheduledAt,
+        DisplayAtBoard
         )
     VALUES(
             @TaskHeaderId,
@@ -43,7 +45,8 @@ BEGIN
             @TaskPriorityId,
             @TaskStatusId,
             @Deadline,
-            @ScheduledAt
+            @ScheduledAt,
+            @DisplayAtBoard
         );
 
         SET @TaskId = SCOPE_IDENTITY();

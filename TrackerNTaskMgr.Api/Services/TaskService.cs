@@ -5,7 +5,6 @@ using Dapper;
 using Microsoft.Data.SqlClient;
 
 using TrackerNTaskMgr.Api.DTOs;
-using TrackerNTaskMgr.Api.Entities;
 
 namespace TrackerNTaskMgr.Api.Services;
 
@@ -49,6 +48,7 @@ public class TaskService : ITaskService
         parameters.Add("@TaskStatusId", taskCreate.TaskStatusId, DbType.Byte, ParameterDirection.Input);
         parameters.Add("@Deadline", taskCreate.Deadline, DbType.DateTime2, ParameterDirection.Input);
         parameters.Add("@ScheduledAt", taskCreate.ScheduledAt, DbType.DateTime2, ParameterDirection.Input);
+        parameters.Add("@DisplayAtBoard", taskCreate.DisplayAtBoard, DbType.Boolean);
         parameters.Add("@SubTasks", subTasks, DbType.Object, ParameterDirection.Input);
         parameters.Add("@Tags", tags, DbType.Object, ParameterDirection.Input);
         parameters.Add("@TaskId", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -59,6 +59,7 @@ public class TaskService : ITaskService
         return taskId;
     }
 
+    // TODO : Display at board property
     public async Task<TaskReadDTO?> GetTaskByTaskIdAsync(int taskId)
     {
         using IDbConnection connection = new SqlConnection(_connectionString);

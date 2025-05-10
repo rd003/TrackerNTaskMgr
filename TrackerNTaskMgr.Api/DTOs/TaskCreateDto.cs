@@ -9,6 +9,8 @@ public class TaskCreateDTO
     public byte? TaskStatusId { get; set; }
     public DateTime? Deadline { get; set; }
     public DateTime? ScheduledAt { get; set; }
+
+    public bool DisplayAtBoard { get; set; }
     public List<SubTaskDto> SubTasks { get; set; } = [];
     public List<string> Tags { get; set; } = [];
 }
