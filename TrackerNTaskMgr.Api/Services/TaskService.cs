@@ -155,6 +155,13 @@ public class TaskService : ITaskService
         return exists;
     }
 
+    public async Task<IEnumerable<TaskReadDTO>> GetTasksAsync(GetTasksParams parameters)
+    {
+        using IDbConnection connection = new SqlConnection(_connectionString);
+        IEnumerable<TaskReadDTO> tasks = await connection.QueryAsync<TaskReadDTO>("GetTasks",parameters,commandType:CommandType.StoredProcedure);
+        return tasks;
+    }
+
     public async System.Threading.Tasks.Task DeleteTask(int taskId)
     {
         using IDbConnection connection = new SqlConnection(_connectionString);

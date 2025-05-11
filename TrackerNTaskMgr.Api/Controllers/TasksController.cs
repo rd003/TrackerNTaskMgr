@@ -15,10 +15,19 @@ public class TasksController : ControllerBase
 {
     private readonly ITaskService _taskService;
     private readonly IValidator<TaskCreateDTO> _taskCreateValidator;
-    public TasksController(ITaskService taskService, IValidator<TaskCreateDTO> taskCreateValidator)
+    private readonly IValidator<TaskUpdateDto> _taskUpdateValidator;
+    public TasksController(ITaskService taskService, IValidator<TaskCreateDTO> taskCreateValidator, IValidator<TaskUpdateDto> taskUpdateValidator)
     {
         _taskService = taskService;
         _taskCreateValidator = taskCreateValidator;
+        _taskUpdateValidator = taskUpdateValidator;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetTasks([FromQuery]GetTasksParams tasksParams)
+    {
+        var tasks = await _taskService.GetTasksAsync(tasksParams);
+        return Ok(tasks);
     }
 
     [HttpPost]
@@ -38,6 +47,13 @@ public class TasksController : ControllerBase
     [HttpPut("{taskId:int}")]
     public async Task<IActionResult> UpdateTask(int taskId, [FromBody] TaskUpdateDto taskToUpdate)
     {
+        var validationResult = await _taskUpdateValidator.ValidateAsync(taskToUpdate);
+        if(!validationResult.IsValid)
+        {
+            validationResult.AddToModelState(ModelState);
+            return UnprocessableEntity(ModelState);
+        }
+        
         if (taskId != taskToUpdate.TaskId)
         {
             throw new BadRequestException("TaskId from parameter and body mismatches");

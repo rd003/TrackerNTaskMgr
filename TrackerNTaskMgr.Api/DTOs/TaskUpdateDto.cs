@@ -2,7 +2,7 @@ namespace TrackerNTaskMgr.Api.DTOs;
 
 public class TaskUpdateDto
 {
-    public int TaskId { get; set; }
+    public int? TaskId { get; set; }
     public int? TaskHeaderId { get; set; }
     public string? TaskTitle { get; set; } = string.Empty;
     public string? TaskUri { get; set; }

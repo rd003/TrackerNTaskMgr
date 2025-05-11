@@ -4,6 +4,9 @@ GET {{base_address}}/2003
 Accept: application/json
 
 ###
+GET {{base_address}}?SortBy=deadline&SortDirection=desc
+
+###
 POST {{base_address}}
 Content-Type: application/json
 
@@ -67,7 +70,7 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:5054/api/tags
+DELETE  {{base_address}}/2002
 
 ###
-DELETE  {{base_address}}/2002
+GET http://localhost:5054/api/tags

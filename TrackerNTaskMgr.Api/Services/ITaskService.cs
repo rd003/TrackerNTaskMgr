@@ -9,5 +9,6 @@ public interface ITaskService
     Task<TaskReadDTO?> GetTaskByTaskIdAsync(int taskId);
     System.Threading.Tasks.Task DeleteTask(int taskId);
     Task<bool> IsTaskExists(int taskId);
+    Task<IEnumerable<TaskReadDTO>> GetTasksAsync(GetTasksParams parameters);
     Task<IEnumerable<TagReadDto>> GetAllTagsAsync();
 }
