@@ -52,10 +52,10 @@ begin
         set SubTaskTitle=inputSubTask.SubTaskTitle,
         SubTaskUri=inputSubTask.SubTaskUri,
         Updated= getdate()
-        from SubTask st
+        from SubTasks st
       inner join @SubTasks inputSubTask
       on st.SubTaskId = inputSubTask.SubTaskId
-        where st.TaskId = @TaskId and inputSubTask is not null
+        where st.TaskId = @TaskId and inputSubTask.SubTaskId is not null
 
 
   end
@@ -80,14 +80,36 @@ begin
     on tg.TagName = et.TagName
   where et.TagId is null
 
-      -- add non-existing tagId to corresponding TaskTags
+  -- delete those tags which are not being passed
+  -- Help me with that, give code of this section only for the sake of brevity
 
-      insert into TaskTags
-    (TaskId,TagId)
+  UPDATE tt 
+  SET tt.Deleted = GETDATE()
+  from TaskTags tt
+    join Tags tg
+    on tt.TagId = tg.TagId
+  where tt.TaskId = @TaskId and tg.TagId NOT IN (
+    select tg.TagId
+    from Tags tg
+      inner join @Tags it
+      on tg.TagName = it.TagName 
+  ) 
+
+   -- add non-existing tagId to corresponding TaskTags
+
+   insert into TaskTags
+    (TaskId, TagId)
   select @TaskId, t.TagId
   from Tags t
     inner join @Tags inputTag
-    on t.TagName=inputTag.TagName;
+    on t.TagName = inputTag.TagName
+  where not exists (
+    select 1
+  from TaskTags tt
+  where tt.TaskId = @TaskId
+    and tt.TagId = t.TagId
+    and tt.Deleted is null
+);
 
       commit transaction;
     end try 

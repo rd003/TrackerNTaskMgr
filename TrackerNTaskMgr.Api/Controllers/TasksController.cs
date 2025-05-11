@@ -35,6 +35,25 @@ public class TasksController : ControllerBase
         return CreatedAtRoute(nameof(GetTaskById), new { taskId = createdTaskId }, createdTask);
     }
 
+    [HttpPut("{taskId:int}")]
+    public async Task<IActionResult> UpdateTask(int taskId, [FromBody] TaskUpdateDto taskToUpdate)
+    {
+        if (taskId != taskToUpdate.TaskId)
+        {
+            throw new BadRequestException("TaskId from parameter and body mismatches");
+        }
+
+        bool isTaskExists = await _taskService.IsTaskExists(taskId);
+        if (!isTaskExists)
+        {
+            throw new NotFoundException($"Task with TaskId:{taskId} does not found");
+        }
+
+        await _taskService.UpdateTaskAsync(taskToUpdate);
+        var updatedTask = await _taskService.GetTaskByTaskIdAsync(taskId);
+        return Ok(updatedTask);
+    }
+
     [HttpGet("{taskId:int}", Name = nameof(GetTaskById))]
     public async Task<IActionResult> GetTaskById(int taskId)
     {
@@ -46,21 +65,23 @@ public class TasksController : ControllerBase
         return Ok(task);
     }
 
-    [HttpGet("/api/tags")]
-    public async Task<IActionResult> GetTags()
-    {
-        return Ok(await _taskService.GetAllTagsAsync());
-    }
 
     [HttpDelete("{taskId:int}")]
     public async Task<IActionResult> DeleteTask(int taskId)
     {
-        var task = await _taskService.GetTaskByTaskIdAsync(taskId);
-        if (task == null)
+        bool isTaskExists = await _taskService.IsTaskExists(taskId);
+        if (!isTaskExists)
         {
             throw new NotFoundException($"Task with TaskId:{taskId} does not found");
         }
         await _taskService.DeleteTask(taskId);
         return NoContent();
     }
+
+    [HttpGet("/api/tags")]
+    public async Task<IActionResult> GetTags()
+    {
+        return Ok(await _taskService.GetAllTagsAsync());
+    }
+
 }

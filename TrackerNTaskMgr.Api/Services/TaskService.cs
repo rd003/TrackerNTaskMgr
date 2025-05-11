@@ -45,7 +45,7 @@ public class TaskService : ITaskService
         parameters.Add("@TaskTitle", taskCreate.TaskTitle, DbType.String, ParameterDirection.Input);
         parameters.Add("@TaskUri", taskCreate.TaskUri, DbType.String, ParameterDirection.Input);
         parameters.Add("@TaskPriorityId", taskCreate.TaskPriorityId, DbType.Byte, ParameterDirection.Input);
-        parameters.Add("@TaskStatusId", taskCreate.TaskStatusId, DbType.Byte, ParameterDirection.Input);
+        parameters.Add("@TaskStatusId", TrackerNTaskMgr.Api.Constants.TaskStatus.InProgress, DbType.Byte, ParameterDirection.Input);
         parameters.Add("@Deadline", taskCreate.Deadline, DbType.DateTime2, ParameterDirection.Input);
         parameters.Add("@ScheduledAt", taskCreate.ScheduledAt, DbType.DateTime2, ParameterDirection.Input);
         parameters.Add("@DisplayAtBoard", taskCreate.DisplayAtBoard, DbType.Boolean);
@@ -141,6 +141,18 @@ public class TaskService : ITaskService
         string sql = @"select TagId, TagName from Tags where deleted is null";
         var tags = await connection.QueryAsync<TagReadDto>(sql);
         return tags;
+    }
+
+    public async Task<bool> IsTaskExists(int taskId)
+    {
+        using IDbConnection connection = new SqlConnection(_connectionString);
+        string sql = @"SELECT CASE
+                       WHEN EXISTS(SELECT 1 FROM Tasks where TaskId=@TaskId and Deleted is null)
+                       THEN 1
+                       ELSE 0
+                       END";
+        bool exists = await connection.QueryFirstAsync<bool>(sql, new { taskId });
+        return exists;
     }
 
     public async System.Threading.Tasks.Task DeleteTask(int taskId)

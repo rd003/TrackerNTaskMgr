@@ -6,7 +6,7 @@ public class TaskCreateDTO
     public string? TaskTitle { get; set; } = string.Empty;
     public string? TaskUri { get; set; }
     public byte? TaskPriorityId { get; set; }
-    public byte? TaskStatusId { get; set; }
+    // public byte? TaskStatusId { get; set; }
     public DateTime? Deadline { get; set; }
     public DateTime? ScheduledAt { get; set; }
 

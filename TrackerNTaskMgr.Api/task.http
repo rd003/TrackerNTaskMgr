@@ -1,6 +1,6 @@
 @base_address = http://localhost:5054/api/tasks
 
-GET {{base_address}}/1
+GET {{base_address}}/2003
 Accept: application/json
 
 ###
@@ -12,7 +12,6 @@ Content-Type: application/json
   "TaskTitle": "Video on global exception handling",
   "TaskUri": null,
   "TaskPriorityId": 2,
-  "TaskStatusId": 1,
   "Deadline": null,
   "ScheduledAt": null,
   "DisplayAtBoard":true,
@@ -25,6 +24,44 @@ Content-Type: application/json
   "Tags": [
     "blog",
     "angular",
+    "programming"
+  ]
+}
+
+###
+PUT {{base_address}}/2003
+Content-Type: application/json
+
+{
+  "TaskId":2003,
+  "TaskHeaderId": 1,
+  "TaskTitle": "Create a video on global exception handling",
+  "TaskUri": null,
+  "TaskPriorityId": 3,
+  "TaskStatusId": 2,
+  "Deadline": "2025-05-25T15:18:20",
+  "ScheduledAt": null,
+  "DisplayAtBoard":true,
+  "SubTasks": [
+    {
+      "SubTaskId":2004,
+      "SubTaskTitle": "Edit the video",
+      "SubTaskUri": null
+    },
+    {
+      "SubTaskId":2008,
+      "SubTaskTitle": "Make a thumnail for this video",
+      "SubTaskUri": null
+    },
+    {
+      "SubTaskId":2009,
+      "SubTaskTitle": "Post this video in a Youtube",
+      "SubTaskUri": null
+    }
+  ],
+  "Tags": [
+    "video",
+    "dotnet",
     "programming"
   ]
 }
