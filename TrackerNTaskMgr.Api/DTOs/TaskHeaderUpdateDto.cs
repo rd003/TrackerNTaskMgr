@@ -2,7 +2,7 @@ namespace TrackerNTaskMgr.Api.DTOs;
 
 public record TaskHeaderUpdateDto
 (
-    int TaskHeaderId,
-    string TaskHeaderTitle,
-    int SortOrder
+    int? TaskHeaderId,
+    string? TaskHeaderTitle,
+    int? SortOrder
 );

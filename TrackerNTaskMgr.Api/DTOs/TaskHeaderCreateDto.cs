@@ -1,2 +1,2 @@
 namespace TrackerNTaskMgr.Api.DTOs;
-public record TaskHeaderCreateDto(string TaskHeaderTitle, int SortOrder);
+public record TaskHeaderCreateDto(string? TaskHeaderTitle, int? SortOrder);
