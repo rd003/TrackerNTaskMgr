@@ -2,12 +2,14 @@ using System.Data;
 
 using Dapper;
 
-using Microsoft.AspNetCore.Http.HttpResults;
+using FluentValidation;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 
 using TrackerNTaskMgr.Api.DTOs;
 using TrackerNTaskMgr.Api.Exceptions;
+using TrackerNTaskMgr.Api.Extensions;
 
 namespace TrackerNTaskMgr.Api.Controllers;
 
@@ -17,14 +19,18 @@ public class TaskHeaderController : ControllerBase
 { 
     private readonly IConfiguration _config;
     private readonly string _connectionString;
+    private readonly IValidator<TaskHeaderCreateDto> _createValidator;
+    private readonly IValidator<TaskHeaderUpdateDto> _updateValidator;
 
-    public TaskHeaderController(IConfiguration config)
+    public TaskHeaderController(IConfiguration config, IValidator<TaskHeaderCreateDto> createValidator, IValidator<TaskHeaderUpdateDto> updateValidator)
     {
         _config = config;
-        _connectionString=_config.GetConnectionString("Default");        
+        _connectionString = _config.GetConnectionString("Default");
+        _createValidator = createValidator;
+        _updateValidator = updateValidator;
     }
 
-   [HttpGet]
+    [HttpGet]
    public async Task<IActionResult> GetTaskHeaders()
    {
       using IDbConnection connection = new SqlConnection(_connectionString);
@@ -63,35 +69,52 @@ public class TaskHeaderController : ControllerBase
    [HttpPost]
    public async Task<IActionResult> CreateTaskHeader(TaskHeaderCreateDto taskHeaderToCreate)
    {
-     using IDbConnection connection = new SqlConnection(_connectionString);
-     string sql= @"insert into TaskHeaders (TaskHeaderTitle,SortOrder) 
-                   values (@TaskHeaderTitle,@SortOrder);
-                   select scope_identity()";
-     int createdId = await connection.ExecuteScalarAsync<int>(sql);
-     var createdTaskHeader = new TaskHeaderReadDto(createdId,taskHeaderToCreate.TaskHeaderTitle!,taskHeaderToCreate.SortOrder??0);
-     return CreatedAtRoute(nameof(GetTaskHeader),new {taskHeaderId=createdId},createdTaskHeader);
+        var validationResult = await _createValidator.ValidateAsync(taskHeaderToCreate);
+        if(!validationResult.IsValid)
+        {
+           validationResult.AddToModelState(ModelState); 
+           return UnprocessableEntity(ModelState);    
+        }
+        
+        using IDbConnection connection = new SqlConnection(_connectionString);
+        string sql= @"insert into TaskHeaders (TaskHeaderTitle,SortOrder) 
+                    values (@TaskHeaderTitle,@SortOrder);
+                    select scope_identity()";
+        int createdId = await connection.ExecuteScalarAsync<int>(sql);
+        var createdTaskHeader = new TaskHeaderReadDto(createdId,taskHeaderToCreate.TaskHeaderTitle!,taskHeaderToCreate.SortOrder??0);
+        return CreatedAtRoute(nameof(GetTaskHeader),new {taskHeaderId=createdId},createdTaskHeader);
    }
 
    [HttpPut("{taskHeaderId:int}")]
    public async Task<IActionResult> UpdateTaskHeader(int taskHeaderId,[FromBody]TaskHeaderUpdateDto taskHeaderToUpdate)
    {
-    if(taskHeaderId != taskHeaderToUpdate.TaskHeaderId)
-    {
-       throw new BadRequestException("TaskHeaderId in query and body does not match.");
-    }
+        var validationResult = await _updateValidator.ValidateAsync(taskHeaderToUpdate);
+        
+        if(!validationResult.IsValid)
+        {
+            validationResult.AddToModelState(ModelState);
+            return UnprocessableEntity(ModelState);
+        }
 
-    if(!await IsTaskHeaderExists(taskHeaderId))
-    {
-       throw new NotFoundException($"Task with TaskHeaderId: {taskHeaderId} does not found");
-    }
-     using IDbConnection connection = new SqlConnection(_connectionString);
-     string sql= @"update TaskHeaders 
-                   set TaskHeaderTitle=@TaskHeaderTitle',
-                   SortOrder=@SortOrder
-                   where TaskHeaderId=@TaskHeaderId";
-     await connection.ExecuteAsync(sql,taskHeaderToUpdate);
+        if(taskHeaderId != taskHeaderToUpdate.TaskHeaderId)
+        {
+           throw new BadRequestException("TaskHeaderId in query and body does not match.");
+        }
 
-     return Ok(taskHeaderToUpdate);
+        if(!await IsTaskHeaderExists(taskHeaderId))
+        {
+           throw new NotFoundException($"Task with TaskHeaderId: {taskHeaderId} does not found");
+        }
+        
+        using IDbConnection connection = new SqlConnection(_connectionString);
+        string sql= @"update TaskHeaders 
+                    set TaskHeaderTitle=@TaskHeaderTitle',
+                    SortOrder=@SortOrder
+                    where TaskHeaderId=@TaskHeaderId";
+        
+        await connection.ExecuteAsync(sql,taskHeaderToUpdate);
+
+        return Ok(taskHeaderToUpdate);
    }
 
    [HttpDelete("{taskHeaderId:int}")]
@@ -99,8 +122,9 @@ public class TaskHeaderController : ControllerBase
    {
         if(!await IsTaskHeaderExists(taskHeaderId))
         {
-        throw new NotFoundException($"Task with TaskHeaderId: {taskHeaderId} does not found");
+          throw new NotFoundException($"Task with TaskHeaderId: {taskHeaderId} does not found");
         }
+       
         using IDbConnection connection = new SqlConnection(_connectionString);
         string sql=@"update TaskHeaders
                     set Deleted=GETDATE()
