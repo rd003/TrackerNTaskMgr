@@ -1,0 +1,28 @@
+@base_address = http://localhost:5054/api/task-headers
+
+GET {{base_address}}
+
+###
+GET {{base_address}}/1003
+
+###
+POST {{base_address}}
+Content-Type: application/json
+
+{
+    "taskHeaderTitle":"Blah",
+    "sortOrder":1
+}
+
+###
+DELETE {{base_address}}/1003
+
+###
+PUT {{base_address}}/1003 HTTP/1.1
+Content-Type: application/json
+
+{
+    "taskHeaderId":1003,
+    "taskHeaderTitle":"blah blah blah",
+    "sortOrder":1
+}

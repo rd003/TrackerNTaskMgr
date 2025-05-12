@@ -30,14 +30,14 @@ public class TaskHeaderController : ControllerBase
         _updateValidator = updateValidator;
     }
 
-    [HttpGet]
+   [HttpGet]
    public async Task<IActionResult> GetTaskHeaders()
    {
       using IDbConnection connection = new SqlConnection(_connectionString);
       string sql = @"select
                       th.TaskHeaderId,
                       th.TaskHeaderTitle,
-                      th.SortOrder, 
+                      th.SortOrder 
                      from TaskHeaders th
                      where th.Deleted is null";
       var taskHeaders= await connection.QueryAsync<TaskHeaderReadDto>(sql);
@@ -52,7 +52,7 @@ public class TaskHeaderController : ControllerBase
       string sql = @"select
                       th.TaskHeaderId,
                       th.TaskHeaderTitle,
-                      th.SortOrder, 
+                      th.SortOrder 
                      from TaskHeaders th
                      where th.Deleted is null and TaskHeaderId=@taskHeaderId";
 
@@ -80,7 +80,7 @@ public class TaskHeaderController : ControllerBase
         string sql= @"insert into TaskHeaders (TaskHeaderTitle,SortOrder) 
                     values (@TaskHeaderTitle,@SortOrder);
                     select scope_identity()";
-        int createdId = await connection.ExecuteScalarAsync<int>(sql);
+        int createdId = await connection.ExecuteScalarAsync<int>(sql,taskHeaderToCreate);
         var createdTaskHeader = new TaskHeaderReadDto(createdId,taskHeaderToCreate.TaskHeaderTitle!,taskHeaderToCreate.SortOrder??0);
         return CreatedAtRoute(nameof(GetTaskHeader),new {taskHeaderId=createdId},createdTaskHeader);
    }
@@ -108,7 +108,7 @@ public class TaskHeaderController : ControllerBase
         
         using IDbConnection connection = new SqlConnection(_connectionString);
         string sql= @"update TaskHeaders 
-                    set TaskHeaderTitle=@TaskHeaderTitle',
+                    set TaskHeaderTitle=@TaskHeaderTitle,
                     SortOrder=@SortOrder
                     where TaskHeaderId=@TaskHeaderId";
         
