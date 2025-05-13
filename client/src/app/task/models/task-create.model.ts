@@ -1,13 +1,16 @@
-import { SubTaskCreateModel } from "./sub-task-create.model";
-
 export interface TaskCreateModel {
-  TaskHeaderId: number;
-  TaskTitle: string;
-  TaskUri: string | null;
-  TaskPriorityId: number;
-  Deadline: string | null; // Can be changed to Date if parsing is involved
-  ScheduledAt: string | null; // Same as above
-  DisplayAtBoard: boolean;
-  SubTasks: SubTaskCreateModel[];
-  Tags: string[];
+  taskHeaderId: number;
+  taskTitle: string;
+  taskUri: string | null;
+  taskPriorityId: number;
+  deadline: Date | null;
+  scheduledAt: Date | null;
+  displayAtBoard: boolean;
+  subTasks: SubTaskCreateModel[];
+  tags: string[];
+}
+
+export interface SubTaskCreateModel {
+  subTaskTitle: string;
+  subTaskUri: string | null;
 }

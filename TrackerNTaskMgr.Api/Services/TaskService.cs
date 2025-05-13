@@ -175,6 +175,32 @@ public class TaskService : ITaskService
         return tasks;
     }
 
+    public async Task<IEnumerable<TaskStatusSelect>> GetTaskStatusesAsync()
+    {
+       using IDbConnection connection = new SqlConnection(_connectionString);
+       string sql = @"select 
+                        ts.TaskStatusId,
+                        ts.TaskStatusName + ' ' + 
+                        ts.TaskStatusEmoji as TaskStatusName
+                    from TaskStatuses ts
+                    where ts.Deleted is null
+                    ";
+       var taskStatuses = await connection.QueryAsync<TaskStatusSelect>(sql);   
+       return taskStatuses;                 
+    }
+
+    public async Task<IEnumerable<TaskPrioritySelect>> GetTaskPrioritiesAsync()
+    {
+        using IDbConnection connection = new SqlConnection(_connectionString);
+        string sql = @"select 
+                        tp.TaskPriorityId,
+                        tp.TaskPriorityName + ' ' + 
+                        tp.TaskPriorityEmoji as TaskPriorityName
+                    from TaskPriorities tp
+                    where tp.Deleted is null";
+        var taskPriorities = await connection.QueryAsync<TaskPrioritySelect>(sql);
+        return taskPriorities;
+    }
 
 }
 

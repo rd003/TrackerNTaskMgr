@@ -107,4 +107,16 @@ public class TasksController : ControllerBase
         return Ok(await _taskService.GetAllTagsAsync());
     }
 
+    [HttpGet("statuses")]
+    public async Task<IActionResult> GetTaskStatuses()
+    {
+        return Ok(await _taskService.GetTaskStatusesAsync());
+    }
+
+     [HttpGet("priorities")]
+    public async Task<IActionResult> GetTaskPriorities()
+    {
+        return Ok(await _taskService.GetTaskPrioritiesAsync());
+    }
+
 }

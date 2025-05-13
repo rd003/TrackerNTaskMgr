@@ -5,8 +5,8 @@ export interface TaskReadModel {
   taskUri?: string | null;
   taskPriorityId: number;
   taskStatusId: number;
-  deadline?: string | null; // Can be Date if parsing
-  scheduledAt?: string | null; // Can be Date if parsing
+  deadline?: string | null;
+  scheduledAt?: string | null;
   displayAtBoard: boolean;
   taskHeaderTitle: string;
   subTasks: SubTaskReadModel[];

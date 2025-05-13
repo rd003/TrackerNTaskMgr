@@ -10,6 +10,12 @@ GET {{base_address}}?SortBy=deadline&SortDirection=desc
 GET {{base_address}}/displayboard-tasks
 
 ###
+GET {{base_address}}/statuses
+
+###
+GET {{base_address}}/priorities
+
+###
 POST {{base_address}}
 Content-Type: application/json
 

@@ -12,4 +12,6 @@ public interface ITaskService
     Task<IEnumerable<TaskReadDTO>> GetTasksAsync(GetTasksParams parameters);
     Task<IEnumerable<DisplayBoardTaskDto>> GetDisplayBoardTasksAsync();
     Task<IEnumerable<TagReadDto>> GetAllTagsAsync();
+    Task<IEnumerable<TaskStatusSelect>> GetTaskStatusesAsync();
+    Task<IEnumerable<TaskPrioritySelect>> GetTaskPrioritiesAsync();
 }
