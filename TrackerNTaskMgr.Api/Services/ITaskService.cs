@@ -10,5 +10,6 @@ public interface ITaskService
     System.Threading.Tasks.Task DeleteTask(int taskId);
     Task<bool> IsTaskExists(int taskId);
     Task<IEnumerable<TaskReadDTO>> GetTasksAsync(GetTasksParams parameters);
+    Task<IEnumerable<DisplayBoardTaskDto>> GetDisplayBoardTasksAsync();
     Task<IEnumerable<TagReadDto>> GetAllTagsAsync();
 }

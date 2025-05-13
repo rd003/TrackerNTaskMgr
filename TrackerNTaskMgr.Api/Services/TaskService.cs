@@ -168,5 +168,13 @@ public class TaskService : ITaskService
         await connection.ExecuteAsync("DeleteTask", new { taskId }, commandType: CommandType.StoredProcedure);
     }
 
+    public async Task<IEnumerable<DisplayBoardTaskDto>> GetDisplayBoardTasksAsync()
+    {
+        using IDbConnection connection = new SqlConnection(_connectionString);
+        var tasks= await connection.QueryAsync<DisplayBoardTaskDto>("GetDisplayBoardTask",commandType:CommandType.StoredProcedure);
+        return tasks;
+    }
+
+
 }
 

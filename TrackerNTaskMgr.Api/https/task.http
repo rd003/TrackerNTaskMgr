@@ -7,6 +7,9 @@ Accept: application/json
 GET {{base_address}}?SortBy=deadline&SortDirection=desc
 
 ###
+GET {{base_address}}/displayboard-tasks
+
+###
 POST {{base_address}}
 Content-Type: application/json
 

@@ -30,6 +30,13 @@ public class TasksController : ControllerBase
         return Ok(tasks);
     }
 
+    [HttpGet("displayboard-tasks")]
+    public async Task<IActionResult> GetDisplayBoardTasks()
+    {
+        var tasks = await _taskService.GetDisplayBoardTasksAsync();
+        return Ok(tasks);
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateTask(TaskCreateDTO taskToCreate)
     {
