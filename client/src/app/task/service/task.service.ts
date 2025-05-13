@@ -4,6 +4,8 @@ import { HttpClient } from "@angular/common/http";
 import { TaskCreateModel } from "../models/task-create.model";
 import { TaskReadModel } from "../models/task-read-model";
 import { Observable } from "rxjs";
+import { TaskStatusModel } from "../models/task-status.model";
+import { TaskPriorityModel } from "../models/task-priority.model";
 
 @Injectable({
     providedIn: 'root'
@@ -14,6 +16,14 @@ export class TaskService {
 
     addTask(task: TaskCreateModel): Observable<TaskReadModel> {
         return this._http.post<TaskReadModel>(this._url, task);
+    }
+
+    getTaskStatuses(): Observable<TaskStatusModel[]> {
+        return this._http.get<TaskStatusModel[]>(this._url + '/statuses');
+    }
+
+    getTaskPriorities(): Observable<TaskPriorityModel[]> {
+        return this._http.get<TaskPriorityModel[]>(this._url + '/priorities');
     }
 
 }

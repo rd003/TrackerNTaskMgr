@@ -1,6 +1,6 @@
 import {
   HighContrastModeDetector
-} from "./chunk-AHIZINDQ.js";
+} from "./chunk-FPLA2RMJ.js";
 import {
   BidiModule
 } from "./chunk-7VR4VRUX.js";
@@ -48,4 +48,4 @@ export {
   MATERIAL_SANITY_CHECKS,
   MatCommonModule
 };
-//# sourceMappingURL=chunk-EXLET7WC.js.map
+//# sourceMappingURL=chunk-LVYGOK2A.js.map

@@ -1,12 +1,12 @@
 import {
   _CdkPrivateStyleLoader,
   _bindEventWithOptions
-} from "./chunk-DL7WR7GE.js";
+} from "./chunk-CTJLPMPM.js";
 import {
   Platform,
   coerceElement,
   coerceNumberProperty
-} from "./chunk-KQ2WK7DX.js";
+} from "./chunk-LAHP56Y6.js";
 import {
   DOCUMENT
 } from "./chunk-QMBK7RYN.js";
@@ -80,6 +80,7 @@ var LEFT_ARROW = 37;
 var UP_ARROW = 38;
 var RIGHT_ARROW = 39;
 var DOWN_ARROW = 40;
+var DELETE = 46;
 var ZERO = 48;
 var NINE = 57;
 var A = 65;
@@ -3113,6 +3114,7 @@ export {
   UP_ARROW,
   RIGHT_ARROW,
   DOWN_ARROW,
+  DELETE,
   A,
   _getFocusedElementPierceShadowDom,
   _getEventTarget,
@@ -3126,12 +3128,15 @@ export {
   InteractivityChecker,
   FocusTrapFactory,
   CdkTrapFocus,
+  LiveAnnouncer,
   HighContrastModeDetector,
   A11yModule,
   _IdGenerator,
   hasModifierKey,
   ActiveDescendantKeyManager,
   FocusKeyManager,
+  addAriaReferencedId,
+  removeAriaReferencedId,
   AriaDescriber
 };
-//# sourceMappingURL=chunk-AHIZINDQ.js.map
+//# sourceMappingURL=chunk-FPLA2RMJ.js.map
