@@ -18,6 +18,10 @@ export class TaskService {
         return this._http.post<TaskReadModel>(this._url, task);
     }
 
+    getTask(taskId: number) {
+        return this._http.get<TaskReadModel>(`${this._url}/${taskId}`);
+    }
+
     getTaskStatuses(): Observable<TaskStatusModel[]> {
         return this._http.get<TaskStatusModel[]>(this._url + '/statuses');
     }

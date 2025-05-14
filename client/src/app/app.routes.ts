@@ -15,6 +15,10 @@ export const routes: Routes = [
         loadComponent: () => import("./task/task-save.component").then(a => a.TaskSaveComponent)
     },
     {
+        path: "update-task/:taskId",
+        loadComponent: () => import("./task/task-save.component").then(a => a.TaskSaveComponent)
+    },
+    {
         path: "",
         redirectTo: "/dashboard",
         pathMatch: "full"

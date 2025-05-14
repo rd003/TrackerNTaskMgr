@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, Input, OnInit } from "@angular/core";
 import { TaskStore } from "./state/task.store";
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { TaskCreateModel } from "./models/task-create.model";
@@ -18,6 +18,9 @@ import { TaskPriorityModel } from "./models/task-priority.model";
 import { TaskStatusModel } from "./models/task-status.model";
 import { TaskHeaderService } from "../task-header/services/task-header.service";
 import { TaskHeaderReadModel } from "../task-header/models/task-header-read.model";
+import { ActivatedRoute } from "@angular/router";
+import { catchError, of, tap } from "rxjs";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 @Component({
   selector: 'app-task-save',
@@ -249,12 +252,15 @@ import { TaskHeaderReadModel } from "../task-header/models/task-header-read.mode
     }
         `]
 })
-export class TaskSaveComponent {
+export class TaskSaveComponent implements OnInit {
   store = inject(TaskStore);
   fb = inject(FormBuilder);
   taskService = inject(TaskService);
   taskHeaderService = inject(TaskHeaderService);
+  route = inject(ActivatedRoute);
+  destroyRef = inject(DestroyRef);
   message = "";
+  @Input() taskId = '';
 
   taskStatuses$ = this.taskService.getTaskStatuses();
   taskPriorities$ = this.taskService.getTaskPriorities();
@@ -317,5 +323,37 @@ export class TaskSaveComponent {
     this.subTasksFormArray.clear();
   }
 
+  ngOnInit() {
+    if (this.taskId) {
+      const taskIdNum = parseInt(this.taskId);
+      this.taskService.getTask(taskIdNum).pipe(
+        tap((task) => {
+          this.frm.patchValue(task);
+
+          // Clear existing subtasks array
+          this.subTasksFormArray.clear();
+
+          // Add each subtask to the form array
+          if (task.subTasks && task.subTasks.length > 0) {
+            task.subTasks.forEach(subTask => {
+              const subTaskForm = this.fb.group({
+                subTaskId: [subTask.subTaskId],
+                subTaskTitle: [subTask.subTaskTitle, Validators.required],
+                subTaskUri: [subTask.subTaskUri]
+              });
+              this.subTasksFormArray.push(subTaskForm);
+            });
+          }
+
+        }),
+        catchError((error) => {
+          console.log(error);
+          return of(error);
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+        .subscribe();
+    }
+  }
 
 }
