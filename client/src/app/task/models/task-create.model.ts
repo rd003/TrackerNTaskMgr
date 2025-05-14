@@ -3,6 +3,7 @@ export interface TaskCreateModel {
   taskTitle: string;
   taskUri: string | null;
   taskPriorityId: number;
+  taskStatusId: number;
   deadline: Date | null;
   scheduledAt: Date | null;
   displayAtBoard: boolean;

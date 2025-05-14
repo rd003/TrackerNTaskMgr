@@ -1,9 +1,6 @@
 using System.Data;
-
 using Dapper;
-
 using Microsoft.Data.SqlClient;
-
 using TrackerNTaskMgr.Api.DTOs;
 
 namespace TrackerNTaskMgr.Api.Services;
@@ -45,7 +42,7 @@ public class TaskService : ITaskService
         parameters.Add("@TaskTitle", taskCreate.TaskTitle, DbType.String, ParameterDirection.Input);
         parameters.Add("@TaskUri", taskCreate.TaskUri, DbType.String, ParameterDirection.Input);
         parameters.Add("@TaskPriorityId", taskCreate.TaskPriorityId, DbType.Byte, ParameterDirection.Input);
-        parameters.Add("@TaskStatusId", TrackerNTaskMgr.Api.Constants.TaskStatus.InProgress, DbType.Byte, ParameterDirection.Input);
+        parameters.Add("@TaskStatusId", taskCreate.TaskStatusId, DbType.Byte, ParameterDirection.Input);
         parameters.Add("@Deadline", taskCreate.Deadline, DbType.DateTime2, ParameterDirection.Input);
         parameters.Add("@ScheduledAt", taskCreate.ScheduledAt, DbType.DateTime2, ParameterDirection.Input);
         parameters.Add("@DisplayAtBoard", taskCreate.DisplayAtBoard, DbType.Boolean);

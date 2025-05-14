@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { TaskStore } from "./state/task.store";
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { TaskCreateModel } from "./models/task-create.model";
 import { TaskService } from "./service/task.service";
 import { MatFormFieldModule } from "@angular/material/form-field";
@@ -10,13 +10,14 @@ import { MatDatepickerModule } from "@angular/material/datepicker";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 import { MatCheckboxModule } from "@angular/material/checkbox";
-import { MatChipsModule } from "@angular/material/chips";
 import { MatCardModule } from "@angular/material/card";
 import { MatDividerModule } from "@angular/material/divider";
 import { provideNativeDateAdapter } from "@angular/material/core";
 import { AsyncPipe, NgFor, NgIf } from "@angular/common";
 import { TaskPriorityModel } from "./models/task-priority.model";
 import { TaskStatusModel } from "./models/task-status.model";
+import { TaskHeaderService } from "../task-header/services/task-header.service";
+import { TaskHeaderReadModel } from "../task-header/models/task-header-read.model";
 
 @Component({
     selector: 'app-task-save',
@@ -33,20 +34,35 @@ import { TaskStatusModel } from "./models/task-status.model";
         MatButtonModule,
         MatIconModule,
         MatCheckboxModule,
-        MatChipsModule,
         MatCardModule,
         MatDividerModule
     ],
     providers: [provideNativeDateAdapter()],
     template: `
-      <form [formGroup]="frm" (ngSubmit)="save()">
+    <form [formGroup]="frm" (ngSubmit)="save()">
+      <div class="main-container">
+        
+         <div class="form-row" *ngIf="taskHeaders$|async as taskHeaders">
+            <mat-form-field>
+                <mat-label>Task group</mat-label>
+                <mat-select formControlName="taskHeaderId">
+                    <mat-option *ngFor="let th of taskHeaders" [value]="th.taskHeaderId">
+                        {{th.taskHeaderTitle}}
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="frm.get('taskHeaderId')?.hasError('required')">
+                    Group is required
+                </mat-error>
+            </mat-form-field>
+         </div>
+
         <div class="form-row">
             <mat-form-field appearance="outline">
                <mat-label>Task Title</mat-label>
                <input matInput formControlName="taskTitle" required>
-               <!-- <mat-error *ngIf="frm.get('taskTitle')?.hasError('required')">
+               <mat-error *ngIf="frm.get('taskTitle')?.hasError('required')">
                   Task title is required
-               </mat-error> -->
+               </mat-error>
             </mat-form-field>
         </div>
 
@@ -60,18 +76,18 @@ import { TaskStatusModel } from "./models/task-status.model";
         <div class="form-row" *ngIf="taskPriorities$ | async as priorities">
              <mat-form-field appearance="outline">
                 <mat-label>Priority</mat-label>
-                <mat-select formControlName="taskPriorityId" required>
+                <mat-select formControlName="taskPriorityId">
                   <mat-option *ngFor="let priority of priorities;trackBy:trackPriorityByFn" [value]="priority.taskPriorityId">
                     {{ priority.taskPriorityName }}
                   </mat-option>
                 </mat-select>
-                <!-- <mat-error *ngIf="frm.get('taskPriorityId')?.hasError('required')">
+                <mat-error *ngIf="frm.get('taskPriorityId')?.hasError('required')">
                   Priority is required
-                </mat-error> -->
+                </mat-error>
               </mat-form-field>
         </div>
 
-         <!-- <div class="form-row" *ngIf="taskStatuses$ | async as statuses">
+         <div class="form-row" *ngIf="taskStatuses$ | async as statuses">
              <mat-form-field appearance="outline">
                 <mat-label>Status</mat-label>
                 <mat-select formControlName="taskStatusId" required>
@@ -79,11 +95,85 @@ import { TaskStatusModel } from "./models/task-status.model";
                     {{ status.taskStatusName }}
                   </mat-option>
                 </mat-select>
-               
+                <mat-error *ngIf="frm.get('taskStatusId')?.hasError('required')">
+                    Status is required
+                </mat-error>
               </mat-form-field>
-        </div> -->
-            
+        </div>
+      
+        <div class="form-row">
+            <mat-form-field>
+                <mat-label>Deadline</mat-label>
+                <input matInput [matDatepicker]="datline_picker" formControlName="deadline">
+                <mat-hint>MM/DD/YYYY</mat-hint>
+                <mat-datepicker-toggle matIconSuffix [for]="datline_picker"></mat-datepicker-toggle>
+                <mat-datepicker #datline_picker></mat-datepicker>
+            </mat-form-field>
+        </div>
 
+         <div class="form-row">
+            <mat-form-field>
+                <mat-label>Deadline</mat-label>
+                <input matInput [matDatepicker]="sat_picker" formControlName="scheduledAt">
+                <mat-hint>MM/DD/YYYY</mat-hint>
+                <mat-datepicker-toggle matIconSuffix [for]="sat_picker"></mat-datepicker-toggle>
+                <mat-datepicker #sat_picker></mat-datepicker>
+            </mat-form-field>
+        </div>
+
+        <div class="form-row">
+            <mat-checkbox formControlName="displayAtBoard">
+                Display on Board
+            </mat-checkbox>
+        </div>
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Tags (separate with comma)</mat-label>
+                <input matInput formControlName="tags">
+            </mat-form-field>
+        </div> 
+
+       </div>
+
+       <mat-divider></mat-divider>
+
+       <!-- SubTasks Section -->
+            <div class="form-section" formArrayName="subTasks">
+              <div class="section-header">
+                <h3>Subtasks</h3>
+                <button type="button" mat-mini-fab color="primary" (click)="addSubTask()">
+                  <mat-icon>add</mat-icon>
+                </button>
+              </div>
+
+              <div *ngFor="let subTask of subTasksFormArray.controls; let i = index" 
+                   [formGroupName]="i" class="subtask-row">
+                <div class="subtask-fields">
+                  <mat-form-field appearance="outline" class="subtask-title">
+                    <mat-label>Subtask Title</mat-label>
+                    <input matInput formControlName="subTaskTitle" required>
+                    <mat-error *ngIf="subTask.get('subTaskTitle')?.hasError('required')">
+                      Subtask title is required
+                    </mat-error>
+                  </mat-form-field>
+                  
+                  <mat-form-field appearance="outline" class="subtask-uri">
+                    <mat-label>Subtask URI</mat-label>
+                    <input matInput formControlName="subTaskUri">
+                  </mat-form-field>
+                </div>
+                
+                <button type="button" mat-icon-button color="warn" (click)="removeSubTask(i)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" mat-stroked-button (click)="cancel()">Cancel</button>
+              <button type="submit" mat-raised-button color="primary">Save Task</button>
+            </div>
       </form>   
     `,
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -91,15 +181,56 @@ import { TaskStatusModel } from "./models/task-status.model";
         .form-row {
       margin-bottom: 8px;
     }
+
+    form-section {
+      margin-top: 24px;
+      margin-bottom: 24px;
+    }
+    
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    
+    .subtask-row {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    
+    .subtask-fields {
+      display: flex;
+      flex: 1;
+      gap: 16px;
+    }
+    
+    .subtask-title {
+      flex: 3;
+    }
+    
+    .subtask-uri {
+      flex: 2;
+    }
+    
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 16px;
+      margin-top: 24px;
+    }
         `]
 })
 export class TaskSaveComponent {
     store = inject(TaskStore);
     fb = inject(FormBuilder);
     taskService = inject(TaskService);
+    taskHeaderService = inject(TaskHeaderService);
 
     taskStatuses$ = this.taskService.getTaskStatuses();
     taskPriorities$ = this.taskService.getTaskPriorities();
+    taskHeaders$ = this.taskHeaderService.getTaskHeaders();
 
     frm: FormGroup = this.fb.group({
         taskHeaderId: [null, Validators.required],
@@ -111,7 +242,7 @@ export class TaskSaveComponent {
         scheduledAt: [null],
         displayAtBoard: [true],
         subTasks: this.fb.array([]),
-        tags: [[]],
+        tags: [''],
     });
 
     trackPriorityByFn(index: number, priority: TaskPriorityModel) {
@@ -122,8 +253,34 @@ export class TaskSaveComponent {
         return priority.taskStatusId;
     }
 
+    trackHeadersByFn(index: number, header: TaskHeaderReadModel) {
+        return header.taskHeaderId;
+    }
+
+    get subTasksFormArray() {
+        return this.frm.get('subTasks') as FormArray;
+    }
+
     save() {
-        this.store.addTask({} as TaskCreateModel);
+        console.log(this.frm.value);
+        //this.store.addTask({} as TaskCreateModel);
+    }
+
+    addSubTask() {
+        const subTaskForm = this.fb.group({
+            subTaskTitle: ['', Validators.required],
+            subTaskUri: [null]
+        });
+
+        this.subTasksFormArray.push(subTaskForm);
+    }
+
+    removeSubTask(index: number) {
+        this.subTasksFormArray.removeAt(index);
+    }
+
+    cancel() {
+        this.frm.reset();
     }
 
 
