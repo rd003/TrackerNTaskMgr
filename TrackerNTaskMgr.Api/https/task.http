@@ -33,12 +33,8 @@ Content-Type: application/json
       "SubTaskUri": null
     }
   ],
-  "Tags": [
-    "blog",
-    "angular",
-    "programming"
-  ]
-}
+  "Tags": "blog,angular,programming"
+  }
 
 ###
 PUT {{base_address}}/2003
@@ -71,11 +67,8 @@ Content-Type: application/json
       "SubTaskUri": null
     }
   ],
-  "Tags": [
-    "video",
-    "dotnet",
-    "programming"
-  ]
+  
+  "Tags": "video,dotnet,programming"
 }
 
 ###

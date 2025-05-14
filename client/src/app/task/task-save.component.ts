@@ -39,6 +39,20 @@ import { TaskHeaderReadModel } from "../task-header/models/task-header-read.mode
   ],
   providers: [provideNativeDateAdapter()],
   template: `
+    
+    <ng-container *ngIf="store.loading|async as loading">
+      {{loading}}
+       loading....
+    </ng-container>
+
+    <ng-container *ngIf="store.error|async">
+       something went wrong!
+    </ng-container>
+
+    <div class="form-row">
+      {{message}} 
+    </div>
+
     <form [formGroup]="frm" (ngSubmit)="save()">
       <div class="main-container">
         
@@ -149,10 +163,12 @@ import { TaskHeaderReadModel } from "../task-header/models/task-header-read.mode
 
               <div *ngFor="let subTask of subTasksFormArray.controls; let i = index" 
                    [formGroupName]="i" class="subtask-row">
+                <input type="hidden" formControlName="subTaskId">
+
                 <div class="subtask-fields">
                   <mat-form-field appearance="outline" class="subtask-title">
                     <mat-label>Subtask Title</mat-label>
-                    <input matInput formControlName="subTaskTitle" required>
+                    <input matInput formControlName="subTaskTitle">
                     <mat-error *ngIf="subTask.get('subTaskTitle')?.hasError('required')">
                       Subtask title is required
                     </mat-error>
@@ -179,7 +195,9 @@ import { TaskHeaderReadModel } from "../task-header/models/task-header-read.mode
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [`
     .main-container{
-      display:grid;
+      display:flex;
+      gap:15px;
+      flex-wrap:wrap;
     }
     .midInput{
         width:400px;
@@ -236,12 +254,14 @@ export class TaskSaveComponent {
   fb = inject(FormBuilder);
   taskService = inject(TaskService);
   taskHeaderService = inject(TaskHeaderService);
+  message = "";
 
   taskStatuses$ = this.taskService.getTaskStatuses();
   taskPriorities$ = this.taskService.getTaskPriorities();
   taskHeaders$ = this.taskHeaderService.getTaskHeaders();
 
   frm: FormGroup = this.fb.group({
+    taskId: [0],
     taskHeaderId: [null, Validators.required],
     taskTitle: ['', Validators.required],
     taskUri: [null],
@@ -271,14 +291,16 @@ export class TaskSaveComponent {
   }
 
   save() {
+    this.message = "";
     var taskToAdd = this.frm.value as TaskCreateModel;
-    console.log(taskToAdd);
-
-    //this.store.addTask({} as TaskCreateModel);
+    this.store.addTask(taskToAdd);
+    this.message = "Saved successfully";
+    this.cancel();
   }
 
   addSubTask() {
     const subTaskForm = this.fb.group({
+      subTaskId: [0],
       subTaskTitle: ['', Validators.required],
       subTaskUri: [null]
     });
@@ -292,6 +314,7 @@ export class TaskSaveComponent {
 
   cancel() {
     this.frm.reset();
+    this.subTasksFormArray.clear();
   }
 
 
