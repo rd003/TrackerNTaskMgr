@@ -13,5 +13,5 @@ public class TaskUpdateDto
 
     public bool DisplayAtBoard { get; set; }
     public List<SubTaskUpdateDto> SubTasks { get; set; } = [];
-    public List<string> Tags { get; set; } = [];
+    public string? Tags { get; set; }
 }

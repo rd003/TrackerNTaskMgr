@@ -8,7 +8,7 @@ export interface TaskCreateModel {
   scheduledAt: Date | null;
   displayAtBoard: boolean;
   subTasks: SubTaskCreateModel[];
-  tags: string[];
+  tags: string;
 }
 
 export interface SubTaskCreateModel {

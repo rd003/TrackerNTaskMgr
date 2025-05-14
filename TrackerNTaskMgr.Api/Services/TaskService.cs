@@ -22,10 +22,14 @@ public class TaskService : ITaskService
 
         DataTable tags = new();
         tags.Columns.Add("TagName", typeof(string));
-
-        foreach (var tag in taskCreate.Tags)
+        
+        if(!string.IsNullOrWhiteSpace(taskCreate.Tags))
         {
-            tags.Rows.Add(tag.ToLower());
+            var tagsArray= taskCreate.Tags.Split(",");
+            foreach (var tag in tagsArray)
+            {
+                tags.Rows.Add(tag.ToLower());
+            }
         }
 
         DataTable subTasks = new();
@@ -73,9 +77,13 @@ public class TaskService : ITaskService
         DataTable tags = new();
         tags.Columns.Add("@TagName", typeof(string));
 
-        foreach (var tag in taskToUpdate.Tags)
+        if(!string.IsNullOrWhiteSpace(taskToUpdate.Tags))
         {
-            tags.Rows.Add(tag);
+            var tagsArray= taskToUpdate.Tags.Split(",");
+            foreach (var tag in tagsArray)
+            {
+                tags.Rows.Add(tag.ToLower());
+            }
         }
 
         var parameters = new DynamicParameters();

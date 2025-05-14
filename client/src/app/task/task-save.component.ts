@@ -20,30 +20,30 @@ import { TaskHeaderService } from "../task-header/services/task-header.service";
 import { TaskHeaderReadModel } from "../task-header/models/task-header-read.model";
 
 @Component({
-    selector: 'app-task-save',
-    standalone: true,
-    imports: [
-        NgIf,
-        NgFor,
-        AsyncPipe,
-        ReactiveFormsModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatSelectModule,
-        MatDatepickerModule,
-        MatButtonModule,
-        MatIconModule,
-        MatCheckboxModule,
-        MatCardModule,
-        MatDividerModule
-    ],
-    providers: [provideNativeDateAdapter()],
-    template: `
+  selector: 'app-task-save',
+  standalone: true,
+  imports: [
+    NgIf,
+    NgFor,
+    AsyncPipe,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatButtonModule,
+    MatIconModule,
+    MatCheckboxModule,
+    MatCardModule,
+    MatDividerModule
+  ],
+  providers: [provideNativeDateAdapter()],
+  template: `
     <form [formGroup]="frm" (ngSubmit)="save()">
       <div class="main-container">
         
          <div class="form-row" *ngIf="taskHeaders$|async as taskHeaders">
-            <mat-form-field>
+            <mat-form-field >
                 <mat-label>Task group</mat-label>
                 <mat-select formControlName="taskHeaderId">
                     <mat-option *ngFor="let th of taskHeaders" [value]="th.taskHeaderId">
@@ -57,7 +57,7 @@ import { TaskHeaderReadModel } from "../task-header/models/task-header-read.mode
          </div>
 
         <div class="form-row">
-            <mat-form-field appearance="outline">
+            <mat-form-field appearance="outline" class="midInput">
                <mat-label>Task Title</mat-label>
                <input matInput formControlName="taskTitle" required>
                <mat-error *ngIf="frm.get('taskTitle')?.hasError('required')">
@@ -67,7 +67,7 @@ import { TaskHeaderReadModel } from "../task-header/models/task-header-read.mode
         </div>
 
         <div class="form-row">
-            <mat-form-field appearance="outline">
+            <mat-form-field appearance="outline" class="midInput">
                 <mat-label>Task URI</mat-label>
                 <input matInput formControlName="taskUri">
             </mat-form-field>
@@ -113,7 +113,7 @@ import { TaskHeaderReadModel } from "../task-header/models/task-header-read.mode
 
          <div class="form-row">
             <mat-form-field>
-                <mat-label>Deadline</mat-label>
+                <mat-label>Scheduled At</mat-label>
                 <input matInput [matDatepicker]="sat_picker" formControlName="scheduledAt">
                 <mat-hint>MM/DD/YYYY</mat-hint>
                 <mat-datepicker-toggle matIconSuffix [for]="sat_picker"></mat-datepicker-toggle>
@@ -128,7 +128,7 @@ import { TaskHeaderReadModel } from "../task-header/models/task-header-read.mode
         </div>
 
         <div class="form-row">
-            <mat-form-field appearance="outline" class="full-width">
+            <mat-form-field appearance="outline"  class="midInput">
                 <mat-label>Tags (separate with comma)</mat-label>
                 <input matInput formControlName="tags">
             </mat-form-field>
@@ -172,17 +172,26 @@ import { TaskHeaderReadModel } from "../task-header/models/task-header-read.mode
 
             <div class="form-actions">
               <button type="button" mat-stroked-button (click)="cancel()">Cancel</button>
-              <button type="submit" mat-raised-button color="primary">Save Task</button>
+              <button type="submit" mat-raised-button color="primary" [disabled]="this.frm.invalid">Save</button>
             </div>
       </form>   
     `,
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    styles: [`
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  styles: [`
+    .main-container{
+      display:grid;
+    }
+    .midInput{
+        width:400px;
+    }
+    form{
+      margin-bottom:24px;
+    }
         .form-row {
       margin-bottom: 8px;
     }
 
-    form-section {
+    .form-section {
       margin-top: 24px;
       margin-bottom: 24px;
     }
@@ -223,65 +232,67 @@ import { TaskHeaderReadModel } from "../task-header/models/task-header-read.mode
         `]
 })
 export class TaskSaveComponent {
-    store = inject(TaskStore);
-    fb = inject(FormBuilder);
-    taskService = inject(TaskService);
-    taskHeaderService = inject(TaskHeaderService);
+  store = inject(TaskStore);
+  fb = inject(FormBuilder);
+  taskService = inject(TaskService);
+  taskHeaderService = inject(TaskHeaderService);
 
-    taskStatuses$ = this.taskService.getTaskStatuses();
-    taskPriorities$ = this.taskService.getTaskPriorities();
-    taskHeaders$ = this.taskHeaderService.getTaskHeaders();
+  taskStatuses$ = this.taskService.getTaskStatuses();
+  taskPriorities$ = this.taskService.getTaskPriorities();
+  taskHeaders$ = this.taskHeaderService.getTaskHeaders();
 
-    frm: FormGroup = this.fb.group({
-        taskHeaderId: [null, Validators.required],
-        taskTitle: ['', Validators.required],
-        taskUri: [null],
-        taskPriorityId: [null, Validators.required],
-        taskStatusId: [null, Validators.required],
-        deadline: [null],
-        scheduledAt: [null],
-        displayAtBoard: [true],
-        subTasks: this.fb.array([]),
-        tags: [''],
+  frm: FormGroup = this.fb.group({
+    taskHeaderId: [null, Validators.required],
+    taskTitle: ['', Validators.required],
+    taskUri: [null],
+    taskPriorityId: [null, Validators.required],
+    taskStatusId: [null, Validators.required],
+    deadline: [null],
+    scheduledAt: [null],
+    displayAtBoard: [true],
+    subTasks: this.fb.array([]),
+    tags: [''],
+  });
+
+  trackPriorityByFn(index: number, priority: TaskPriorityModel) {
+    return priority.taskPriorityId;
+  }
+
+  trackStatusByFn(index: number, priority: TaskStatusModel) {
+    return priority.taskStatusId;
+  }
+
+  trackHeadersByFn(index: number, header: TaskHeaderReadModel) {
+    return header.taskHeaderId;
+  }
+
+  get subTasksFormArray() {
+    return this.frm.get('subTasks') as FormArray;
+  }
+
+  save() {
+    var taskToAdd = this.frm.value as TaskCreateModel;
+    console.log(taskToAdd);
+
+    //this.store.addTask({} as TaskCreateModel);
+  }
+
+  addSubTask() {
+    const subTaskForm = this.fb.group({
+      subTaskTitle: ['', Validators.required],
+      subTaskUri: [null]
     });
 
-    trackPriorityByFn(index: number, priority: TaskPriorityModel) {
-        return priority.taskPriorityId;
-    }
+    this.subTasksFormArray.push(subTaskForm);
+  }
 
-    trackStatusByFn(index: number, priority: TaskStatusModel) {
-        return priority.taskStatusId;
-    }
+  removeSubTask(index: number) {
+    this.subTasksFormArray.removeAt(index);
+  }
 
-    trackHeadersByFn(index: number, header: TaskHeaderReadModel) {
-        return header.taskHeaderId;
-    }
-
-    get subTasksFormArray() {
-        return this.frm.get('subTasks') as FormArray;
-    }
-
-    save() {
-        console.log(this.frm.value);
-        //this.store.addTask({} as TaskCreateModel);
-    }
-
-    addSubTask() {
-        const subTaskForm = this.fb.group({
-            subTaskTitle: ['', Validators.required],
-            subTaskUri: [null]
-        });
-
-        this.subTasksFormArray.push(subTaskForm);
-    }
-
-    removeSubTask(index: number) {
-        this.subTasksFormArray.removeAt(index);
-    }
-
-    cancel() {
-        this.frm.reset();
-    }
+  cancel() {
+    this.frm.reset();
+  }
 
 
 }
