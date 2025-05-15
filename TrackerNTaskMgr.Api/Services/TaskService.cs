@@ -130,7 +130,6 @@ public class TaskService : ITaskService
             // Add the tag if it's not null and not already in the list
             if (tag != null && !string.IsNullOrEmpty(tag.TagName) && !cachedTask.Tags.Any(tg => tg == tag.TagName))
             {
-                // TODO: tags[] is empty
                 cachedTask.Tags.Add(tag.TagName);
             }
 
@@ -140,13 +139,43 @@ public class TaskService : ITaskService
         return taskDict.Values.FirstOrDefault();
     }
 
-    public async Task<IEnumerable<TagReadDto>> GetAllTagsAsync()
+    public async Task<IEnumerable<TaskReadDTO>> GetTasksAsync(GetTasksParams parameters)
     {
         using IDbConnection connection = new SqlConnection(_connectionString);
-        string sql = @"select TagId, TagName from Tags where deleted is null";
-        var tags = await connection.QueryAsync<TagReadDto>(sql);
-        return tags;
+        
+        var taskDictionary = new Dictionary<int,TaskReadDTO>();
+
+        await connection.QueryAsync<TaskReadDTO,TaskStatusReadDto, TaskPriorityReadDto, SubTaskReadDto, TagDto, TaskReadDTO>("GetTasks",(task, taskStatus, taskPriority, subTask, tag)=>{
+            if(!taskDictionary.TryGetValue(task.TaskId,out TaskReadDTO taskRead))
+            {
+                taskRead = task;
+                taskRead.Tags=[];
+                taskRead.SubTasks=[];
+                taskRead.TaskStatus=taskStatus;
+                taskRead.TaskPriority=taskPriority;
+                taskDictionary.Add(task.TaskId,taskRead);
+            }
+
+            // avoid duplicate subtask
+            if(subTask!=null && subTask.SubTaskId!=0 && ! taskRead.SubTasks.Any(a=>a.SubTaskId==subTask.SubTaskId))
+            {
+                taskRead.SubTasks.Add(subTask);
+            }
+
+            // avoid duplicate tags
+            if(tag!=null && !string.IsNullOrEmpty(tag.TagName) && !taskRead.Tags.Contains(tag.TagName))
+            {
+                taskRead.Tags.Add(tag.TagName);
+            }
+
+            return taskRead;
+        },parameters,splitOn:"TaskStatusName,TaskPriorityName,SubTaskId,TagName",commandType:CommandType.StoredProcedure);
+
+        return taskDictionary.Values;
+
+        // I am unable to do this, please help me
     }
+
 
     public async Task<bool> IsTaskExists(int taskId)
     {
@@ -158,13 +187,6 @@ public class TaskService : ITaskService
                        END";
         bool exists = await connection.QueryFirstAsync<bool>(sql, new { taskId });
         return exists;
-    }
-
-    public async Task<IEnumerable<TaskReadDTO>> GetTasksAsync(GetTasksParams parameters)
-    {
-        using IDbConnection connection = new SqlConnection(_connectionString);
-        IEnumerable<TaskReadDTO> tasks = await connection.QueryAsync<TaskReadDTO>("GetTasks",parameters,commandType:CommandType.StoredProcedure);
-        return tasks;
     }
 
     public async System.Threading.Tasks.Task DeleteTask(int taskId)
@@ -207,5 +229,12 @@ public class TaskService : ITaskService
         return taskPriorities;
     }
 
+    public async Task<IEnumerable<TagReadDto>> GetAllTagsAsync()
+    {
+        using IDbConnection connection = new SqlConnection(_connectionString);
+        string sql = @"select TagId, TagName from Tags where deleted is null";
+        var tags = await connection.QueryAsync<TagReadDto>(sql);
+        return tags;
+    }
 }
 

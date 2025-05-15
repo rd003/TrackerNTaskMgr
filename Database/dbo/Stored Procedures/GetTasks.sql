@@ -2,10 +2,10 @@ use TrackerNTaskMgt
 go
 
 create or alter procedure GetTasks
-    @TaskHeaderId int,
-    @TaskPriorityId int,
-    @TagId int,
-    @SortBy nvarchar(20),
+    @TaskHeaderId int=null,
+    @TaskPriorityId int=null,
+    @TagId int=null,
+    @SortBy nvarchar(20)=null,
     @SortDirection nvarchar(4) = 'desc'
 as
 begin
