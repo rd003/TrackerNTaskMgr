@@ -1,11 +1,12 @@
 import { inject, Injectable } from "@angular/core";
 import { environment } from "../../../environments/environment.development";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { TaskCreateModel } from "../models/task-create.model";
 import { TaskReadModel } from "../models/task-read-model";
 import { Observable } from "rxjs";
 import { TaskStatusModel } from "../models/task-status.model";
 import { TaskPriorityModel } from "../models/task-priority.model";
+import { SortDirection } from "@angular/material/sort";
 
 @Injectable({
     providedIn: 'root'
@@ -25,6 +26,33 @@ export class TaskService {
 
     getTask(taskId: number) {
         return this._http.get<TaskReadModel>(`${this._url}/${taskId}`);
+    }
+
+    getTasks(taskHeaderId: number | null = null,
+        taskPriorityId: number | null = null,
+        tagId: number | null = null,
+        sortBy: string | null = null,
+        sortDirection: SortDirection = 'desc') {
+        let parameters = new HttpParams();
+        parameters = parameters.set("sortDirection", sortDirection);
+
+        if (taskHeaderId) {
+            parameters = parameters.set("taskHeaderId", taskHeaderId);
+        }
+
+        if (tagId) {
+            parameters = parameters.set("tagId", tagId);
+        }
+
+        if (taskPriorityId) {
+            parameters = parameters.set("taskPriorityId", taskPriorityId);
+        }
+
+        if (sortBy) {
+            parameters = parameters.set("sortBy", sortBy);
+        }
+
+        return this._http.get<TaskReadModel[]>(this._url, { params: parameters });
     }
 
     getTaskStatuses(): Observable<TaskStatusModel[]> {

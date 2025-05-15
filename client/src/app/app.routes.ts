@@ -15,6 +15,10 @@ export const routes: Routes = [
         loadComponent: () => import("./task/task-save/task-save.component").then(a => a.TaskSaveComponent)
     },
     {
+        path: "tasks",
+        loadComponent: () => import("./task/get-tasks/get-tasks.component").then(a => a.GetTasksComponent)
+    },
+    {
         path: "update-task/:taskId",
         loadComponent: () => import("./task/task-save/task-save.component").then(a => a.TaskSaveComponent)
     },
