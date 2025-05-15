@@ -1,0 +1,56 @@
+.main-container {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.midInput {
+    width: 400px;
+}
+
+form {
+    margin-bottom: 24px;
+}
+
+.form-row {
+    margin-bottom: 8px;
+}
+
+.form-section {
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.subtask-row {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.subtask-fields {
+    display: flex;
+    flex: 1;
+    gap: 16px;
+}
+
+.subtask-title {
+    flex: 3;
+}
+
+.subtask-uri {
+    flex: 2;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 24px;
+}

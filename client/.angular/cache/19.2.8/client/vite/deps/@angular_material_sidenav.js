@@ -1,3 +1,10 @@
+import {
+  CdkScrollable,
+  CdkScrollableModule,
+  ScrollDispatcher,
+  ViewportRuler
+} from "./chunk-XPOFO653.js";
+import "./chunk-MOHRKI6L.js";
 import "./chunk-XAH5Y7GI.js";
 import {
   coerceBooleanProperty
@@ -13,18 +20,11 @@ import {
   InteractivityChecker,
   hasModifierKey
 } from "./chunk-FPLA2RMJ.js";
-import {
-  CdkScrollable,
-  CdkScrollableModule,
-  ScrollDispatcher,
-  ViewportRuler
-} from "./chunk-XPOFO653.js";
-import "./chunk-MOHRKI6L.js";
+import "./chunk-CTJLPMPM.js";
 import "./chunk-IJ3KGSPX.js";
 import {
   Directionality
 } from "./chunk-7VR4VRUX.js";
-import "./chunk-CTJLPMPM.js";
 import {
   Platform,
   coerceNumberProperty

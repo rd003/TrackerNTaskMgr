@@ -12,11 +12,11 @@ export const routes: Routes = [
     },
     {
         path: "create-task",
-        loadComponent: () => import("./task/task-save.component").then(a => a.TaskSaveComponent)
+        loadComponent: () => import("./task/task-save/task-save.component").then(a => a.TaskSaveComponent)
     },
     {
         path: "update-task/:taskId",
-        loadComponent: () => import("./task/task-save.component").then(a => a.TaskSaveComponent)
+        loadComponent: () => import("./task/task-save/task-save.component").then(a => a.TaskSaveComponent)
     },
     {
         path: "",

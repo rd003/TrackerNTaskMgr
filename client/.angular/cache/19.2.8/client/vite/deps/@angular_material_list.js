@@ -5,6 +5,10 @@ import {
 import {
   SelectionModel
 } from "./chunk-WZJ35MYA.js";
+import "./chunk-MOHRKI6L.js";
+import {
+  NG_VALUE_ACCESSOR
+} from "./chunk-XOMLNA7X.js";
 import {
   MatPseudoCheckboxModule
 } from "./chunk-QMG7LF6Y.js";
@@ -12,9 +16,6 @@ import "./chunk-AYIIGIN2.js";
 import {
   MatRippleModule
 } from "./chunk-NRLVAENZ.js";
-import {
-  NG_VALUE_ACCESSOR
-} from "./chunk-XOMLNA7X.js";
 import {
   MAT_RIPPLE_GLOBAL_OPTIONS,
   RippleRenderer
@@ -40,12 +41,11 @@ import {
   _getFocusedElementPierceShadowDom,
   hasModifierKey
 } from "./chunk-FPLA2RMJ.js";
-import "./chunk-MOHRKI6L.js";
-import "./chunk-IJ3KGSPX.js";
-import "./chunk-7VR4VRUX.js";
 import {
   _CdkPrivateStyleLoader
 } from "./chunk-CTJLPMPM.js";
+import "./chunk-IJ3KGSPX.js";
+import "./chunk-7VR4VRUX.js";
 import {
   Platform,
   coerceNumberProperty

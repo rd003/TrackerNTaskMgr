@@ -1,10 +1,10 @@
 import {
-  MatPseudoCheckboxModule
-} from "./chunk-QMG7LF6Y.js";
-import {
   MatOptgroup,
   MatOption
 } from "./chunk-GGPF4EOD.js";
+import {
+  MatPseudoCheckboxModule
+} from "./chunk-QMG7LF6Y.js";
 import {
   MatRippleModule
 } from "./chunk-NRLVAENZ.js";
@@ -45,4 +45,4 @@ var MatOptionModule = class _MatOptionModule {
 export {
   MatOptionModule
 };
-//# sourceMappingURL=chunk-HY2I2QR4.js.map
+//# sourceMappingURL=chunk-5ME4JIZ4.js.map
