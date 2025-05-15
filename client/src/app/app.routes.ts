@@ -11,7 +11,7 @@ export const routes: Routes = [
         loadComponent: () => import("./track-entry/track-entry.component").then(a => a.TrackEntryComponent)
     },
     {
-        path: "tasks",
+        path: "create-task",
         loadComponent: () => import("./task/task-save.component").then(a => a.TaskSaveComponent)
     },
     {

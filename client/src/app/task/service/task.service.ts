@@ -18,6 +18,11 @@ export class TaskService {
         return this._http.post<TaskReadModel>(this._url, task);
     }
 
+    updateTask(task: TaskCreateModel): Observable<TaskReadModel> {
+        return this._http.put<TaskReadModel>(`${this._url}/${task.taskId}`, task);
+    }
+
+
     getTask(taskId: number) {
         return this._http.get<TaskReadModel>(`${this._url}/${taskId}`);
     }

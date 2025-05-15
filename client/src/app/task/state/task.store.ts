@@ -2,7 +2,6 @@ import { inject, Injectable } from "@angular/core";
 import { TaskReadModel } from "../models/task-read-model";
 import { HttpErrorResponse } from "@angular/common/http";
 import { BehaviorSubject, catchError, map, of, tap } from "rxjs";
-import { TaskCreateModel } from "../models/task-create.model";
 import { TaskService } from "../service/task.service";
 
 export interface TaskState {
@@ -28,25 +27,9 @@ export class TaskStore {
     loading = this._state$.pipe(map(a => a.loading));
     error = this._state$.pipe(map(a => a.error));
 
-    addTask(task: TaskCreateModel) {
-        this.setLoading();
-        this._taskService.addTask(task).pipe(
-            tap((createdTask) => {
-                this._state$.next(
-                    {
-                        ...this._state$.value,
-                        loading: false,
-                        tasks: [...this._state$.value.tasks, createdTask]
-                    });
-            }),
-            catchError(this.handlError)
-        ).subscribe();
-    }
-
     private setLoading() {
         this._state$.next({ ...this._state$.value, loading: true });
     }
-
 
     private handlError(error: HttpErrorResponse) {
         this._state$.next({ ...this._state$.value, loading: false, error });

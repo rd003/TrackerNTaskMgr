@@ -67,7 +67,6 @@ Content-Type: application/json
       "SubTaskUri": null
     }
   ],
-  
   "Tags": "video,dotnet,programming"
 }
 

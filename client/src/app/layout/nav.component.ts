@@ -21,6 +21,11 @@ import { RouterModule } from "@angular/router";
          <mat-icon>assessment</mat-icon>
          <span class="nav-link-text">Track Entry</span>
        </a>
+        <a mat-list-item routerLink="/create-task">
+         <mat-icon>assessment</mat-icon>
+         <span class="nav-link-text">+ Task</span>
+       </a>
+
        <a mat-list-item routerLink="/tasks">
          <mat-icon>assessment</mat-icon>
          <span class="nav-link-text">Tasks</span>

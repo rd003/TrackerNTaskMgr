@@ -19,7 +19,7 @@ import { TaskStatusModel } from "./models/task-status.model";
 import { TaskHeaderService } from "../task-header/services/task-header.service";
 import { TaskHeaderReadModel } from "../task-header/models/task-header-read.model";
 import { ActivatedRoute } from "@angular/router";
-import { catchError, of, tap } from "rxjs";
+import { BehaviorSubject, catchError, of, tap } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 @Component({
@@ -42,17 +42,7 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
   ],
   providers: [provideNativeDateAdapter()],
   template: `
-    
-    <ng-container *ngIf="store.loading|async as loading">
-      {{loading}}
-       loading....
-    </ng-container>
-
-    <ng-container *ngIf="store.error|async">
-       something went wrong!
-    </ng-container>
-
-    <div class="form-row">
+    <div class="form-row" *ngIf="message$|async as message">
       {{message}} 
     </div>
 
@@ -259,7 +249,8 @@ export class TaskSaveComponent implements OnInit {
   taskHeaderService = inject(TaskHeaderService);
   route = inject(ActivatedRoute);
   destroyRef = inject(DestroyRef);
-  message = "";
+  message$ = new BehaviorSubject<string>("");
+  loading = false;
   @Input() taskId = '';
 
   taskStatuses$ = this.taskService.getTaskStatuses();
@@ -277,7 +268,7 @@ export class TaskSaveComponent implements OnInit {
     scheduledAt: [null],
     displayAtBoard: [true],
     subTasks: this.fb.array([]),
-    tags: [''],
+    tags: '',
   });
 
   trackPriorityByFn(index: number, priority: TaskPriorityModel) {
@@ -297,16 +288,59 @@ export class TaskSaveComponent implements OnInit {
   }
 
   save() {
-    this.message = "";
-    var taskToAdd = this.frm.value as TaskCreateModel;
-    this.store.addTask(taskToAdd);
-    this.message = "Saved successfully";
-    this.cancel();
+    this.loading = true;
+    var taskToSave = this.frm.value as TaskCreateModel;
+
+    if (taskToSave.taskId < 1) {
+      this.addTask(taskToSave);
+    }
+    else {
+      this.updateTask(taskToSave);
+    }
+  }
+
+  addTask(task: TaskCreateModel) {
+    this.taskService.addTask(task).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: () => {
+        this.setMessage("Saved successfully");
+        this.cancel();
+      },
+      error: (error) => {
+        this.setMessage("Something went wrong");
+        console.log(error);
+      },
+      complete: () => {
+        this.loading = false;
+      }
+    });
+  }
+
+  updateTask(task: TaskCreateModel) {
+    this.taskService.updateTask(task).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: () => {
+        this.setMessage("Saved successfully");
+      },
+      error: (error) => {
+        this.setMessage("Something went wrong");
+        console.log(error);
+      },
+      complete: () => {
+        this.loading = false;
+      }
+    });
+  }
+
+  private setMessage(message: string) {
+    this.message$.next(message);
   }
 
   addSubTask() {
     const subTaskForm = this.fb.group({
-      subTaskId: [0],
+      subTaskId: [null],
       subTaskTitle: ['', Validators.required],
       subTaskUri: [null]
     });
@@ -328,7 +362,12 @@ export class TaskSaveComponent implements OnInit {
       const taskIdNum = parseInt(this.taskId);
       this.taskService.getTask(taskIdNum).pipe(
         tap((task) => {
-          this.frm.patchValue(task);
+          var taskToUpdate = {
+            ...task,
+            tags: task.tags ? task.tags.join(',') : ''
+          } as TaskCreateModel;
+
+          this.frm.patchValue(taskToUpdate);
 
           // Clear existing subtasks array
           this.subTasksFormArray.clear();
@@ -347,6 +386,7 @@ export class TaskSaveComponent implements OnInit {
 
         }),
         catchError((error) => {
+          this.setMessage("Something went wrong!");
           console.log(error);
           return of(error);
         }),

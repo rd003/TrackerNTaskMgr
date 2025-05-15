@@ -13,7 +13,7 @@ export interface TaskCreateModel {
 }
 
 export interface SubTaskCreateModel {
-  subTaskId: number,
+  subTaskId: number | null,
   subTaskTitle: string;
   subTaskUri: string | null;
 }
