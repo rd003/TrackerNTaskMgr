@@ -2,8 +2,8 @@ import { inject, Injectable } from "@angular/core";
 import { environment } from "../../../environments/environment.development";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { TaskCreateModel } from "../models/task-create.model";
-import { TaskReadModel } from "../models/task-read-model";
-import { Observable } from "rxjs";
+import { TaskReadModel, TasksByTaskHeader } from "../models/task-read-model";
+import { map, Observable } from "rxjs";
 import { TaskStatusModel } from "../models/task-status.model";
 import { TaskPriorityModel } from "../models/task-priority.model";
 import { SortDirection } from "@angular/material/sort";
@@ -32,7 +32,7 @@ export class TaskService {
         taskPriorityId: number | null = null,
         tagId: number | null = null,
         sortBy: string | null = null,
-        sortDirection: SortDirection = 'desc') {
+        sortDirection: SortDirection = 'desc'): Observable<TasksByTaskHeader[]> {
         let parameters = new HttpParams();
         parameters = parameters.set("sortDirection", sortDirection);
 
@@ -52,7 +52,27 @@ export class TaskService {
             parameters = parameters.set("sortBy", sortBy);
         }
 
-        return this._http.get<TaskReadModel[]>(this._url, { params: parameters });
+        return this._http.get<TaskReadModel[]>(this._url, { params: parameters }).pipe(map(this.mapTasksByGroup));
+    }
+
+    private mapTasksByGroup(tasks: TaskReadModel[]): TasksByTaskHeader[] {
+        const taskMap = new Map<string, TaskReadModel[]>();
+
+        tasks.forEach(task => {
+            const headerTitle = task.taskHeaderTitle;
+
+            if (!taskMap.has(headerTitle)) {
+                taskMap.set(headerTitle, []);
+            }
+            taskMap.get(headerTitle)!.push(task);
+        });
+
+        const result: TasksByTaskHeader[] = Array.from(taskMap.entries()).map(([taskHeaderTitle, tasks]) => ({
+            taskHeaderTitle,
+            tasks
+        }));
+
+        return result;
     }
 
     getTaskStatuses(): Observable<TaskStatusModel[]> {

@@ -32,3 +32,9 @@ export interface TaskPriorityReadModel {
   taskPriorityOrder: number;
   taskPriorityEmoji?: string | null;
 }
+
+export interface TasksByTaskHeader {
+  taskHeaderTitle: string,
+  tasks: TaskReadModel[]
+}
+
