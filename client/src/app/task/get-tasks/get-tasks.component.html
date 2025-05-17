@@ -1,3 +1,33 @@
+<div class="filters">
+    <ng-container *ngIf="taskHeaders$ | async as taskHeaders">
+        <mat-form-field formControlName="taskHeaderId">
+            <mat-label>Group/header</mat-label>
+            <mat-select>
+                <mat-option *ngFor="let header of taskHeaders; trackByFn:trackTaskHeaderFn"
+                    [value]="header.taskHeaderId">
+                    {{header.taskHeaderTitle}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </ng-container>
+
+    <ng-container *ngIf="taskStatuses$ | async as taskStatuses">
+        <mat-form-field formControlName="taskStatusId">
+            <mat-option *ngFor="let status of taskStatuses; trackByFn:trackTaskStatusFn" [value]="status.taskStatusId">
+                {{status.taskStatusName}}
+            </mat-option>
+        </mat-form-field>
+    </ng-container>
+
+    <ng-container *ngIf="taskPriorities$ | async as taskPriorities">
+        <mat-form-field formControlName="taskPriorityId">
+            <mat-option *ngFor="let tp of taskPriorities" [value]="tp.taskPriorityId">
+                {{tp.taskPriorityName}}
+            </mat-option>
+        </mat-form-field>
+    </ng-container>
+</div>
+
 <ng-container *ngIf="groupedTasks$|async as groupedTasks">
     <div *ngFor="let task of groupedTasks" style="margin-bottom: 20px;">
         <div style="margin: 20px 0px;font-size: 1.5em;">{{task.taskHeaderTitle}}</div>

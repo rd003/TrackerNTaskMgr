@@ -31,7 +31,7 @@ export class TaskService {
     getTasks(taskHeaderId: number | null = null,
         taskPriorityId: number | null = null,
         tagId: number | null = null,
-        sortBy: string | null = null,
+        sortBy: 'scheduledAt' | 'deadline' | null = null,
         sortDirection: SortDirection = 'desc'): Observable<TasksByTaskHeader[]> {
         let parameters = new HttpParams();
         parameters = parameters.set("sortDirection", sortDirection);
