@@ -6,7 +6,7 @@ import { TaskHeaderModel } from "../task-headers/models/task-header.model";
 @Injectable({ providedIn: 'root' })
 export class TaskHeaderService {
     private readonly _http = inject(HttpClient);
-    private readonly _url = environment.baseUrl + '/api/task-headers';
+    private readonly _url = environment.baseUrl + '/task-headers';
 
     getTaskHeaders() {
         return this._http.get<TaskHeaderModel[]>(this._url);

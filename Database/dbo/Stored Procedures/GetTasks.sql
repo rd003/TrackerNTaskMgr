@@ -1,7 +1,4 @@
-use TrackerNTaskMgt
-go
-
-create or alter procedure GetTasks
+create or alter  procedure [dbo].[GetTasks]
     @TaskHeaderId int=null,
     @TaskPriorityId int=null,
     @TagId int=null,
@@ -74,6 +71,9 @@ begin
     if(@TaskPriorityId is not null)
       set @sql = @sql + ' and t.TaskPriorityId = @TaskPriorityId';
 
+    if(@TagId is not null)
+      set @sql = @sql + ' and tt.TagId = @TagId';  
+
   -- eliminate null from date column if someone sort by ScheduledAt or Deadline
    if(@SortBy is not null)
     begin
@@ -109,4 +109,6 @@ begin
     print @sql;
     execute sp_executesql @sql,N'@TaskHeaderId int,@TaskPriorityId int,@TagId int,@SortBy nvarchar(20),@SortDirection nvarchar(4)', @TaskHeaderId,@TaskPriorityId,@TagId,@SortBy,@SortDirection
 end 
+
+GO
 
