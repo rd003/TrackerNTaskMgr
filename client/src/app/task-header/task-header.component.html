@@ -5,13 +5,28 @@
 <div class="mb-10" *ngIf="(store.loading$|async) === true">
     <mat-spinner [diameter]="70"></mat-spinner>
 </div>
-
+<!-- form -->
 <div class="mb-10">
-    <!-- form -->
+    <form [formGroup]="form" (ngSubmit)="onSave()" style="display: flex; gap:10px;">
+        <input type="hidden" formControlName="taskHeaderId">
+        <div>
+            <mat-form-field [appearance]="'outline'" style="width:500px;">
+                <mat-label>Title</mat-label>
+                <input type="text" matInput formControlName="taskHeaderTitle">
+            </mat-form-field>
+            <mat-error
+                *ngIf="form.get('taskHeaderTitle')?.invalid && (form.get('taskHeaderTitle')?.dirty || form.get('taskHeaderTitle')?.touched)">
+                <span *ngIf="form.get('taskHeaderTitle')?.hasError('required')">Title is required</span>
+            </mat-error>
+
+        </div>
+
+        <button type="submit" mat-raised-button [disabled]="form.invalid">Save</button>
+    </form>
 </div>
 
+<!-- task-header-list -->
 <div class="mb-10">
-    <!-- task-header-list -->
     <ng-container *ngIf="store.taskHeaders$|async as taskHeaders">
         <ng-container *ngIf="taskHeaders.length>0;else noData">
             <table mat-table [dataSource]="taskHeaders" class="mat-elevation-z8">
