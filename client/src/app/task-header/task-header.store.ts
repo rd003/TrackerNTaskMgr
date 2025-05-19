@@ -78,7 +78,6 @@ export class TaskHeaderStore {
             error,
             loading: false
         });
-        return of(error);
     }
 
     private loadTaskHeaders() {

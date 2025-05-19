@@ -9,6 +9,8 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { TaskHeaderReadModel } from "./models/task-header-read.model";
 import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { MatInputModule } from "@angular/material/input";
+import { TaskHeaderCreateModel } from "./models/task-header-create.model";
+import { TaskHeaderUpdateModel } from "./models/task-header-update.model";
 
 @Component({
     selector: 'app-task-header',
@@ -27,9 +29,10 @@ export class TaskHeaderComponent {
     form = this.fb.group({
         taskHeaderId: [0],
         taskHeaderTitle: ['', Validators.required],
+        sortOrder: [0, Validators.required],
     });
 
-    displayedColumns = ["taskHeaderTitle", "action"];
+    displayedColumns = ["taskHeaderTitle", "sortOrder", "action"];
 
     onEdit(taskHeader: TaskHeaderReadModel) {
         console.log(taskHeader);
@@ -40,6 +43,15 @@ export class TaskHeaderComponent {
     }
 
     onSave() {
+        var submittedData = this.form.value;
 
+        if (submittedData.taskHeaderId == null || submittedData.taskHeaderId < 1) {
+            this.store.addTaskHeader(submittedData as TaskHeaderCreateModel);
+        }
+
+        else {
+            this.store.updateTaskHeader(submittedData as TaskHeaderUpdateModel);
+        }
+        this.form.setValue({ taskHeaderId: 0, taskHeaderTitle: '', sortOrder: 0 });
     }
 }
