@@ -1,5 +1,5 @@
 import { TaskHeaderCreateModel } from "./task-header-create.model";
 
-export interface TaskHeaderUpdatModel extends TaskHeaderCreateModel {
+export interface TaskHeaderUpdateModel extends TaskHeaderCreateModel {
     taskHeaderId: number
 }
