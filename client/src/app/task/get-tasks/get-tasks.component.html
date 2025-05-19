@@ -21,17 +21,16 @@
         </mat-form-field>
     </ng-container>
 
-    <!-- <ng-container *ngIf="taskStatuses$ | async as taskStatuses">
+    <ng-container *ngIf="tags$ | async as tags">
         <mat-form-field>
-            <mat-label>Status</mat-label>
-            <mat-select [formControl]="taskStatus">
-                <mat-option *ngFor="let status of taskStatuses; trackBy:trackTaskStatusFn"
-                    [value]="status.taskStatusId">
-                    {{status.taskStatusName}}
+            <mat-label>Tags</mat-label>
+            <mat-select [formControl]="tag">
+                <mat-option *ngFor="let status of tags; trackBy:trackTagsFn" [value]="status.tagId">
+                    {{status.tagName}}
                 </mat-option>
             </mat-select>
         </mat-form-field>
-    </ng-container> -->
+    </ng-container>
 
     <button mat-raised-button (click)="clearFilter()">Clear</button>
 </div>

@@ -7,6 +7,7 @@ import { map, Observable } from "rxjs";
 import { TaskStatusModel } from "../models/task-status.model";
 import { TaskPriorityModel } from "../models/task-priority.model";
 import { SortDirection } from "@angular/material/sort";
+import { TagModel } from "../models/tag.model";
 
 @Injectable({
     providedIn: 'root'
@@ -83,4 +84,7 @@ export class TaskService {
         return this._http.get<TaskPriorityModel[]>(this._url + '/priorities');
     }
 
+    getTags(): Observable<TagModel[]> {
+        return this._http.get<TagModel[]>(environment.baseUrl + "/tags");
+    }
 }
