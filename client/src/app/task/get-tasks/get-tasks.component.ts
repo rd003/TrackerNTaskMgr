@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
+import { ChangeDetectionStrategy, Component, DestroyRef, inject } from "@angular/core";
 import { TaskService } from "../service/task.service";
 import { AsyncPipe, DatePipe, NgFor, NgIf } from "@angular/common";
-import { BehaviorSubject, catchError, combineLatest, Observable, of, startWith, switchMap } from "rxjs";
+import { BehaviorSubject, catchError, combineLatest, finalize, Observable, of, startWith, switchMap, tap } from "rxjs";
 import { MatTableModule } from "@angular/material/table";
 import { MatIconModule } from "@angular/material/icon";
 import { MatButtonModule } from "@angular/material/button";
@@ -14,26 +14,38 @@ import { TaskHeaderModel } from "../../task-headers/models/task-header.model";
 import { TaskReadModel, TasksByTaskHeader } from "../models/task-read-model";
 import { TagModel } from "../models/tag.model";
 import { Router, RouterModule } from "@angular/router";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { MatSortModule, Sort } from "@angular/material/sort";
+import { SortModel } from "../../shared/sort.model";
+import { SortDirection } from "../../shared/sort-direction";
 
 @Component({
     selector: 'app-get-tasks',
     templateUrl: "get-tasks.component.html",
-    styles: [``],
+    styles: [`
+    .form-row{
+        margin-bottom: 10px;
+    }
+    `],
     standalone: true,
     imports: [NgIf, NgFor, AsyncPipe, DatePipe, MatTableModule,
-        MatIconModule, MatButtonModule, MatSelectModule, MatFormFieldModule, ReactiveFormsModule, RouterModule],
+        MatIconModule, MatButtonModule, MatSelectModule, MatFormFieldModule, ReactiveFormsModule, RouterModule, MatProgressSpinnerModule, MatSortModule],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GetTasksComponent {
     private readonly _taskService = inject(TaskService);
     private readonly _taskHeaderService = inject(TaskHeaderService);
     router = inject(Router);
+    destroyRef = inject(DestroyRef);
 
     loading$ = new BehaviorSubject<boolean>(false);
     message$ = new BehaviorSubject<string>('');
     taskHeaders$ = this._taskHeaderService.getTaskHeaders();
     taskPriorities$ = this._taskService.getTaskPriorities();
     tags$ = this._taskService.getTags();
+    isDeleted$ = new BehaviorSubject<boolean>(false);
+    sort$ = new BehaviorSubject<SortModel>({ sortColumn: null, sortDirection: 'desc' });
 
     taskPriority = new FormControl<number>(0);
     taskHeader = new FormControl<number>(0);
@@ -43,22 +55,33 @@ export class GetTasksComponent {
     taskPriorityId$ = this.taskPriority.valueChanges.pipe(startWith(null));
     tagId$ = this.tag.valueChanges.pipe(startWith(null));
 
-    groupedTasks$: Observable<TasksByTaskHeader[]> = combineLatest([this.taskHeaderId$, this.taskPriorityId$, this.tagId$]).pipe(
-        switchMap(([taskHeaderId, taskPriorityId, tagId]) => {
-            //console.log(taskHeaderId, taskPriorityId, tagId);
-            return this._taskService.getTasks(taskHeaderId, taskPriorityId, tagId);
-        }), catchError((error) => {
-            console.log(error);
-            this.message$.next("Error has occured");
-            return of(error);
-        }));
+    groupedTasks$: Observable<TasksByTaskHeader[]> = combineLatest([this.taskHeaderId$, this.taskPriorityId$, this.tagId$, this.isDeleted$, this.sort$]).pipe(
+        tap(() => this.setLoading(true)),
+        switchMap(([taskHeaderId, taskPriorityId, tagId, isDeleted, sort]) => {
+            return this._taskService.getTasks(taskHeaderId, taskPriorityId, tagId, sort.sortColumn, sort.sortDirection).pipe(
+                catchError((error) => {
+                    console.log(error);
+                    this.message$.next("Error has occurred");
+                    return of([]);
+                })
+            );
+        })
+    ).pipe(
+        tap(_ => this.setLoading(false))
+    );
+
+    setLoading(val: boolean) {
+        this.loading$.next(val);
+    }
 
     displayedColumns = ["taskTitle", "status", "priority", "deadline", "scheduledAt", "tags", "action"];
 
     clearFilter() {
+        // this is crap: It is making api call 3 or 4 times
         this.taskHeader.setValue(null);
         this.taskPriority.setValue(null);
         this.tag.setValue(null);
+        this.sort$.next({ sortColumn: null, sortDirection: 'desc' });
     }
 
     trackTaskHeaderFn(index: number, task: TaskHeaderModel) {
@@ -79,8 +102,28 @@ export class GetTasksComponent {
 
     deleteTask(task: TaskReadModel) {
         if (confirm(`Are you sure to delete : ${task.taskTitle}`)) {
-            alert('deleted');
+            this.setLoading(true);
+
+            this._taskService.deleteTask(task.taskId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+                next: () => {
+                    this.isDeleted$.next(true);
+                },
+                error: (error) => {
+                    console.log(error);
+                    this.message$.next("Error!");
+                },
+                complete: () => {
+                    this.setLoading(false);
+                }
+            });
         }
     }
 
+    onSort(sortState: Sort) {
+        const sort: SortModel = {
+            sortDirection: sortState.direction as SortDirection,
+            sortColumn: sortState.active
+        };
+        this.sort$.next(sort);
+    }
 }

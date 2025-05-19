@@ -81,10 +81,12 @@ import { Sort, MatSortModule, SortDirection } from '@angular/material/sort';
 
 export class TrackEntryListComponent {
   displayedColumns = ["entryDate", "sleptAt", "wokeUpAt", "napInMinutes", "totalSleepInMinutes", "totalWorkInMinutes", "trackEntryRemark", "action"];
+
   @Input({ required: true }) dataSource!: readonly TrackEntryReadModel[];
   @Output() editTrackEntry = new EventEmitter<TrackEntryReadModel>();
   @Output() deleteTrackEntry = new EventEmitter<TrackEntryReadModel>();
   @Output() sort = new EventEmitter<SortDirection>();
+
   onEdit(trackEntry: TrackEntryReadModel) {
     this.editTrackEntry.emit(trackEntry)
   }

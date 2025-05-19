@@ -32,7 +32,7 @@ export class TaskService {
     getTasks(taskHeaderId: number | null = null,
         taskPriorityId: number | null = null,
         tagId: number | null = null,
-        sortBy: 'scheduledAt' | 'deadline' | null = null,
+        sortBy: string | null = null,
         sortDirection: SortDirection = 'desc'): Observable<TasksByTaskHeader[]> {
         let parameters = new HttpParams();
         parameters = parameters.set("sortDirection", sortDirection);
@@ -86,5 +86,9 @@ export class TaskService {
 
     getTags(): Observable<TagModel[]> {
         return this._http.get<TagModel[]>(environment.baseUrl + "/tags");
+    }
+
+    deleteTask(taskId: number): Observable<void> {
+        return this._http.delete<void>(`${this._url}/${taskId}`);
     }
 }
