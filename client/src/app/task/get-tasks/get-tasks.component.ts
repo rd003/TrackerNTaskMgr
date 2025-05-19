@@ -7,13 +7,13 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatButtonModule } from "@angular/material/button";
 import { TaskHeaderService } from "../../task-header/task-header.service";
 import { TaskPriorityModel } from "../models/task-priority.model";
-import { TaskStatusModel } from "../models/task-status.model";
 import { FormControl, ReactiveFormsModule } from "@angular/forms";
 import { MatSelectModule } from "@angular/material/select";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { TaskHeaderModel } from "../../task-headers/models/task-header.model";
-import { TasksByTaskHeader } from "../models/task-read-model";
+import { TaskReadModel, TasksByTaskHeader } from "../models/task-read-model";
 import { TagModel } from "../models/tag.model";
+import { Router, RouterModule } from "@angular/router";
 
 @Component({
     selector: 'app-get-tasks',
@@ -21,13 +21,13 @@ import { TagModel } from "../models/tag.model";
     styles: [``],
     standalone: true,
     imports: [NgIf, NgFor, AsyncPipe, DatePipe, MatTableModule,
-        MatIconModule, MatButtonModule, MatSelectModule, MatFormFieldModule, ReactiveFormsModule],
+        MatIconModule, MatButtonModule, MatSelectModule, MatFormFieldModule, ReactiveFormsModule, RouterModule],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GetTasksComponent {
     private readonly _taskService = inject(TaskService);
     private readonly _taskHeaderService = inject(TaskHeaderService);
-    // private readonly dRef = inject(DestroyRef);
+    router = inject(Router);
 
     loading$ = new BehaviorSubject<boolean>(false);
     message$ = new BehaviorSubject<string>('');
@@ -45,7 +45,7 @@ export class GetTasksComponent {
 
     groupedTasks$: Observable<TasksByTaskHeader[]> = combineLatest([this.taskHeaderId$, this.taskPriorityId$, this.tagId$]).pipe(
         switchMap(([taskHeaderId, taskPriorityId, tagId]) => {
-            console.log(taskHeaderId, taskPriorityId, tagId);
+            //console.log(taskHeaderId, taskPriorityId, tagId);
             return this._taskService.getTasks(taskHeaderId, taskPriorityId, tagId);
         }), catchError((error) => {
             console.log(error);
@@ -71,6 +71,16 @@ export class GetTasksComponent {
 
     trackTagsFn(index: number, tag: TagModel) {
         return tag.tagId;
+    }
+
+    editTask(task: TaskReadModel) {
+        this.router.navigate([`update-task/${task.taskId}`])
+    }
+
+    deleteTask(task: TaskReadModel) {
+        if (confirm(`Are you sure to delete : ${task.taskTitle}`)) {
+            alert('deleted');
+        }
     }
 
 }

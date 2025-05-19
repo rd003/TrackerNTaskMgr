@@ -17,7 +17,7 @@ import { TaskPriorityModel } from "../models/task-priority.model";
 import { TaskStatusModel } from "../models/task-status.model";
 import { TaskHeaderService } from "../../task-header/services/task-header.service";
 import { TaskHeaderReadModel } from "../../task-header/models/task-header-read.model";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, RouterModule } from "@angular/router";
 import { BehaviorSubject, catchError, finalize, of, tap } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
@@ -39,7 +39,8 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
     MatCheckboxModule,
     MatCardModule,
     MatDividerModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    RouterModule
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: "task-save.component.html",
@@ -125,6 +126,7 @@ export class TaskSaveComponent implements OnInit {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: () => {
+        this.setMessage("Saved successfully");
         this.setLoading(false);
       },
       error: (error) => {
