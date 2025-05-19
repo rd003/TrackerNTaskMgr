@@ -20,11 +20,11 @@ export class TaskHeaderService {
     }
 
     getTaskHeader(id: number) {
-        return this.http.get<TaskHeaderUpdateModel>(`${this.url}/${id}`);
+        return this.http.get<TaskHeaderReadModel>(`${this.url}/${id}`);
     }
 
     deleteTaskHeader(id: number) {
-        return this.http.delete<TaskHeaderUpdateModel>(`${this.url}/${id}`);
+        return this.http.delete<void>(`${this.url}/${id}`);
     }
 
     getTaskHeaders() {

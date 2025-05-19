@@ -5,12 +5,12 @@ import { BehaviorSubject, catchError, combineLatest, finalize, Observable, of, s
 import { MatTableModule } from "@angular/material/table";
 import { MatIconModule } from "@angular/material/icon";
 import { MatButtonModule } from "@angular/material/button";
-import { TaskHeaderService } from "../../task-header/task-header.service";
+import { TaskHeaderService } from "../../task-header/services/task-header.service";
 import { TaskPriorityModel } from "../models/task-priority.model";
 import { FormControl, ReactiveFormsModule } from "@angular/forms";
 import { MatSelectModule } from "@angular/material/select";
 import { MatFormFieldModule } from "@angular/material/form-field";
-import { TaskHeaderModel } from "../../task-headers/models/task-header.model";
+import { TaskHeaderReadModel } from "../../task-header/models/task-header-read.model";
 import { TaskReadModel, TasksByTaskHeader } from "../models/task-read-model";
 import { TagModel } from "../models/tag.model";
 import { Router, RouterModule } from "@angular/router";
@@ -84,7 +84,7 @@ export class GetTasksComponent {
         this.sort$.next({ sortColumn: null, sortDirection: 'desc' });
     }
 
-    trackTaskHeaderFn(index: number, task: TaskHeaderModel) {
+    trackTaskHeaderFn(index: number, task: TaskHeaderReadModel) {
         return task.taskHeaderId
     }
 
