@@ -23,6 +23,10 @@ export const routes: Routes = [
         loadComponent: () => import("./task/task-save/task-save.component").then(a => a.TaskSaveComponent)
     },
     {
+        path: "task-detail/:taskId",
+        loadComponent: () => import("./task/task-detail.component").then(a => a.TaskDetailComponent)
+    },
+    {
         path: 'task-group',
         loadComponent: () => import("./task-header/task-header.component").then(a => a.TaskHeaderComponent)
     },

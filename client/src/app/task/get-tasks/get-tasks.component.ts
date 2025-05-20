@@ -27,6 +27,12 @@ import { SortDirection } from "../../shared/sort-direction";
     .form-row{
         margin-bottom: 10px;
     }
+    .link-icon {
+  font-size: 18px;
+  vertical-align: middle;
+  margin-left: 5px;
+  cursor: pointer;
+}
     `],
     standalone: true,
     imports: [NgIf, NgFor, AsyncPipe, DatePipe, MatTableModule,

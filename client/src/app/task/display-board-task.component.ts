@@ -1,5 +1,5 @@
 import { AsyncPipe, DatePipe, NgIf } from "@angular/common";
-import { Component, inject } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatTableModule } from "@angular/material/table";
 import { TaskService } from "./service/task.service";
@@ -7,14 +7,14 @@ import { DisplayBoardTaskModel } from "./models/display-board-task.model";
 import { HttpErrorResponse } from "@angular/common/http";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { BehaviorSubject, catchError, map, of, tap } from "rxjs";
-import { Router } from "@angular/router";
+import { Router, RouterModule } from "@angular/router";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 
 @Component({
     selector: 'app-display-board-task',
     standalone: true,
-    imports: [NgIf, MatTableModule, MatProgressSpinnerModule, AsyncPipe, DatePipe, MatButtonModule, MatIconModule],
+    imports: [NgIf, MatTableModule, MatProgressSpinnerModule, AsyncPipe, DatePipe, MatButtonModule, MatIconModule, RouterModule],
     template: `
        <div class="mb-10" *ngIf="(loading$|async)===true">
             <mat-spinner [diameter]="50"/>
@@ -55,7 +55,11 @@ import { MatIconModule } from "@angular/material/icon";
                   <ng-container matColumnDef="actions">
                     <th mat-header-cell *matHeaderCellDef> Actions </th>
                     <td mat-cell *matCellDef="let element" style="display: flex;gap:7px;">
-                        <button mat-mini-fab aria-label="edit-entry" color="accent" (click)="edit(element.taskId);">
+                     <a mat-mini-fab area-label="task-detail" routerLink="/task-detail/{{element.taskId}}"
+                        color="primary">
+                        <mat-icon>assignment</mat-icon>
+                    </a>    
+                    <button mat-mini-fab aria-label="edit-entry" color="accent" (click)="edit(element.taskId);">
                             <mat-icon>edit</mat-icon>
                         </button>
                     </td>
@@ -67,9 +71,10 @@ import { MatIconModule } from "@angular/material/icon";
        </ng-container>      
        </div>
     `,
-    styles: `.mb10{
+    styles: [`.mb10{
         margin-bottom:10px;
-    }`,
+    }`],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DisplayBoardTaskComponent {
     private readonly _taskService = inject(TaskService);
