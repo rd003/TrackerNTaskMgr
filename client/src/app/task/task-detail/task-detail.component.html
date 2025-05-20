@@ -1,0 +1,104 @@
+<h2>Task Detail</h2>
+
+<div class="links">
+    <a mat-raised-button routerLink="/tasks">All-Tasks</a>
+    <a mat-raised-button routerLink="/dashboard">Dashboard</a>
+</div>
+@if(loading$ | async)
+{
+<div class="mb10">
+    <mat-spinner [diameter]="60"></mat-spinner>
+</div>
+}
+
+@if(error$ | async)
+{
+<div class="mb10">
+    Error has occured
+</div>
+}
+
+@else {
+
+@if(task$|async; as task)
+{
+@if(!task){
+<span>No task available</span>
+}
+@else{
+<div class="taskDiv">
+    <div class="row">
+        <div class="heading">Title</div>
+        <div class="content">
+            {{task.taskTitle}}
+
+            @if(task.taskUri){
+            <a [href]="task.taskUri" target="_blank">
+                <mat-icon class="link-icon">link</mat-icon>
+            </a>
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="heading">Group/Header</div>
+        <div class="content">
+            {{task.taskHeaderTitle}}
+        </div>
+    </div>
+
+    @if(task.taskStatus){
+    <div class="row">
+        <div class="heading">Status</div>
+        <div class="content">{{task.taskStatus.taskStatusName}} {{task.taskStatus.taskStatusEmoji}}</div>
+    </div>
+    }
+
+    @if(task.taskPriority){
+    <div class="row">
+        <div class="heading">Priority</div>
+        <div class="content">{{task.taskPriority.taskPriorityName}} {{task.taskPriority.taskPriorityEmoji}}</div>
+    </div>
+    }
+
+    @if(task.deadline){
+    <div class="row">
+        <div class="heading">Deadline</div>
+        <div class="content">{{task.deadline | date : 'dd-MMM-yyy hh:mm:ss'}}</div>
+    </div>
+    }
+
+    @if(task.scheduledAt){
+    <div class="row">
+        <div class="heading">Scheduled Aut</div>
+        <div class="content">{{task.scheduledAt | date : 'dd-MMM-yyy hh:mm:ss'}}</div>
+    </div>
+    }
+
+    @if(task.tags && task.tags.length>0){
+    <div class="row">
+        <div class="heading">Tags</div>
+        <div class="content">
+            {{task.tags.join(',')}}
+        </div>
+    </div>
+    }
+
+    @if(task.subTasks && task.subTasks.length>0)
+    {
+    <h3>SubTasks</h3>
+    @for(subTask of task.subTasks; track subTask.taskId)
+    {
+    <div class="sub-task">{{subTask.subTaskTitle}}
+        @if(subTask.subTaskUri){
+        <a [href]="subTask.subTaskUri" target="_blank">
+            <mat-icon class="link-icon">link</mat-icon>
+        </a>
+        }
+    </div>
+    }
+    }
+</div>
+}
+}
+}

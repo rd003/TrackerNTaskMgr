@@ -1,0 +1,44 @@
+.mb10 {
+    margin-bottom: 10px;
+}
+
+.links {
+    margin-bottom: 18px;
+    display: flex;
+    gap: 10px;
+}
+
+.taskDiv {
+    font-size: 1.2em;
+    margin-bottom: 18px;
+}
+
+.row {
+    margin-bottom: 5px;
+    display: flex;
+    gap: 10px;
+    border: 1px solid rgb(182, 181, 181);
+    background-color: rgb(234, 240, 241);
+    padding: 10px;
+    box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
+}
+
+.heading {
+    width: 15%;
+    font-weight: 500;
+}
+
+.sub-task {
+    border: 1px solid rgb(182, 181, 181);
+    background-color: rgb(234, 240, 241);
+    padding: 10px;
+    box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
+    margin-bottom: 5px;
+}
+
+.link-icon {
+    font-size: 18px;
+    vertical-align: middle;
+    margin-left: 5px;
+    cursor: pointer;
+}
