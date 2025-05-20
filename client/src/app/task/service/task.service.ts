@@ -8,6 +8,7 @@ import { TaskStatusModel } from "../models/task-status.model";
 import { TaskPriorityModel } from "../models/task-priority.model";
 import { SortDirection } from "@angular/material/sort";
 import { TagModel } from "../models/tag.model";
+import { DisplayBoardTaskModel } from "../models/display-board-task.model";
 
 @Injectable({
     providedIn: 'root'
@@ -90,5 +91,9 @@ export class TaskService {
 
     deleteTask(taskId: number): Observable<void> {
         return this._http.delete<void>(`${this._url}/${taskId}`);
+    }
+
+    getDisplayBoardTask() {
+        return this._http.get<DisplayBoardTaskModel[]>(this._url + "/displayboard-tasks");
     }
 }

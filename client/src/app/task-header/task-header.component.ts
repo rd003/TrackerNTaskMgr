@@ -35,11 +35,13 @@ export class TaskHeaderComponent {
     displayedColumns = ["taskHeaderTitle", "sortOrder", "action"];
 
     onEdit(taskHeader: TaskHeaderReadModel) {
-        console.log(taskHeader);
+        this.form.patchValue(taskHeader);
     }
 
     onDelete(taskHeader: TaskHeaderReadModel) {
-        console.log(taskHeader);
+        if (confirm(`Ary you sure to delete: ${taskHeader.taskHeaderTitle}`)) {
+            this.store.deleteTaskHeader(taskHeader.taskHeaderId);
+        }
     }
 
     onSave() {
@@ -52,6 +54,6 @@ export class TaskHeaderComponent {
         else {
             this.store.updateTaskHeader(submittedData as TaskHeaderUpdateModel);
         }
-        this.form.setValue({ taskHeaderId: 0, taskHeaderTitle: '', sortOrder: 0 });
+        this.form.reset();
     }
 }

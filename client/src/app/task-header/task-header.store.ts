@@ -36,7 +36,7 @@ export class TaskHeaderStore {
                     loading: false
                 });
             }),
-            error: (this.handleError)
+            error: (error) => this.handleError(error)
         });
     }
 
@@ -50,7 +50,7 @@ export class TaskHeaderStore {
                     loading: false
                 });
             }),
-            error: (this.handleError)
+            error: (error) => this.handleError(error)
         });
     }
 
@@ -64,7 +64,7 @@ export class TaskHeaderStore {
                     loading: false
                 });
             }),
-            error: (this.handleError)
+            error: (error) => this.handleError(error)
         });
     }
 
@@ -90,7 +90,7 @@ export class TaskHeaderStore {
                     loading: false
                 });
             }),
-            error: (this.handleError)
+            error: (error) => this.handleError(error)
         });
     }
 
