@@ -18,7 +18,22 @@ import { TaskHeaderUpdateModel } from "./models/task-header-update.model";
     imports: [NgIf, AsyncPipe, MatProgressSpinnerModule, MatIconModule, MatTableModule, MatButtonModule, MatFormFieldModule, ReactiveFormsModule, MatInputModule],
     providers: [TaskHeaderStore],
     templateUrl: 'task-header.component.html',
-    styles: [`.mb-10{margin-bottom:10px}`],
+    styles: [`
+    .mb-10{margin-bottom:10px}
+    
+    :host ::ng-deep .mat-mdc-row .mat-mdc-cell.action-cell {
+  padding: 0;
+  min-height:55px;
+}
+
+:host ::ng-deep .action-cell {
+  display: flex !important;
+  gap:7px;
+  align-items: center !important;
+  justify-content: center !important;
+}
+   
+        `],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 

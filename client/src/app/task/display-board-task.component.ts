@@ -54,14 +54,16 @@ import { MatIconModule } from "@angular/material/icon";
 
                   <ng-container matColumnDef="actions">
                     <th mat-header-cell *matHeaderCellDef> Actions </th>
-                    <td mat-cell *matCellDef="let element" style="display: flex;gap:7px;">
-                     <a mat-mini-fab area-label="task-detail" routerLink="/task-detail/{{element.taskId}}"
+                    <td mat-cell *matCellDef="let element" class="action-cell">
+                     
+                        <a mat-mini-fab area-label="task-detail" routerLink="/task-detail/{{element.taskId}}"
                         color="primary">
                         <mat-icon>assignment</mat-icon>
                     </a>    
                     <button mat-mini-fab aria-label="edit-entry" color="accent" (click)="edit(element.taskId);">
                             <mat-icon>edit</mat-icon>
                         </button>
+                    
                     </td>
                 </ng-container>
 
@@ -73,7 +75,21 @@ import { MatIconModule } from "@angular/material/icon";
     `,
     styles: [`.mb10{
         margin-bottom:10px;
-    }`],
+    }
+  
+
+:host ::ng-deep .mat-mdc-row .mat-mdc-cell.action-cell {
+  padding: 0;
+  min-height:55px;
+}
+
+:host ::ng-deep .action-cell {
+  display: flex !important;
+  gap:7px;
+  align-items: center !important;
+  justify-content: center !important;
+}
+    `],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DisplayBoardTaskComponent {

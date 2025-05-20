@@ -61,7 +61,7 @@ import { Sort, MatSortModule, SortDirection } from '@angular/material/sort';
 
 <ng-container matColumnDef="action">
   <th mat-header-cell *matHeaderCellDef> Actions </th>
-  <td mat-cell *matCellDef="let element" style="display: flex;gap:7px;"> 
+  <td mat-cell *matCellDef="let element" class="action-cell"> 
   <button mat-mini-fab aria-label="edit-entry" color="accent" (click)="onEdit(element);">
      <mat-icon>edit</mat-icon>
   </button>
@@ -75,7 +75,26 @@ import { Sort, MatSortModule, SortDirection } from '@angular/material/sort';
 <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 </table>
     `,
-  styles: [],
+  styles: [`
+      .action-buttons {
+  display: flex;
+  gap: 5px;
+  padding:6px;
+}
+
+
+:host ::ng-deep .mat-mdc-row .mat-mdc-cell.action-cell {
+  padding: 0;
+  min-height: 55px;
+}
+
+:host ::ng-deep .action-cell {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap:7px;
+}
+    `],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 

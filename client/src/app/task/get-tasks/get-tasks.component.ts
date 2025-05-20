@@ -33,6 +33,19 @@ import { SortDirection } from "../../shared/sort-direction";
         margin-left: 5px;
         cursor: pointer;
      }
+
+     :host ::ng-deep .mat-mdc-row .mat-mdc-cell.action-cell {
+  padding: 0;
+  min-height:55px;
+}
+
+:host ::ng-deep .action-cell {
+  display: flex !important;
+  gap:7px;
+  align-items: center !important;
+  justify-content: center !important;
+}
+   
     `],
     standalone: true,
     imports: [NgIf, NgFor, AsyncPipe, DatePipe, MatTableModule,

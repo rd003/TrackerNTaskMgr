@@ -54,7 +54,7 @@
 
                 <ng-container matColumnDef="action">
                     <th mat-header-cell *matHeaderCellDef> Actions </th>
-                    <td mat-cell *matCellDef="let element" style="display: flex;gap:7px;">
+                    <td mat-cell *matCellDef="let element" class="action-cell">
                         <button mat-mini-fab aria-label="edit-entry" color="accent" (click)="onEdit(element);">
                             <mat-icon>edit</mat-icon>
                         </button>
