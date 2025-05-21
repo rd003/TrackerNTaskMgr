@@ -1,6 +1,6 @@
-﻿namespace TrackerNTaskMgr.Api.Entities;
+namespace TrackerNTaskMgr.Api.DTOs;
 
-public class UserAccount
+public class UserAccountDto
 {
     public int UserAccountId { get; set; }
     public string Username { get; set; } = string.Empty;

@@ -13,6 +13,7 @@ using System.Globalization;
 
 using TrackerNTaskMgr.Api.DTOs;
 using TrackerNTaskMgr.Api.Exceptions;
+using TrackerNTaskMgr.Api.Extensions;
 using TrackerNTaskMgr.Api.Services;
 using TrackerNTaskMgr.Api.TypeHandlers;
 using TrackerNTaskMgr.Api.Validators;
@@ -93,6 +94,8 @@ app.MapPost("/bulk-track-entries", async (ITrackEntryService trackEntryService) 
     await InsertTrackEntries(trackEntryService);
     return Results.Ok();
 });
+
+await app.SeedAsync(); // Seeding default user
 
 await app.RunAsync();
 
