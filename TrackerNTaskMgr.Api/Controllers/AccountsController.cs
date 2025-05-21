@@ -40,14 +40,14 @@ public class AccountsController : ControllerBase
 
         using IDbConnection connection = new SqlConnection(_constr);
         string sql = @"select UserAccountId,Username,PasswordHash from UserAccounts
-          where Username=@username and PasswordHash=@password; 
+          where Username=@username; 
          ";
-        var user = await connection.QueryFirstOrDefaultAsync<UserAccountDto>(sql, loginModel);
-        if (user is null)
+        var user = await connection.QueryFirstOrDefaultAsync<UserAccountDto>(sql, new { loginModel.Username });
+        if (user != null && BCrypt.Net.BCrypt.Verify(loginModel.Password, user.PasswordHash))
         {
-            return Unauthorized();
+            return Ok("Logged in");
         }
-        return Ok("Logged in");
+        return Unauthorized();
     }
 
 }

@@ -26,7 +26,7 @@ public static class DbSeeder
     private static async Task SeedUserAsync(string constr)
     {
         string username = "user";
-        string password = "123"; // I have deliberitely used the weak password
+        string passwordHash = BCrypt.Net.BCrypt.HashPassword("123"); // I have deliberitely used the weak password
 
         using IDbConnection connection = new SqlConnection(constr);
 
@@ -34,9 +34,9 @@ public static class DbSeeder
         if not exists(select 1 from UserAccounts)
         begin
           insert into UserAccounts (Username,PasswordHash)
-          values (@username,@password);
+          values (@username,@passwordHash);
         end  
         ";
-        await connection.ExecuteAsync(sql, new { username, password });
+        await connection.ExecuteAsync(sql, new { username, passwordHash });
     }
 }
