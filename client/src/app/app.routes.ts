@@ -31,6 +31,10 @@ export const routes: Routes = [
         loadComponent: () => import("./task-header/task-header.component").then(a => a.TaskHeaderComponent)
     },
     {
+        path: 'login',
+        loadComponent: () => import('./account/login/login.component').then(a => a.LoginComponent)
+    },
+    {
         path: "",
         redirectTo: "/dashboard",
         pathMatch: "full"

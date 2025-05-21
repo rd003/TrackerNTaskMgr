@@ -1,0 +1,38 @@
+<div class="main">
+    <div class="login">
+        <h3>Login</h3>
+        <form (ngSubmit)="onSubmit()" [formGroup]="loginForm" class="login-form">
+            <div class="row">
+                <mat-form-field [appearance]="'fill'">
+                    <mat-label>Username</mat-label>
+                    <input type="text" matInput formControlName="username">
+                    @if(f.username.invalid && (f.username.touched || f.username.dirty))
+                    {
+                    @if(f.username.hasError('required'))
+                    {
+                    <mat-error>Username is required</mat-error>
+                    }
+                    }
+                </mat-form-field>
+            </div>
+
+            <div class="row">
+                <mat-form-field [appearance]="'fill'">
+                    <mat-label>Password</mat-label>
+                    <input type="password" matInput formControlName="password">
+                    @if(f.password.invalid && (f.password.touched || f.password.dirty))
+                    {
+                    @if(f.password.hasError('required'))
+                    {
+                    <mat-error>Password is required</mat-error>
+                    }
+                    }
+                </mat-form-field>
+
+                <div class="row">
+                    <button type="submit" mat-raised-button [disabled]="loginForm.invalid">Login</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
