@@ -54,7 +54,7 @@ SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
 
 //builder.Services.AddScoped<IValidator<TrackEntryUpdateDto>, TrackEntryUpdateValidator>();
 
-builder.Services.AddValidatorsFromAssemblyContaining<TrackEntryCreateDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<TrackEntryCreateDtoValidator>(); // it registers all the validators for the assembly that contains TrackEntryCreateDtoValidator
 
 // cors
 

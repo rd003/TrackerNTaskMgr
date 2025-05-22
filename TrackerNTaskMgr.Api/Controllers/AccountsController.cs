@@ -31,18 +31,19 @@ public class AccountsController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginDto loginModel)
     {
-        // var validationResult = await _loginValidator.ValidateAsync(loginModel);
-        // if (!validationResult.IsValid)
-        // {
-        //     validationResult.AddToModelState(ModelState);
-        //     return UnprocessableEntity(ModelState);
-        // }
+        var validationResult = await _loginValidator.ValidateAsync(loginModel);
+        if (!validationResult.IsValid)
+        {
+            validationResult.AddToModelState(ModelState);
+            return UnprocessableEntity(ModelState);
+        }
 
         using IDbConnection connection = new SqlConnection(_constr);
         string sql = @"select UserAccountId,Username,PasswordHash from UserAccounts
           where Username=@username; 
          ";
         var user = await connection.QueryFirstOrDefaultAsync<UserAccountDto>(sql, new { loginModel.Username });
+
         if (user != null && BCrypt.Net.BCrypt.Verify(loginModel.Password, user.PasswordHash))
         {
             return Ok("Logged in");

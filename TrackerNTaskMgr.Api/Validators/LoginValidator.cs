@@ -8,12 +8,7 @@ public class LoginValidator : AbstractValidator<LoginDto>
 {
   public LoginValidator()
   {
-    RuleFor(l => l.Username).NotNull().WithMessage("Username can not be null");
-
-    RuleFor(l => l.Username).Empty().WithMessage("Username can not be empty");
-
-    RuleFor(l => l.Password).NotNull().WithMessage("Password can not be null");
-
-    RuleFor(l => l.Password).Empty().WithMessage("Password can not be empty");
+    RuleFor(l => l.Username).NotEmpty().WithMessage("Username can not be empty");
+    RuleFor(l => l.Password).NotEmpty().WithMessage("Password can not be empty");
   }
 }
