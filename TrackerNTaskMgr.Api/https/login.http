@@ -4,6 +4,6 @@ POST {{base_address}}/accounts/login
 Content-Type: application/json
 
 {
-  "username": "",
-  "password": ""
+  "username": "abc",
+  "password": "ab11"
 }

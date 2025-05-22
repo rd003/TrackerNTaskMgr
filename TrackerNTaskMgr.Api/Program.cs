@@ -5,6 +5,8 @@ using Dapper;
 
 using FluentValidation;
 
+using JwtLib.Extensions;
+
 using Microsoft.AspNetCore.Http.Features;
 
 using Scalar.AspNetCore;
@@ -69,6 +71,10 @@ builder.Services.AddCors(options =>
                 .AllowAnyMethod();
                       });
 });
+string validIssuer = builder.Configuration["JWT:ValidIssuer"]!;
+string validAudience = builder.Configuration["JWT:ValidAudience"]!;
+string secret = builder.Configuration["JWT:Secret"]!;
+builder.Services.AddJwtAuthentication(validAudience, validIssuer, secret, 15);
 
 var app = builder.Build();
 
