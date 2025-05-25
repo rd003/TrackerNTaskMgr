@@ -13,7 +13,7 @@
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.1" />
-    <PackageReference Include="Rd003.JwtAuth" Version="0.0.5" />
+    <PackageReference Include="Rd003.JwtAuth" Version="1.0.1" />
     <PackageReference Include="Scalar.AspnetCore" Version="2.0.36" />
   </ItemGroup>
 

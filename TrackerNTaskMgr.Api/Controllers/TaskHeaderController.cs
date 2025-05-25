@@ -4,6 +4,7 @@ using Dapper;
 
 using FluentValidation;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 
@@ -15,6 +16,7 @@ namespace TrackerNTaskMgr.Api.Controllers;
 
 [ApiController]
 [Route("/api/task-headers")]
+[Authorize]
 public class TaskHeaderController : ControllerBase
 {
    private readonly IConfiguration _config;

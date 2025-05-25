@@ -71,10 +71,11 @@ builder.Services.AddCors(options =>
                 .AllowAnyMethod();
                       });
 });
+
 string validIssuer = builder.Configuration["JWT:ValidIssuer"]!;
 string validAudience = builder.Configuration["JWT:ValidAudience"]!;
 string secret = builder.Configuration["JWT:Secret"]!;
-builder.Services.AddJwtAuthentication(validAudience, validIssuer, secret, 15);
+builder.Services.AddJwtAuthentication(validIssuer, validAudience, secret, 30);
 
 var app = builder.Build();
 
@@ -91,6 +92,7 @@ app.UseHttpsRedirection();
 
 app.UseCors(MyAllowSpecificOrigins);
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

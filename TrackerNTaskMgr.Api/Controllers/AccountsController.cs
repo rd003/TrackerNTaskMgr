@@ -34,35 +34,37 @@ public class AccountsController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginDto loginModel)
     {
-        // var validationResult = await _loginValidator.ValidateAsync(loginModel);
-        // if (!validationResult.IsValid)
-        // {
-        //     validationResult.AddToModelState(ModelState);
-        //     return UnprocessableEntity(ModelState);
-        // }
+        var validationResult = await _loginValidator.ValidateAsync(loginModel);
+        if (!validationResult.IsValid)
+        {
+            validationResult.AddToModelState(ModelState);
+            return UnprocessableEntity(ModelState);
+        }
 
-        // using IDbConnection connection = new SqlConnection(_constr);
-        // string sql = @"select UserAccountId,Username,PasswordHash from UserAccounts
-        //   where Username=@username; 
-        //  ";
-        // var user = await connection.QueryFirstOrDefaultAsync<UserAccountDto>(sql, new { loginModel.Username });
-
-        // if (user != null && BCrypt.Net.BCrypt.Verify(loginModel.Password, user.PasswordHash))
-        // {
-        //     return Ok("Logged in");
-        // }
-        // return Unauthorized();
-
-        string username = "rd003";
-
-        List<string> roles = ["admin"];
-
-        Dictionary<string, object> additionalClaims = [];
-        additionalClaims.Add("email", "rd003@example.com");
-        additionalClaims.Add("foo", "bar");
-
-        var jwt = _tokenService.GenerateAccessToken(username, roles, additionalClaims);
-
-        return Ok(jwt);
+        using IDbConnection connection = new SqlConnection(_constr);
+        string sql = @"select UserAccountId,Username,PasswordHash from UserAccounts
+          where Username=@username; 
+         ";
+        var user = await connection.QueryFirstOrDefaultAsync<UserAccountDto>(sql, new { loginModel.Username });
+        if (user != null && BCrypt.Net.BCrypt.Verify(loginModel.Password, user.PasswordHash))
+        {
+            var jwt = _tokenService.GenerateAccessToken(user.Username);
+            return Ok(jwt);
+        }
+        return Unauthorized();
     }
+
+    // [HttpPost("login2")]
+    // public async Task<IActionResult> Login2(LoginDto loginModel)
+    // {
+    //     using IDbConnection connection = new SqlConnection(_constr);
+    //     string sql = $"select UserAccountId,Username,PasswordHash from UserAccounts where Username='{loginModel.Username}';";
+
+    //     var user = await connection.QueryFirstOrDefaultAsync<UserAccountDto>(sql);
+    //     if (user != null && BCrypt.Net.BCrypt.Verify(loginModel.Password, user.PasswordHash))
+    //     {
+    //         return Ok("Logged In");
+    //     }
+    //     return Unauthorized();
+    // }
 }

@@ -4,6 +4,15 @@ POST {{base_address}}/accounts/login
 Content-Type: application/json
 
 {
-  "username": "abc",
-  "password": "ab11"
+  "username": "user",
+  "password": "123"
 }
+
+###
+# POST {{base_address}}/accounts/login2
+# Content-Type: application/json
+
+# {
+#   "username": "' or 1=1; --",
+#   "password": "123"
+# }

@@ -1,5 +1,6 @@
 using FluentValidation;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using TrackerNTaskMgr.Api.DTOs;
@@ -11,6 +12,7 @@ namespace TrackerNTaskMgr.Api.Controllers;
 
 [ApiController]
 [Route("/api/{controller}")]
+[Authorize]
 public class TasksController : ControllerBase
 {
     private readonly ITaskService _taskService;
@@ -24,7 +26,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetTasks([FromQuery]GetTasksParams tasksParams)
+    public async Task<IActionResult> GetTasks([FromQuery] GetTasksParams tasksParams)
     {
         var tasks = await _taskService.GetTasksAsync(tasksParams);
         return Ok(tasks);
@@ -55,12 +57,12 @@ public class TasksController : ControllerBase
     public async Task<IActionResult> UpdateTask(int taskId, [FromBody] TaskUpdateDto taskToUpdate)
     {
         var validationResult = await _taskUpdateValidator.ValidateAsync(taskToUpdate);
-        if(!validationResult.IsValid)
+        if (!validationResult.IsValid)
         {
             validationResult.AddToModelState(ModelState);
             return UnprocessableEntity(ModelState);
         }
-        
+
         if (taskId != taskToUpdate.TaskId)
         {
             throw new BadRequestException("TaskId from parameter and body mismatches");
@@ -113,7 +115,7 @@ public class TasksController : ControllerBase
         return Ok(await _taskService.GetTaskStatusesAsync());
     }
 
-     [HttpGet("priorities")]
+    [HttpGet("priorities")]
     public async Task<IActionResult> GetTaskPriorities()
     {
         return Ok(await _taskService.GetTaskPrioritiesAsync());
