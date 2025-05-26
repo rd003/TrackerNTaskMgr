@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject } from "@angular/core";
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, Input, OnInit } from "@angular/core";
 import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatFormFieldModule } from "@angular/material/form-field";
@@ -24,6 +24,7 @@ import { Router, RouterModule } from "@angular/router";
 })
 
 export class LoginComponent {
+    @Input() returnUrl: string = "/dashboard";
     fb = inject(FormBuilder);
     accountService = inject(AccountService);
     destroyRef = inject(DestroyRef);
@@ -44,7 +45,7 @@ export class LoginComponent {
         this.accountService.login(this.loginForm.value as LoginModel).pipe(
             tap(() => {
                 this.loading$.next(true);
-                this.router.navigate(['/dashboard']);
+                this.router.navigate([this.returnUrl]);
             }),
             takeUntilDestroyed(this.destroyRef)
         ).subscribe({
@@ -66,4 +67,6 @@ export class LoginComponent {
             }
         });
     }
+
+
 }
