@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { MainLayoutComponent } from "./layout/main-layout.component";
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from './account/services/auth.service';
 
 @Component({
@@ -8,20 +8,30 @@ import { AuthService } from './account/services/auth.service';
   standalone: true,
   imports: [MainLayoutComponent, RouterModule],
   template: `
-  <!-- I have created separate component for layout, so the I can easily put in if block of logged user-->
-  <!-- The layout will only show if admin is logged in -->
-  <!-- <app-main-layout/> -->
-
+@if(isLoggedIn){
+   <app-main-layout/>
+ }
+ @else{
   <router-outlet></router-outlet>
-  {{isLoggedIn}}
+ }
   `,
   styles: [``],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class AppComponent {
+export class AppComponent implements OnInit {
   private authService = inject(AuthService);
-  isLoggedIn = this.authService.isLoggedIn;
+  router = inject(Router);
+
+  isLoggedIn = this.authService.isLoggedIn();
+
+  ngOnInit(): void {
+    if (!this.isLoggedIn) {
+      this.router.navigate([`/login`]);
+    }
+    this.router.navigate([`/dashboard`]);
+  }
+
 }
 
 

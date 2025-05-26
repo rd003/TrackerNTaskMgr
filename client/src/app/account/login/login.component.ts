@@ -49,7 +49,6 @@ export class LoginComponent {
             takeUntilDestroyed(this.destroyRef)
         ).subscribe({
             next: (jwt: string) => {
-                console.log(jwt);
                 localStorage.setItem(authKeys.token, jwt);
             },
             error: ((error: HttpErrorResponse) => {

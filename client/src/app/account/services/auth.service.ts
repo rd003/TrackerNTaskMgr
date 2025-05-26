@@ -9,12 +9,12 @@ export interface JwtPayloadExtended extends JwtPayload {
 @Injectable({ providedIn: "root" })
 export class AuthService {
 
-    get isLoggedIn() {
+    isLoggedIn(): boolean {
         const decoded = this.getDecodedJwt();
-        return (decoded && decoded.exp && !this.isTokenExpired(decoded.exp))
+        return (decoded && decoded.exp && !this.isTokenExpired(decoded.exp)) ? true : false;
     }
 
-    get username() {
+    getUsername(): string {
         return this.getDecodedJwt()?.unique_name || "";
     }
 

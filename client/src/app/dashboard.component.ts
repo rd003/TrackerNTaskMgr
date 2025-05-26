@@ -12,5 +12,4 @@ import { DisplayBoardTaskComponent } from "./task/display-board-task.component";
 })
 
 export class DashboardComponent {
-
 }

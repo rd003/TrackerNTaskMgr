@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { RouterOutlet } from '@angular/router';
 import { NavComponent } from "./nav.component";
+import { AuthService } from '../account/services/auth.service';
 
 @Component({
   selector: "app-main-layout",
@@ -30,7 +31,7 @@ import { NavComponent } from "./nav.component";
    </button>
    <span class="spacer"></span>
    <div class="user-section">
-     <span class="username">Admin</span>
+     <span class="username">{{username}}</span>
      <button mat-button (click)="({})">
        <mat-icon>exit_to_app</mat-icon> Logout
      </button>
@@ -104,5 +105,6 @@ import { NavComponent } from "./nav.component";
 })
 
 export class MainLayoutComponent {
-
+  private authService = inject(AuthService);
+  username = this.authService.getUsername();
 }
