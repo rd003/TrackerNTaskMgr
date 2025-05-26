@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MainLayoutComponent } from "./layout/main-layout.component";
 import { RouterModule } from '@angular/router';
+import { AuthService } from './account/services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -12,10 +13,15 @@ import { RouterModule } from '@angular/router';
   <!-- <app-main-layout/> -->
 
   <router-outlet></router-outlet>
+  {{isLoggedIn}}
   `,
   styles: [``],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
 export class AppComponent {
+  private authService = inject(AuthService);
+  isLoggedIn = this.authService.isLoggedIn;
 }
+
+

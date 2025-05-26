@@ -12,6 +12,6 @@ export class AccountService {
     private readonly http = inject(HttpClient);
 
     login(login: LoginModel): Observable<string> {
-        return this.http.post<string>(this._url + "/login", login);
+        return this.http.post(this._url + "/login", login, { responseType: 'text' });
     }
 }

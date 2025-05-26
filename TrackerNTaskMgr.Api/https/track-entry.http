@@ -1,4 +1,5 @@
 @base_address = http://localhost:5054
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InVzZXIiLCJqdGkiOiI2MWZiYzQyMy02NzY1LTQ3MWMtYjkwMy03ZjdhMmJlMjliOTEiLCJuYmYiOjE3NDgxNzUyNDUsImV4cCI6MTc0ODE3NzA0NSwiaWF0IjoxNzQ4MTc1MjQ1LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUwNTQiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjQyMDAifQ.1YVtnPnwBmozDNCetvha6sOCTjDnMoQA0ekOHZfbO0g
 
 POST {{base_address}}/api/trackentries
 Content-Type: application/json
@@ -14,8 +15,8 @@ Content-Type: application/json
 
 ###
 GET {{base_address}}/api/trackentries?limit=3&sortDirection=ASC&pageDirection=prev&lastEntryDate=2025-02-16
-
 Accept: application/json
+Authorization: Bearer {{token}}
 
 ###
 GET {{base_address}}/api/trackentries/1001

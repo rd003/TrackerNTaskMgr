@@ -1,6 +1,19 @@
 <div class="main">
     <div class="login">
         <h3>Login</h3>
+
+        @if((loading$ | async)===true)
+        {
+        <mat-progress-spinner [diameter]="60" />
+        }
+
+        @if(message$ | async; as message)
+        {
+        <div class="row">
+            {{message}}
+        </div>
+        }
+
         <form (ngSubmit)="onSubmit()" [formGroup]="loginForm" class="login-form">
             <div class="row">
                 <mat-form-field [appearance]="'fill'">
