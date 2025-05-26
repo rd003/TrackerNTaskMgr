@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { AsyncPipe, CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
@@ -22,7 +22,8 @@ import { AuthService } from '../account/services/auth.service';
     MatButtonModule,
     MatCardModule,
     RouterOutlet,
-    NavComponent
+    NavComponent,
+    AsyncPipe
   ],
   template: `<div class="dashboard-container">
  <mat-toolbar color="primary" class="toolbar">
@@ -31,8 +32,11 @@ import { AuthService } from '../account/services/auth.service';
    </button>
    <span class="spacer"></span>
    <div class="user-section">
-     <span class="username">{{username}}</span>
-     <button mat-button (click)="({})">
+     @if(authService.userName$ |async; as username)
+     {
+        <span class="username">{{username}}</span>
+     }
+     <button mat-button (click)="logout()">
        <mat-icon>exit_to_app</mat-icon> Logout
      </button>
    </div>
@@ -105,6 +109,9 @@ import { AuthService } from '../account/services/auth.service';
 })
 
 export class MainLayoutComponent {
-  private authService = inject(AuthService);
-  username = this.authService.getUsername();
+  authService = inject(AuthService);
+
+  logout() {
+    this.authService.logout();
+  }
 }

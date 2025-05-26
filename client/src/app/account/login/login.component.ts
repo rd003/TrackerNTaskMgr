@@ -13,6 +13,7 @@ import { Subject, tap } from "rxjs";
 import { AsyncPipe } from "@angular/common";
 import { HttpErrorResponse } from "@angular/common/http";
 import { Router, RouterModule } from "@angular/router";
+import { AuthService } from "../services/auth.service";
 
 @Component({
     selector: 'app-login',
@@ -26,6 +27,8 @@ import { Router, RouterModule } from "@angular/router";
 export class LoginComponent {
     @Input() returnUrl: string = "/dashboard";
     fb = inject(FormBuilder);
+    authService = inject(AuthService);
+
     accountService = inject(AccountService);
     destroyRef = inject(DestroyRef);
     loading$ = new Subject<boolean>();
@@ -45,12 +48,12 @@ export class LoginComponent {
         this.accountService.login(this.loginForm.value as LoginModel).pipe(
             tap(() => {
                 this.loading$.next(true);
-                this.router.navigate([this.returnUrl]);
             }),
             takeUntilDestroyed(this.destroyRef)
         ).subscribe({
             next: (jwt: string) => {
-                localStorage.setItem(authKeys.token, jwt);
+                this.authService.setToken(jwt);
+                this.router.navigate([this.returnUrl]);
             },
             error: ((error: HttpErrorResponse) => {
                 if (error.status === 401) {
