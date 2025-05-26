@@ -22,7 +22,7 @@ export class AuthService {
         return Date.now() >= exp * 1000;
     }
 
-    private getJwt(): string | null {
+    public getJwt(): string | null {
         return localStorage.getItem(authKeys.token);
     }
 
