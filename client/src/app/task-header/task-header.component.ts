@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { TaskHeaderStore } from "./task-header.store";
-import { AsyncPipe, NgIf } from "@angular/common";
+import { AsyncPipe } from "@angular/common";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatIconModule } from "@angular/material/icon";
 import { MatTableModule } from "@angular/material/table";
@@ -15,7 +15,7 @@ import { TaskHeaderUpdateModel } from "./models/task-header-update.model";
 @Component({
     selector: 'app-task-header',
     standalone: true,
-    imports: [NgIf, AsyncPipe, MatProgressSpinnerModule, MatIconModule, MatTableModule, MatButtonModule, MatFormFieldModule, ReactiveFormsModule, MatInputModule],
+    imports: [AsyncPipe, MatProgressSpinnerModule, MatIconModule, MatTableModule, MatButtonModule, MatFormFieldModule, ReactiveFormsModule, MatInputModule],
     providers: [TaskHeaderStore],
     templateUrl: 'task-header.component.html',
     styles: [`

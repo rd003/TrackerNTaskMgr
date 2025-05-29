@@ -7,7 +7,7 @@ import { TrackEntryDialogComponent } from "./ui/track-entry-dialog.component";
 import { catchError, combineLatest, distinctUntilChanged, map, of, Subject, switchMap, take, takeUntil, tap } from "rxjs";
 import { MatButtonModule } from "@angular/material/button";
 import { TrackEntryStore } from "./store/track-entry.store";
-import { AsyncPipe, NgIf } from "@angular/common";
+import { AsyncPipe } from "@angular/common";
 import { SortDirection } from "@angular/material/sort";
 import { formatDateToLocalISOString } from "../shared/services/date.util";
 import { PageDirection } from "../shared/page-direction";
@@ -18,62 +18,64 @@ import { minutesToHoursMinutes } from "../shared/timeFormatter";
 @Component({
   selector: 'app-track-entry',
   standalone: true,
-  imports: [TrackEntryListComponent, MatDialogModule, MatButtonModule, AsyncPipe, NgIf, TrackEntryFilterComponent, MatIconModule],
+  imports: [TrackEntryListComponent, MatDialogModule, MatButtonModule, AsyncPipe, TrackEntryFilterComponent, MatIconModule],
   providers: [TrackEntryStore],
   template: `
   <h1>Track Entries</h1>
   <p>
-      <button
-        type="button"
-        (click)="onAddUpdate('Add', null)"
-        mat-fab
-        color="accent"
+    <button
+      type="button"
+      (click)="onAddUpdate('Add', null)"
+      mat-fab
+      color="accent"
       >
-        <mat-icon>add</mat-icon>
-      </button>
+      <mat-icon>add</mat-icon>
+    </button>
   </p>
-   <div *ngIf="store.loading$ | async as loading"> loading... </div>
-
-   <div *ngIf="store.error$|async as error" style="color:red">
-      Something went wrong    
-   </div>
-
-   <!-- filter -->
-    <app-track-entry-filter (filterByEntryDate)="onEntryDateSelect($event)" (clearFilter)="onClearFilter()"/>
-
-   <app-track-entry-list [dataSource]="(store.entries$|async)??[]" (editTrackEntry)= "onAddUpdate('Edit', $event)" (deleteTrackEntry)="onDelete($event)" (sort)="onSort($event)"/>
-
-   <!-- total sleep, work etc -->
-   
-   <div *ngIf="total$ | async as total" 
-     style="display: flex; gap: 24px; margin: 16px 0; padding: 16px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9;">
-
-  <div>
-    <strong>Total Sleep:</strong>
-    {{ total.totalSleep }} min
+  @if (store.loading$ | async; as loading) {
+    <div> loading... </div>
+  }
+  
+  @if (store.error$|async; as error) {
+    <div style="color:red">
+      Something went wrong
+    </div>
+  }
+  
+  <!-- filter -->
+  <app-track-entry-filter (filterByEntryDate)="onEntryDateSelect($event)" (clearFilter)="onClearFilter()"/>
+  
+  <app-track-entry-list [dataSource]="(store.entries$|async)??[]" (editTrackEntry)= "onAddUpdate('Edit', $event)" (deleteTrackEntry)="onDelete($event)" (sort)="onSort($event)"/>
+  
+  <!-- total sleep, work etc -->
+  
+  @if (total$ | async; as total) {
+    <div
+      style="display: flex; gap: 24px; margin: 16px 0; padding: 16px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9;">
+      <div>
+        <strong>Total Sleep:</strong>
+        {{ total.totalSleep }} min
+      </div>
+      <div>
+        <strong>Average Sleep:</strong>
+        {{ total.averageSleepInMinutes }} min <span style="color: #666;">({{ total.averageSleepFormatted }})</span>
+      </div>
+      <div>
+        <strong>Total Work:</strong>
+        {{ total.totalWork }} min <span style="color: #666;">({{ total.totalWorkFormatted }})</span>
+      </div>
+    </div>
+  }
+  
+  
+  <div class="paginator" style="display:flex;gap:5px;margin:15px 0px">
+    <button mat-mini-fab (click)="onPaginate('PREV')">
+      <mat-icon>keyboard_arrow_left</mat-icon>
+    </button>
+    <button mat-mini-fab (click)="onPaginate('NEXT')">
+      <mat-icon>keyboard_arrow_right</mat-icon>
+    </button>
   </div>
-
-  <div>
-    <strong>Average Sleep:</strong>
-    {{ total.averageSleepInMinutes }} min <span style="color: #666;">({{ total.averageSleepFormatted }})</span>
-  </div>
-
-  <div>
-    <strong>Total Work:</strong>
-    {{ total.totalWork }} min <span style="color: #666;">({{ total.totalWorkFormatted }})</span>
-  </div>
-
-</div>
-
-
-   <div class="paginator" style="display:flex;gap:5px;margin:15px 0px">
-   <button mat-mini-fab (click)="onPaginate('PREV')">
-   <mat-icon>keyboard_arrow_left</mat-icon>
-   </button>
-   <button mat-mini-fab (click)="onPaginate('NEXT')">
-   <mat-icon>keyboard_arrow_right</mat-icon>
-   </button>
-   </div>
   `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,

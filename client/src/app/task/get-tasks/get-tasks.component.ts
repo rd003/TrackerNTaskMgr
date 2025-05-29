@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject } from "@angular/core";
 import { TaskService } from "../service/task.service";
-import { AsyncPipe, DatePipe, NgFor, NgIf } from "@angular/common";
+import { AsyncPipe, DatePipe } from "@angular/common";
 import { BehaviorSubject, catchError, combineLatest, finalize, Observable, of, startWith, switchMap, tap } from "rxjs";
 import { MatTableModule } from "@angular/material/table";
 import { MatIconModule } from "@angular/material/icon";
@@ -48,8 +48,7 @@ import { SortDirection } from "../../shared/sort-direction";
    
     `],
     standalone: true,
-    imports: [NgIf, NgFor, AsyncPipe, DatePipe, MatTableModule,
-        MatIconModule, MatButtonModule, MatSelectModule, MatFormFieldModule, ReactiveFormsModule, RouterModule, MatProgressSpinnerModule, MatSortModule],
+    imports: [AsyncPipe, DatePipe, MatTableModule, MatIconModule, MatButtonModule, MatSelectModule, MatFormFieldModule, ReactiveFormsModule, RouterModule, MatProgressSpinnerModule, MatSortModule],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GetTasksComponent {

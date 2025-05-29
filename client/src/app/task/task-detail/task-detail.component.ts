@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, Input, OnInit }
 import { TaskService } from "../service/task.service";
 import { TaskReadModel } from "../models/task-read-model";
 import { HttpErrorResponse } from "@angular/common/http";
-import { AsyncPipe, DatePipe, JsonPipe, NgIf } from "@angular/common";
+import { AsyncPipe, DatePipe, JsonPipe } from "@angular/common";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { BehaviorSubject, catchError, map, of, tap } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";

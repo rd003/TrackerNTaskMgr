@@ -12,7 +12,7 @@ import { MatCheckboxModule } from "@angular/material/checkbox";
 import { MatCardModule } from "@angular/material/card";
 import { MatDividerModule } from "@angular/material/divider";
 import { provideNativeDateAdapter } from "@angular/material/core";
-import { AsyncPipe, NgFor, NgIf } from "@angular/common";
+import { AsyncPipe } from "@angular/common";
 import { TaskPriorityModel } from "../models/task-priority.model";
 import { TaskStatusModel } from "../models/task-status.model";
 import { TaskHeaderService } from "../../task-header/services/task-header.service";
@@ -26,8 +26,6 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
   selector: 'app-task-save',
   standalone: true,
   imports: [
-    NgIf,
-    NgFor,
     AsyncPipe,
     ReactiveFormsModule,
     MatFormFieldModule,
@@ -41,7 +39,7 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
     MatDividerModule,
     MatProgressSpinnerModule,
     RouterModule
-  ],
+],
   providers: [provideNativeDateAdapter()],
   templateUrl: "task-save.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,

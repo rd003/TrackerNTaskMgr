@@ -1,4 +1,4 @@
-import { AsyncPipe, DatePipe, NgIf } from "@angular/common";
+import { AsyncPipe, DatePipe } from "@angular/common";
 import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatTableModule } from "@angular/material/table";
@@ -14,65 +14,63 @@ import { MatIconModule } from "@angular/material/icon";
 @Component({
     selector: 'app-display-board-task',
     standalone: true,
-    imports: [NgIf, MatTableModule, MatProgressSpinnerModule, AsyncPipe, DatePipe, MatButtonModule, MatIconModule, RouterModule],
+    imports: [MatTableModule, MatProgressSpinnerModule, AsyncPipe, DatePipe, MatButtonModule, MatIconModule, RouterModule],
     template: `
-       <div class="mb-10" *ngIf="(loading$|async)===true">
-            <mat-spinner [diameter]="50"/>
-       </div>
-       <div class="mb-10" *ngIf="error$|async">
+       @if ((loading$|async)===true) {
+         <div class="mb-10">
+           <mat-spinner [diameter]="50"/>
+         </div>
+       }
+       @if (error$|async) {
+         <div class="mb-10">
            Error has occured
-       </div>
+         </div>
+       }
        
-       <div class="mb-10" *ngIf="tasks$|async as tasks">
-       <ng-container *ngIf="tasks.length>0">
-          <h1>Important Tasks</h1>
-          <table mat-table [dataSource]="tasks" class="mat-elevation-z8">
-                <ng-container matColumnDef="taskTitle">
-                    <th mat-header-cell *matHeaderCellDef> Title </th>
-                    <td mat-cell *matCellDef="let element"> {{element.taskTitle}} </td>
-                </ng-container>
-
-                <ng-container matColumnDef="scheduledAt">
-                    <th mat-header-cell *matHeaderCellDef> scheduledAt </th>
-                    <td mat-cell *matCellDef="let element"> {{element.scheduledAt | date:'dd-MMM-yyyy'}} </td>
-                </ng-container>
-
-                 <ng-container matColumnDef="deadline">
-                    <th mat-header-cell *matHeaderCellDef> scheduledAt </th>
-                    <td mat-cell *matCellDef="let element"> {{element.deadline | date:'dd-MMM-yyyy'}} </td>
-                </ng-container>
-
-                <ng-container matColumnDef="status">
-                    <th mat-header-cell *matHeaderCellDef> Status </th>
-                    <td mat-cell *matCellDef="let element"> {{element.taskStatusName}} {{element.taskStatusEmoji}} </td>
-                </ng-container>
-
-                <ng-container matColumnDef="priority">
-                    <th mat-header-cell *matHeaderCellDef> Priority </th>
-                    <td mat-cell *matCellDef="let element"> {{element.taskPriorityName}} {{element.taskPriorityEmoji}} </td>
-                </ng-container>
-
-                  <ng-container matColumnDef="actions">
-                    <th mat-header-cell *matHeaderCellDef> Actions </th>
-                    <td mat-cell *matCellDef="let element" class="action-cell">
-                     
-                        <a mat-mini-fab area-label="task-detail" routerLink="/task-detail/{{element.taskId}}"
-                        color="primary">
-                        <mat-icon>assignment</mat-icon>
-                    </a>    
-                    <button mat-mini-fab aria-label="edit-entry" color="accent" (click)="edit(element.taskId);">
-                            <mat-icon>edit</mat-icon>
-                        </button>
-                    
-                    </td>
-                </ng-container>
-
-                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-          </table>
-       </ng-container>      
-       </div>
-    `,
+       @if (tasks$|async; as tasks) {
+         <div class="mb-10">
+           @if (tasks.length>0) {
+             <h1>Important Tasks</h1>
+             <table mat-table [dataSource]="tasks" class="mat-elevation-z8">
+               <ng-container matColumnDef="taskTitle">
+                 <th mat-header-cell *matHeaderCellDef> Title </th>
+                 <td mat-cell *matCellDef="let element"> {{element.taskTitle}} </td>
+               </ng-container>
+               <ng-container matColumnDef="scheduledAt">
+                 <th mat-header-cell *matHeaderCellDef> scheduledAt </th>
+                 <td mat-cell *matCellDef="let element"> {{element.scheduledAt | date:'dd-MMM-yyyy'}} </td>
+               </ng-container>
+               <ng-container matColumnDef="deadline">
+                 <th mat-header-cell *matHeaderCellDef> scheduledAt </th>
+                 <td mat-cell *matCellDef="let element"> {{element.deadline | date:'dd-MMM-yyyy'}} </td>
+               </ng-container>
+               <ng-container matColumnDef="status">
+                 <th mat-header-cell *matHeaderCellDef> Status </th>
+                 <td mat-cell *matCellDef="let element"> {{element.taskStatusName}} {{element.taskStatusEmoji}} </td>
+               </ng-container>
+               <ng-container matColumnDef="priority">
+                 <th mat-header-cell *matHeaderCellDef> Priority </th>
+                 <td mat-cell *matCellDef="let element"> {{element.taskPriorityName}} {{element.taskPriorityEmoji}} </td>
+               </ng-container>
+               <ng-container matColumnDef="actions">
+                 <th mat-header-cell *matHeaderCellDef> Actions </th>
+                 <td mat-cell *matCellDef="let element" class="action-cell">
+                   <a mat-mini-fab area-label="task-detail" routerLink="/task-detail/{{element.taskId}}"
+                     color="primary">
+                     <mat-icon>assignment</mat-icon>
+                   </a>
+                   <button mat-mini-fab aria-label="edit-entry" color="accent" (click)="edit(element.taskId);">
+                     <mat-icon>edit</mat-icon>
+                   </button>
+                 </td>
+               </ng-container>
+               <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+               <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+             </table>
+           }
+         </div>
+       }
+       `,
     styles: [`.mb10{
         margin-bottom:10px;
     }
