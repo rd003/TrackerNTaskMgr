@@ -12,7 +12,6 @@ namespace TrackerNTaskMgr.Api.Controllers;
 
 [ApiController]
 [Route("/api/[controller]")]
-[Authorize]
 public class TrackEntriesController : ControllerBase
 {
     private readonly ITrackEntryService _trackEntryServcice;

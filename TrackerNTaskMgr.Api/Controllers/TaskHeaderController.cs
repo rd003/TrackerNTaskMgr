@@ -16,7 +16,6 @@ namespace TrackerNTaskMgr.Api.Controllers;
 
 [ApiController]
 [Route("/api/task-headers")]
-[Authorize]
 public class TaskHeaderController : ControllerBase
 {
    private readonly IConfiguration _config;
