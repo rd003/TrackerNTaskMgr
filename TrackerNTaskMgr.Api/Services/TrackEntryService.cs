@@ -58,22 +58,48 @@ public class TrackEntryService : ITrackEntryService
 
     public async Task<IEnumerable<TrackEntryReadDto>> GetTrackEntiesAsync(GetTrackEntriesParams parameters)
     {
-        // using IDbConnection connection = new SqlConnection(_connectionString);
+        var filterBuilder = Builders<TrackEntry>.Filter;
+        var filter = filterBuilder.Empty;
 
-        // IEnumerable<TrackEntryReadDto> trackEntries = await connection.QueryAsync<TrackEntryReadDto, TrackEntryRemarkReadDto, TrackEntryReadDto>(
-        //      sql: "GetTrackEntries",
-        //      param: parameters,
-        //      map: (entry, remark) =>
-        //      {
-        //          entry.TrackEntryRemark = remark;
-        //          return entry;
-        //      },
-        //      splitOn: "TrackEntryId",
-        //      commandType: CommandType.StoredProcedure
-        //      );
-        // return trackEntries;
-        throw new NotImplementedException();
+        if (parameters.StartDate.HasValue && !parameters.EndDate.HasValue)
+        {
+            filter &= filterBuilder.Gte(x => x.EntryDate, parameters.StartDate);
+        }
 
+        if (parameters.StartDate.HasValue && parameters.EndDate.HasValue)
+        {
+            // TODO: How to apply both gte and lte
+        }
+
+        // Pagination filtering based on LastEntryDate and PageDirection
+        if (parameters.LastEntryDate.HasValue)
+        {
+            if (parameters.PageDirection.Equals("NEXT", StringComparison.CurrentCultureIgnoreCase))
+            {
+                if (parameters.PageDirection.Equals("DESC", StringComparison.CurrentCultureIgnoreCase))
+                    filter &= filterBuilder.Lt(x => x.EntryDate, parameters.LastEntryDate);
+                else
+                    filter &= filterBuilder.Gt(x => x.EntryDate, parameters.LastEntryDate);
+            }
+            else if (parameters.PageDirection.Equals("PREV", StringComparison.CurrentCultureIgnoreCase))
+            {
+                if (parameters.SortDirection.Equals("DESC", StringComparison.CurrentCultureIgnoreCase))
+                    filter &= filterBuilder.Gt(x => x.EntryDate, parameters.LastEntryDate);
+                else
+                    filter &= filterBuilder.Lt(x => x.EntryDate, parameters.LastEntryDate);
+            }
+        }
+
+        var sortBuilder = Builders<TrackEntry>.Sort;
+        var sort = parameters.SortDirection.Equals("DESC", StringComparison.CurrentCultureIgnoreCase) ? sortBuilder.Descending(x => x.EntryDate) : sortBuilder.Ascending(x => x.EntryDate);
+
+        var trackEntries = await _trackEntriesCollection
+                           .Find(filter)
+                            .Sort(sort)
+                            .Limit(parameters.Limit)
+                            .ToListAsync();
+
+        return trackEntries.Select(te => te.ToTrackEntryReadDto());
     }
 
     public async Task UpdateTrackEntryAsync(TrackEntryUpdateDto trackEntryToUpdate)

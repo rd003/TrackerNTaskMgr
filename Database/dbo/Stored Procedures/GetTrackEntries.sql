@@ -1,23 +1,23 @@
 CREATE OR ALTER PROCEDURE [dbo].[GetTrackEntries]
-  @StartDate date null=null,
-  @EndDate date null=null,
-  @Limit int = 10,
-  @LastEntryDate date null=null,
-  @PageDirection NVARCHAR(4)="NEXT",
-  @SortDirection varchar(4) = 'DESC'
+   @StartDate date null=null,
+   @EndDate date null=null,
+   @Limit int = 10,
+   @LastEntryDate date null=null,
+   @PageDirection NVARCHAR(4)="NEXT",
+   @SortDirection varchar(4) = 'DESC'
 as
 begin
-  set nocount on;
+   set nocount on;
 
-  if (UPPER(@SortDirection) NOT IN ('ASC','DESC'))
+   if (UPPER(@SortDirection) NOT IN ('ASC','DESC'))
      throw 50000,'SortDirection can only be ''asc'' or ''desc''',1;
-   
-  if(UPPER(@PageDirection) NOT IN ('NEXT','PREV'))
+
+   if(UPPER(@PageDirection) NOT IN ('NEXT','PREV'))
      throw 50001,'PageDirection can only be ''next'' or ''prev''',1;
 
-  declare @sql nvarchar(max);
+   declare @sql nvarchar(max);
 
-  set @sql= 'select top (@Limit) 
+   set @sql= 'select top (@Limit) 
                te.TrackEntryId,
                te.EntryDate,
                te.SleptAt,
@@ -32,41 +32,41 @@ begin
              on te.TrackEntryId = tr.TrackEntryId
              where 1=1';
 
-  -- filtering
-  
-  if (@StartDate is not null and @EndDate is null)
-     set @sql +=' and EntryDate = @StartDate'; 
-  
-  if (@StartDate is not null and @EndDate is not null)
-     set @sql +=' and EntryDate between @StartDate and @EndDate'; 
-  
-  --  sorting and pagination
-  if (@LastEntryDate is null)
+   -- filtering
+
+   if (@StartDate is not null and @EndDate is null)
+     set @sql +=' and EntryDate = @StartDate';
+
+   if (@StartDate is not null and @EndDate is not null)
+     set @sql +=' and EntryDate between @StartDate and @EndDate';
+
+   --  sorting and pagination
+   if (@LastEntryDate is null)
   begin
-    set @sql += ' order by te.EntryDate';
-    if (upper(@SortDirection))='DESC'
+      set @sql += ' order by te.EntryDate';
+      if (upper(@SortDirection))='DESC'
        set @sql += ' DESC';
-  end
+   end
 
   else
   begin
-    if(UPPER(@PageDirection)='NEXT')
-    begin 
-      if (upper(@SortDirection))='ASC'
+      if(UPPER(@PageDirection)='NEXT')
+    begin
+         if (upper(@SortDirection))='ASC'
          set @sql += ' and te.EntryDate > @LastEntryDate order by te.EntryDate';
   
       else if (upper(@SortDirection))='DESC'
          set @sql += ' and te.EntryDate < @LastEntryDate order by te.EntryDate desc';
-    end
+      end
    -- else page direction is previous 
     else
       begin
-        if (upper(@SortDirection))='ASC'
+         if (upper(@SortDirection))='ASC'
          set @sql += ' and te.EntryDate < @LastEntryDate order by te.EntryDate desc';
   
       else if (upper(@SortDirection))='DESC'
          set @sql += ' and te.EntryDate > @LastEntryDate order by te.EntryDate';
-      end     
-  end
-  execute sp_executesql @sql, N'@StartDate date,@EndDate date,@Limit int,@LastEntryDate date,@SortDirection varchar(4)', @StartDate,@EndDate,@Limit,@LastEntryDate,@SortDirection
+      end
+   end
+   execute sp_executesql @sql, N'@StartDate date,@EndDate date,@Limit int,@LastEntryDate date,@SortDirection varchar(4)', @StartDate,@EndDate,@Limit,@LastEntryDate,@SortDirection
 end;

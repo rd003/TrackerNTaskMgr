@@ -13,7 +13,12 @@ Content-Type: application/json
   "remarks": "Worked as usual"
 }
 
+### GET all
 ###
+GET {{base_address}}/api/trackentries
+Accept: application/json
+
+### GET Filtered
 GET {{base_address}}/api/trackentries?limit=3&sortDirection=ASC&pageDirection=prev&lastEntryDate=2025-02-16
 Accept: application/json
 Authorization: Bearer {{token}}

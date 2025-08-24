@@ -2,10 +2,10 @@
 
 public record GetTrackEntriesParams
 (
-    DateOnly? StartDate,
-    DateOnly? EndDate,
+    DateTime? StartDate,
+    DateTime? EndDate,
     string SortDirection = "DESC",
-    DateOnly? LastEntryDate = null,
+    DateTime? LastEntryDate = null,
     string PageDirection = "NEXT",
     int Limit = 10
 );
