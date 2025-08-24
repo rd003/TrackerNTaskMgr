@@ -11,7 +11,7 @@ using TrackerNTaskMgr.Api.Services;
 namespace TrackerNTaskMgr.Api.Controllers;
 
 [ApiController]
-[Route("/api/[controller]")]
+[Route("/api/trackentries")]
 public class TrackEntriesController : ControllerBase
 {
     private readonly ITrackEntryService _trackEntryServcice;
@@ -34,8 +34,9 @@ public class TrackEntriesController : ControllerBase
             validationResult.AddToModelState(ModelState);
             return UnprocessableEntity(ModelState);
         }
-        TrackEntryReadDto? createdTrackEntry = await _trackEntryServcice.CreateTrackEntryAsync(trackEntryToCreate);
-        return CreatedAtRoute("GetTrackEntry", new { id = createdTrackEntry.TrackEntryId }, createdTrackEntry);
+        TrackEntryReadDto createdTrackEntry = await _trackEntryServcice.CreateTrackEntryAsync(trackEntryToCreate);
+
+        return CreatedAtAction(nameof(CreateTrackEntry), createdTrackEntry);
     }
 
     [HttpGet("{id:int}", Name = "GetTrackEntry")]
@@ -51,7 +52,7 @@ public class TrackEntriesController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> UpdateTrackEntry(int id, [FromBody] TrackEntryUpdateDto trackEntryToUpdate)
+    public async Task<IActionResult> UpdateTrackEntry(string id, [FromBody] TrackEntryUpdateDto trackEntryToUpdate)
     {
         var validationResult = await _trackEntryUpdateValidator.ValidateAsync(trackEntryToUpdate);
         if (!validationResult.IsValid)
@@ -65,7 +66,9 @@ public class TrackEntriesController : ControllerBase
             throw new BadRequestException("Ids mismatch");
         }
 
-        TrackEntryReadDto? trackEntry = await _trackEntryServcice.GetTrackEntryAsync(id);
+        // TrackEntryReadDto? trackEntry = await _trackEntryServcice.GetTrackEntryAsync(id);
+        // TODO: fix this
+        TrackEntryReadDto? trackEntry = await _trackEntryServcice.GetTrackEntryAsync(1);
 
         if (trackEntry == null)
         {
@@ -76,7 +79,8 @@ public class TrackEntriesController : ControllerBase
 
         // Bad engineering: It is bad practice. It should be done in UpdateTrackEntry stored proc. It would save an additional roundtrip
 
-        TrackEntryReadDto? trackEntryUpdate = await _trackEntryServcice.GetTrackEntryAsync(id);
+        //  // TODO: Pass Id instead of hard coded value 1
+        TrackEntryReadDto? trackEntryUpdate = await _trackEntryServcice.GetTrackEntryAsync(1);
         return Ok(trackEntryUpdate);
     }
 

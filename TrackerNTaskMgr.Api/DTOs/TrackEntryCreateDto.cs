@@ -1,10 +1,11 @@
 namespace TrackerNTaskMgr.Api.DTOs;
+
 public record TrackEntryCreateDto
 (
-    DateOnly? EntryDate,
+    DateTime? EntryDate,
     DateTime? SleptAt,
     DateTime? WokeUpAt,
-    short? NapInMinutes,
-    short? TotalWorkInMinutes,
+    int? NapInMinutes,
+    int? TotalWorkInMinutes,
     string? Remarks
 );

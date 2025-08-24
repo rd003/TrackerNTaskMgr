@@ -5,12 +5,12 @@ POST {{base_address}}/api/trackentries
 Content-Type: application/json
 
 {
-  "entryDate": "2025-03-23",
-  "sleptAt": "2025-03-23T03:15",
-  "wokeUpAt": "2025-03-23T07:45",
+  "entryDate": "2025-03-24T00:00",
+  "sleptAt": "2025-03-24T10:15",
+  "wokeUpAt": "2025-03-25T06:00",
   "napInMinutes": 0,
-  "totalWorkInMinutes": 0,
-  "remarks": null
+  "totalWorkInMinutes": 300,
+  "remarks": "Worked as usual"
 }
 
 ###
@@ -28,7 +28,7 @@ Content-Type: application/json
 
 {
  "trackEntryId": 1001,
- "entryDate": "2025-04-28",
+ "entryDate": "2025-04-28T00:00",
  "sleptAt": "2025-04-28T00:10:00.000Z",
  "wokeUpAt": "2025-04-28T21:00:00.000Z",
  "napInMinutes": 0,
