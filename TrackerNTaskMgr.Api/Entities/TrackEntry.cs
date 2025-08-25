@@ -10,13 +10,16 @@ public class TrackEntry
     public string Id { get; set; } = null!;
 
     [BsonElement("entryDate")]
-    public DateTime EntryDate { get; set; }
+    [BsonRepresentation(BsonType.Document)]
+    public DateTimeOffset EntryDate { get; set; }
 
     [BsonElement("sleptAt")]
-    public DateTime SleptAt { get; set; }
+    [BsonRepresentation(BsonType.Document)]
+    public DateTimeOffset SleptAt { get; set; }
 
     [BsonElement("wokeUpAt")]
-    public DateTime WokeUpAt { get; set; }
+    [BsonRepresentation(BsonType.Document)]
+    public DateTimeOffset WokeUpAt { get; set; }
 
     [BsonElement("napInMinutes")]
     public int? NapInMinutes { get; set; }
@@ -28,8 +31,10 @@ public class TrackEntry
     public string? Remarks { get; set; }
 
     [BsonElement("createdAt")]
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    [BsonRepresentation(BsonType.Document)]
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
     [BsonElement("updatedAt")]
-    public DateTime? UpdatedAt { get; set; }
+    [BsonRepresentation(BsonType.Document)]
+    public DateTimeOffset? UpdatedAt { get; set; }
 }

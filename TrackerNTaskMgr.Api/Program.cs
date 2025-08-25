@@ -34,7 +34,7 @@ builder.Services.Configure<DatabaseSettings>(builder.Configuration.GetSection("D
 // registering services
 builder.Services.AddSingleton<ITrackEntryService, TrackEntryService>();
 builder.Services.AddSingleton<ITaskService, TaskService>();
-
+builder.Services.AddSingleton<IDatabaseInitializer, DatabaseInitializer>();
 
 // Global exception handling
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
@@ -98,6 +98,11 @@ app.MapControllers();
 // });
 
 //await app.SeedAsync(); 
+using (var scope = app.Services.CreateScope())
+{
+    var dbInitializer = scope.ServiceProvider.GetRequiredService<IDatabaseInitializer>();
+    await dbInitializer.InitializeAsync();
+}
 
 await app.RunAsync();
 

@@ -5,18 +5,17 @@ namespace TrackerNTaskMgr.Api.Mappers;
 
 public static class TrackEntryMapper
 {
-
     public static TrackEntry ToTrackEntry(this TrackEntryCreateDto trackEntry)
     {
         return new TrackEntry
         {
-            EntryDate = trackEntry.EntryDate ?? DateTime.UtcNow.Date,
-            SleptAt = trackEntry.SleptAt ?? DateTime.MinValue,
-            WokeUpAt = trackEntry.WokeUpAt ?? DateTime.MinValue,
+            EntryDate = trackEntry.EntryDate ?? DateTimeOffset.UtcNow.Date,
+            SleptAt = trackEntry.SleptAt ?? DateTimeOffset.MinValue,
+            WokeUpAt = trackEntry.WokeUpAt ?? DateTimeOffset.MinValue,
             NapInMinutes = trackEntry.NapInMinutes,
             TotalWorkInMinutes = trackEntry.TotalWorkInMinutes ?? 0,
             Remarks = trackEntry.Remarks,
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = DateTimeOffset.UtcNow,
             UpdatedAt = null
         };
     }

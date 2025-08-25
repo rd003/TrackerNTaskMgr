@@ -39,8 +39,8 @@ public class TrackEntriesController : ControllerBase
         return CreatedAtAction(nameof(CreateTrackEntry), createdTrackEntry);
     }
 
-    [HttpGet("{id:int}", Name = "GetTrackEntry")]
-    public async Task<IActionResult> GetTrackEntry(int id)
+    [HttpGet("{id:length(24)}")]
+    public async Task<IActionResult> GetTrackEntry(string id)
     {
         TrackEntryReadDto? trackEntry = await _trackEntryServcice.GetTrackEntryAsync(id);
 
@@ -48,10 +48,11 @@ public class TrackEntriesController : ControllerBase
         {
             throw new NotFoundException("Track entry not found");
         }
+
         return Ok(trackEntry);
     }
 
-    [HttpPut("{id:int}")]
+    [HttpPut("{id:length(24)}")]
     public async Task<IActionResult> UpdateTrackEntry(string id, [FromBody] TrackEntryUpdateDto trackEntryToUpdate)
     {
         var validationResult = await _trackEntryUpdateValidator.ValidateAsync(trackEntryToUpdate);
@@ -66,9 +67,7 @@ public class TrackEntriesController : ControllerBase
             throw new BadRequestException("Ids mismatch");
         }
 
-        // TrackEntryReadDto? trackEntry = await _trackEntryServcice.GetTrackEntryAsync(id);
-        // TODO: fix this
-        TrackEntryReadDto? trackEntry = await _trackEntryServcice.GetTrackEntryAsync(1);
+        TrackEntryReadDto? trackEntry = await _trackEntryServcice.GetTrackEntryAsync(id);
 
         if (trackEntry == null)
         {
@@ -77,10 +76,7 @@ public class TrackEntriesController : ControllerBase
 
         await _trackEntryServcice.UpdateTrackEntryAsync(trackEntryToUpdate);
 
-        // Bad engineering: It is bad practice. It should be done in UpdateTrackEntry stored proc. It would save an additional roundtrip
-
-        //  // TODO: Pass Id instead of hard coded value 1
-        TrackEntryReadDto? trackEntryUpdate = await _trackEntryServcice.GetTrackEntryAsync(1);
+        TrackEntryReadDto? trackEntryUpdate = await _trackEntryServcice.GetTrackEntryAsync(id);
         return Ok(trackEntryUpdate);
     }
 
@@ -88,8 +84,7 @@ public class TrackEntriesController : ControllerBase
     public async Task<IActionResult> GetTrackEntries([FromQuery] GetTrackEntriesParams parameters)
     {
         ValidateGetTrackEntryParams(parameters);
-        // Console.WriteLine($"====> logged at: {DateTime.Now.ToString("dd-mm-yyy hh:mm:ss")}");
-        // Console.WriteLine(parameters);
+        Console.WriteLine($"====> parameters: {parameters}");
         var trackEntries = await _trackEntryServcice.GetTrackEntiesAsync(parameters);
         // Note: Bad practice
         // Problem: When handling 'prev' + 'desc', the data is coming in asc order, I am reordering them here. Same goes for prev+asc, we need to manually convert data to asc order.
@@ -105,8 +100,8 @@ public class TrackEntriesController : ControllerBase
         return Ok(trackEntries);
     }
 
-    [HttpDelete("{trackEntryId:int}")]
-    public async Task<IActionResult> DeleteTrackEntry(int trackEntryId)
+    [HttpDelete("{trackEntryId:length(24)}")]
+    public async Task<IActionResult> DeleteTrackEntry(string trackEntryId)
     {
         TrackEntryReadDto? trackEntry = await _trackEntryServcice.GetTrackEntryAsync(trackEntryId);
 
@@ -114,7 +109,6 @@ public class TrackEntriesController : ControllerBase
         {
             throw new NotFoundException("Track entry not found");
         }
-
         await _trackEntryServcice.DeleteTrackEntryAsync(trackEntryId);
         return NoContent();
     }

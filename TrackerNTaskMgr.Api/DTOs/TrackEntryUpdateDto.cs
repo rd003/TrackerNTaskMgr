@@ -3,9 +3,9 @@
 public record TrackEntryUpdateDto
 (
 string? TrackEntryId,
-DateTime? EntryDate,
-DateTime? SleptAt,
-DateTime? WokeUpAt,
+DateTimeOffset? EntryDate,
+DateTimeOffset? SleptAt,
+DateTimeOffset? WokeUpAt,
 int? NapInMinutes,
 int? TotalWorkInMinutes,
 string? Remarks

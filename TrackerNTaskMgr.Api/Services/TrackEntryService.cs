@@ -1,14 +1,12 @@
 using System.Data;
 
-using Dapper;
-
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 
 using MongoDB.Driver;
 
 using TrackerNTaskMgr.Api.DTOs;
 using TrackerNTaskMgr.Api.Entities;
+using TrackerNTaskMgr.Api.Exceptions;
 using TrackerNTaskMgr.Api.Mappers;
 using TrackerNTaskMgr.Api.Settings;
 
@@ -16,14 +14,10 @@ namespace TrackerNTaskMgr.Api.Services;
 
 public class TrackEntryService : ITrackEntryService
 {
-    private readonly string _connectionString;
-    private readonly IConfiguration _config;
     private readonly IMongoCollection<TrackEntry> _trackEntriesCollection;
 
-    public TrackEntryService(IConfiguration config, IOptions<DatabaseSettings> databaseSettings)
+    public TrackEntryService(IOptions<DatabaseSettings> databaseSettings)
     {
-        _config = config;
-        _connectionString = _config.GetConnectionString("Default")!;
         var mongoClient = new MongoClient(databaseSettings.Value.ConnectionString);
         var mongoDatabase = mongoClient.GetDatabase(databaseSettings.Value.DatabaseName);
         _trackEntriesCollection = mongoDatabase.GetCollection<TrackEntry>(databaseSettings.Value.TrackEntryCollectionName);
@@ -32,28 +26,35 @@ public class TrackEntryService : ITrackEntryService
     public async Task<TrackEntryReadDto> CreateTrackEntryAsync(TrackEntryCreateDto trackEntryToCreate)
     {
         var trackEntry = trackEntryToCreate.ToTrackEntry();
+        // remove time from entry date 
+        trackEntry.EntryDate = trackEntry.EntryDate.Date;
+
+        var existingRecord = await _trackEntriesCollection.Find(x => x.EntryDate == trackEntry.EntryDate).FirstOrDefaultAsync();
+        if (existingRecord != null)
+        {
+            throw new DuplicateRecordException("Record with this entryDate already exists");
+        }
+
         await _trackEntriesCollection.InsertOneAsync(trackEntry);
         var createdEntry = trackEntry.ToTrackEntryReadDto();
         return createdEntry;
     }
 
-    public async Task<TrackEntryReadDto?> GetTrackEntryAsync(int id)
+    public async Task UpdateTrackEntryAsync(TrackEntryUpdateDto trackEntryToUpdate)
     {
-        // using IDbConnection connection = new SqlConnection(_connectionString);
+        var trackEntry = trackEntryToUpdate.ToTrackEntry();
 
-        // TrackEntryReadDto? trackEntry = (await connection.QueryAsync<TrackEntryReadDto, TrackEntryRemarkReadDto, TrackEntryReadDto>(
-        //      sql: "GetTrackEntryById",
-        //      map: (entry, remark) =>
-        //      {
-        //          entry.TrackEntryRemark = remark;
-        //          return entry;
-        //      },
-        //      param: new { TrackEntryId = id },
-        //      splitOn: "TrackEntryId",
-        //      commandType: CommandType.StoredProcedure
-        //      )).FirstOrDefault();
-        // return trackEntry;
-        throw new NotImplementedException();
+        // remove time from entry date
+        trackEntry.EntryDate = trackEntry.EntryDate.Date;
+
+        await _trackEntriesCollection.ReplaceOneAsync(a => a.Id == trackEntryToUpdate.TrackEntryId, trackEntry);
+    }
+
+
+    public async Task<TrackEntryReadDto?> GetTrackEntryAsync(string id)
+    {
+        var trackEntry = await _trackEntriesCollection.Find(a => a.Id == id).FirstOrDefaultAsync();
+        return trackEntry == null ? default : trackEntry.ToTrackEntryReadDto();
     }
 
     public async Task<IEnumerable<TrackEntryReadDto>> GetTrackEntiesAsync(GetTrackEntriesParams parameters)
@@ -68,7 +69,10 @@ public class TrackEntryService : ITrackEntryService
 
         if (parameters.StartDate.HasValue && parameters.EndDate.HasValue)
         {
-            // TODO: How to apply both gte and lte
+            filter &= filterBuilder.And(
+                filterBuilder.Gte(x => x.EntryDate, parameters.StartDate),
+                filterBuilder.Lte(x => x.EntryDate, parameters.EndDate)
+            );
         }
 
         // Pagination filtering based on LastEntryDate and PageDirection
@@ -102,18 +106,10 @@ public class TrackEntryService : ITrackEntryService
         return trackEntries.Select(te => te.ToTrackEntryReadDto());
     }
 
-    public async Task UpdateTrackEntryAsync(TrackEntryUpdateDto trackEntryToUpdate)
-    {
-        // using IDbConnection connection = new SqlConnection(_connectionString);
-        // await connection.ExecuteAsync("UpdateTrackEntry", trackEntryToUpdate, commandType: CommandType.StoredProcedure);
-        throw new NotImplementedException();
-    }
 
-    public async System.Threading.Tasks.Task DeleteTrackEntryAsync(int trackEntryId)
+    public async Task DeleteTrackEntryAsync(string trackEntryId)
     {
-        using IDbConnection connection = new SqlConnection(_connectionString);
-        await connection.ExecuteAsync("DeleteTrackEntry", new { TrackEntryId = trackEntryId }, commandType: CommandType.StoredProcedure);
+        await _trackEntriesCollection.DeleteOneAsync(a => a.Id == trackEntryId);
     }
-
 
 }

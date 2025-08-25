@@ -5,44 +5,43 @@ POST {{base_address}}/api/trackentries
 Content-Type: application/json
 
 {
-  "entryDate": "2025-03-24T00:00",
-  "sleptAt": "2025-03-24T10:15",
-  "wokeUpAt": "2025-03-25T06:00",
+  "entryDate": "2025-03-27T02:50",
+  "sleptAt": "2025-03-27T22:00",
+  "wokeUpAt": "2025-03-25T06:30",
   "napInMinutes": 0,
-  "totalWorkInMinutes": 300,
-  "remarks": "Worked as usual"
+  "totalWorkInMinutes": 360,
+  "remarks": null
 }
 
-### GET all
-###
+### Get list
 GET {{base_address}}/api/trackentries
 Accept: application/json
 
-### GET Filtered
-GET {{base_address}}/api/trackentries?limit=3&sortDirection=ASC&pageDirection=prev&lastEntryDate=2025-02-16
+### GET List Filtered
+GET {{base_address}}/api/trackentries?startDate=2025-03-24&endDate=2025-03-26
 Accept: application/json
 Authorization: Bearer {{token}}
 
-###
-GET {{base_address}}/api/trackentries/1001
+### GET One
+GET {{base_address}}/api/trackentries/68abe9213b383748dc68588c
 Accept: application/json
 
-###
-PUT {{base_address}}/api/trackentries/1001
+### PUT
+PUT {{base_address}}/api/trackentries/68abeb003b383748dc68588d
 Content-Type: application/json
 
 {
- "trackEntryId": 1001,
- "entryDate": "2025-04-28T00:00",
- "sleptAt": "2025-04-28T00:10:00.000Z",
- "wokeUpAt": "2025-04-28T21:00:00.000Z",
- "napInMinutes": 0,
- "totalWorkInMinutes": 194,
- "remarks": null
- }
+  "trackEntryId":"68abeb003b383748dc68588d",
+  "entryDate": "2025-03-27T02:50",
+  "sleptAt": "2025-03-27T22:00",
+  "wokeUpAt": "2025-03-28T06:30",
+  "napInMinutes": 0,
+  "totalWorkInMinutes": 360,
+  "remarks": null
+}
 
-###
-DELETE {{base_address}}/api/trackentries/14
+### Delete
+DELETE {{base_address}}/api/trackentries/68aaf7d23c50de7c2d44cef6
 
 ### Bulk insert : track entries
 POST {{base_address}}/bulk-track-entries

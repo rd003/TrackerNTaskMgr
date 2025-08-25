@@ -41,6 +41,16 @@ public class CustomExceptionHandler : IExceptionHandler
                     Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1"
                 }
             ),
+            DuplicateRecordException => (
+                StatusCodes.Status400BadRequest,
+                new ProblemDetails
+                {
+                    Status = StatusCodes.Status400BadRequest,
+                    Title = "Duplicate Record",
+                    Detail = exception.Message,
+                    Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+                }
+            ),
             NotFoundException => (
             StatusCodes.Status404NotFound,
             new ProblemDetails
