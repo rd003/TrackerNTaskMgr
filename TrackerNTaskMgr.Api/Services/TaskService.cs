@@ -83,7 +83,125 @@ public class TaskService : ITaskService
         if (taskDocument is null) return null;
 
         // Map BsonDocument to TaskReadDTO
-        var taskReadDto = new TaskReadDTO
+        var taskReadDto = MapBsonDocumentToTaskReadDTO(taskDocument);
+
+        return taskReadDto;
+    }
+
+    public async Task<IEnumerable<TaskReadDTO>> GetTasksAsync(GetTasksParams parameters)
+    {
+
+        var pipeline = new List<BsonDocument>();
+
+        // Step 1: Build match conditions
+        var matchConditions = new List<BsonDocument>();
+
+        // Filter by TaskHeaderId if provided
+        if (!string.IsNullOrEmpty(parameters.TaskHeaderId) && ObjectId.TryParse(parameters.TaskHeaderId, out _))
+        {
+            matchConditions.Add(new BsonDocument("taskHeaderId", ObjectId.Parse(parameters.TaskHeaderId)));
+        }
+
+        // Filter by TaskPriorityId if provided
+        if (!string.IsNullOrEmpty(parameters.TaskPriorityId) && byte.TryParse(parameters.TaskPriorityId, out var priorityId))
+        {
+            matchConditions.Add(new BsonDocument("priority", priorityId));
+        }
+
+        // Filter by Tag if provided (tags are stored as array of strings)
+        if (!string.IsNullOrEmpty(parameters.Tag))
+        {
+            matchConditions.Add(new BsonDocument("tags", parameters.Tag));
+        }
+
+        // Exclude deleted tasks 
+        matchConditions.Add(new BsonDocument("deletedAt", BsonNull.Value));
+
+        // Add match stage if we have conditions
+        if (matchConditions.Any())
+        {
+            var matchStage = matchConditions.Count == 1
+                ? matchConditions.First()
+                : new BsonDocument("$and", new BsonArray(matchConditions));
+
+            pipeline.Add(new BsonDocument("$match", matchStage));
+        }
+
+
+        // Step 2: Lookup TaskHeader to get header title
+        pipeline.Add(new BsonDocument("$lookup", new BsonDocument
+        {
+            { "from", "taskHeaders" }, // Adjust collection name as needed
+            { "localField", "taskHeaderId" },
+            { "foreignField", "_id" },
+            { "as", "taskHeader" }
+        }));
+
+        // Step 3: Unwind taskHeader (handle cases where header might not exist)
+        pipeline.Add(new BsonDocument("$unwind", new BsonDocument
+        {
+            { "path", "$taskHeader" },
+            { "preserveNullAndEmptyArrays", true } // Keep tasks even if header is missing
+        }));
+
+        // Step 4: Project the fields we need
+        pipeline.Add(new BsonDocument("$project", new BsonDocument
+        {
+            { "_id", 1 },
+            { "taskHeaderId", 1 },
+            { "title", 1 },
+            { "uri", 1 },
+            { "priority", 1 },
+            { "status", 1 },
+            { "deadline", 1 },
+            { "scheduledAt", 1 },
+            { "displayAtBoard", 1 },
+            { "subTasks", 1 },
+            { "tags", 1 },
+            { "createdAt", 1 },
+            { "updatedAt", 1 },
+            { "taskHeaderTitle", new BsonDocument("$ifNull", new BsonArray { "$taskHeader.taskHeaderTitle", "Unknown Header" }) }
+        }));
+
+        // Step 5: Add sorting
+        if (!string.IsNullOrEmpty(parameters.SortBy))
+        {
+            var sortDirection = string.Equals(parameters.SortDirection, "desc", StringComparison.OrdinalIgnoreCase) ? -1 : 1;
+
+            var sortField = parameters.SortBy.ToLower() switch
+            {
+                "title" => "title",
+                "priority" => "priority",
+                "status" => "status",
+                "deadline" => "deadline",
+                "scheduledat" => "scheduledAt",
+                "created" => "createdAt",
+                "updated" => "updatedAt",
+                "headertitle" => "taskHeaderTitle",
+                _ => "createdAt" // Default sort
+            };
+
+            pipeline.Add(new BsonDocument("$sort", new BsonDocument(sortField, sortDirection)));
+        }
+        else
+        {
+            // Default sort by created date (newest first)
+            pipeline.Add(new BsonDocument("$sort", new BsonDocument("createdAt", -1)));
+        }
+
+        // Execute the aggregation
+        var cursor = await _taskCollection.AggregateAsync<BsonDocument>(pipeline);
+        var taskDocuments = await cursor.ToListAsync();
+
+        // Map to DTOs
+        var taskReadDtos = taskDocuments.Select(MapBsonDocumentToTaskReadDTO).ToList();
+
+        return taskReadDtos;
+    }
+
+    private static TaskReadDTO MapBsonDocumentToTaskReadDTO(BsonDocument taskDocument)
+    {
+        return new TaskReadDTO
         {
             TaskId = taskDocument["_id"].AsObjectId.ToString(),
             TaskHeaderId = taskDocument["taskHeaderId"].AsString,
@@ -105,16 +223,9 @@ public class TaskService : ITaskService
             {
                 SubTaskTitle = subTask["subTaskTitle"].AsString,
                 SubTaskUri = subTask.AsBsonDocument.Contains("subTaskUri") && !subTask["subTaskUri"].IsBsonNull
-                    ? subTask["subTaskUri"].AsString : null,
+                    ? subTask["subTaskUri"].AsString : null
             }).ToList()
         };
-
-        return taskReadDto;
-    }
-
-    public async Task<IEnumerable<TaskReadDTO>> GetTasksAsync(GetTasksParams parameters)
-    {
-        throw new NotImplementedException();
     }
 
 

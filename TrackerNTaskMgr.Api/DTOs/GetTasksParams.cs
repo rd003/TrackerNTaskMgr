@@ -2,9 +2,9 @@ namespace TrackerNTaskMgr.Api.DTOs;
 
 public record GetTasksParams
 (
-    int? TaskHeaderId,
-    int? TaskPriorityId,
-    int? TagId,
+    string? TaskHeaderId,
+    string? TaskPriorityId,
+    string? Tag,
     string? SortBy,
     string? SortDirection
 );
