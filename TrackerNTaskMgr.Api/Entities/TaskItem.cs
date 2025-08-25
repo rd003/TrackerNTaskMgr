@@ -11,6 +11,9 @@ public class TaskItem
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; } = null!;
 
+    [BsonElement("taskHeaderId")]
+    public string TaskHeaderId { get; set; } = null!;
+
     [BsonElement("title")]
     public string Title { get; set; } = null!;
 
@@ -24,10 +27,12 @@ public class TaskItem
     public Constants.TaskStatus Status { get; set; }
 
     [BsonElement("deadline")]
-    public DateTime? Deadline { get; set; }
+    [BsonRepresentation(BsonType.Document)]
+    public DateTimeOffset? Deadline { get; set; }
 
     [BsonElement("scheduledAt")]
-    public DateTime? ScheduledAt { get; set; }
+    [BsonRepresentation(BsonType.Document)]
+    public DateTimeOffset? ScheduledAt { get; set; }
 
     [BsonElement("displayAtBoard")]
     public bool DisplayAtBoard { get; set; } = false;
@@ -39,11 +44,14 @@ public class TaskItem
     public List<string> Tags { get; set; } = [];
 
     [BsonElement("createdAt")]
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    [BsonRepresentation(BsonType.Document)]
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
     [BsonElement("updatedAt")]
-    public DateTime? UpdatedAt { get; set; }
+    [BsonRepresentation(BsonType.Document)]
+    public DateTimeOffset? UpdatedAt { get; set; }
 
     [BsonElement("deletedAt")]
-    public DateTime? DeletedAt { get; set; }
+    [BsonRepresentation(BsonType.Document)]
+    public DateTimeOffset? DeletedAt { get; set; }
 }

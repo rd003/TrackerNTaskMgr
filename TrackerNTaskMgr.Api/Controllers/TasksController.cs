@@ -52,8 +52,8 @@ public class TasksController : ControllerBase
         return CreatedAtRoute(nameof(GetTaskById), new { taskId = createdTaskId }, createdTask);
     }
 
-    [HttpPut("{taskId:int}")]
-    public async Task<IActionResult> UpdateTask(int taskId, [FromBody] TaskUpdateDto taskToUpdate)
+    [HttpPut("{taskId:length(24)}")]
+    public async Task<IActionResult> UpdateTask(string taskId, [FromBody] TaskUpdateDto taskToUpdate)
     {
         var validationResult = await _taskUpdateValidator.ValidateAsync(taskToUpdate);
         if (!validationResult.IsValid)
@@ -78,8 +78,8 @@ public class TasksController : ControllerBase
         return Ok(updatedTask);
     }
 
-    [HttpGet("{taskId:int}", Name = nameof(GetTaskById))]
-    public async Task<IActionResult> GetTaskById(int taskId)
+    [HttpGet("{taskId:length(24)}", Name = nameof(GetTaskById))]
+    public async Task<IActionResult> GetTaskById(string taskId)
     {
         var task = await _taskService.GetTaskByTaskIdAsync(taskId);
         if (task == null)
@@ -90,8 +90,8 @@ public class TasksController : ControllerBase
     }
 
 
-    [HttpDelete("{taskId:int}")]
-    public async Task<IActionResult> DeleteTask(int taskId)
+    [HttpDelete("{taskId:length(24)}")]
+    public async Task<IActionResult> DeleteTask(string taskId)
     {
         bool isTaskExists = await _taskService.IsTaskExists(taskId);
         if (!isTaskExists)

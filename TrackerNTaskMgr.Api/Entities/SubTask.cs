@@ -5,8 +5,8 @@ namespace TrackerNTaskMgr.Api.Entities;
 
 public class SubTask
 {
-    [BsonRepresentation(BsonType.ObjectId)]
-    public string Id = ObjectId.GenerateNewId().ToString();
+    // [BsonElement("id")]
+    // public string Id = Guid.NewGuid().ToString();
 
     [BsonElement("subTaskTitle")]
     public string SubTaskTitle { get; set; } = null!;
@@ -14,15 +14,6 @@ public class SubTask
     [BsonElement("subTaskUri")]
     public string? SubTaskUri { get; set; }
 
-    [BsonElement("status")]
-    public Constants.TaskStatus Status { get; set; }
-
-    [BsonElement("createdAt")]
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-    [BsonElement("updatedAt")]
-    public DateTime? UpdatedAt { get; set; }
-
-    [BsonElement("deletedAt")]
-    public DateTime? DeletedAt { get; set; }
+    // [BsonElement("status")]
+    // public Constants.TaskStatus Status { get; set; }
 }
