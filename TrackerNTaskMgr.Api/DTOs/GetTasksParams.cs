@@ -3,7 +3,7 @@ namespace TrackerNTaskMgr.Api.DTOs;
 public record GetTasksParams
 (
     string? TaskHeaderId,
-    string? TaskPriorityId,
+    int? TaskPriorityId,
     string? Tag,
     string? SortBy,
     string? SortDirection

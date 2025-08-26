@@ -13,11 +13,11 @@ public class TaskReadDTO
     public bool DisplayAtBoard { get; set; }
     public string TaskHeaderTitle { get; set; } = string.Empty;
     public List<SubTaskReadDto> SubTasks { get; set; } = [];
-    public string TaskStatus { get => ((TrackerNTaskMgr.Api.Constants.TaskStatus)TaskStatusId).ToString(); }
+    public string TaskStatus { get => ((Constants.TaskStatus)TaskStatusId).ToString(); }
     public string TaskPriority
     {
         get =>
-         ((TrackerNTaskMgr.Api.Constants.TaskPriority)TaskPriorityId).ToString();
+         ((Constants.TaskPriority)TaskPriorityId).ToString();
     }
     public List<string> Tags { get; set; } = [];
 }

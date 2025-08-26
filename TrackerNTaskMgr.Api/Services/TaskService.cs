@@ -1,5 +1,4 @@
 using System.Data;
-using System.Reflection.Metadata;
 
 using Microsoft.Extensions.Options;
 
@@ -41,7 +40,11 @@ public class TaskService : ITaskService
     {
         var pipleline = new BsonDocument[]{
             // match specific task
-           new BsonDocument("$match",new BsonDocument("_id",ObjectId.Parse(taskId))),
+            new BsonDocument("$match", new BsonDocument
+        {
+            { "_id", ObjectId.Parse(taskId) },
+            { "deletedAt", BsonNull.Value }
+        }),
 
             // Lookup TaskHeader to get header title
             new BsonDocument("$lookup", new BsonDocument
@@ -52,7 +55,7 @@ public class TaskService : ITaskService
                 { "as", "taskHeader" }
             }),
 
-            // Unwind the taskHeader array (should be single document)
+            // taskHeader is array, so we need to flatten it
             new BsonDocument("$unwind", new BsonDocument
             {
                 { "path", "$taskHeader" },
@@ -103,9 +106,9 @@ public class TaskService : ITaskService
         }
 
         // Filter by TaskPriorityId if provided
-        if (!string.IsNullOrEmpty(parameters.TaskPriorityId) && byte.TryParse(parameters.TaskPriorityId, out var priorityId))
+        if (parameters.TaskPriorityId.HasValue)
         {
-            matchConditions.Add(new BsonDocument("priority", priorityId));
+            matchConditions.Add(new BsonDocument("priority", parameters.TaskPriorityId));
         }
 
         // Filter by Tag if provided (tags are stored as array of strings)
@@ -175,8 +178,6 @@ public class TaskService : ITaskService
                 "status" => "status",
                 "deadline" => "deadline",
                 "scheduledat" => "scheduledAt",
-                "created" => "createdAt",
-                "updated" => "updatedAt",
                 "headertitle" => "taskHeaderTitle",
                 _ => "createdAt" // Default sort
             };
@@ -204,16 +205,18 @@ public class TaskService : ITaskService
         return new TaskReadDTO
         {
             TaskId = taskDocument["_id"].AsObjectId.ToString(),
-            TaskHeaderId = taskDocument["taskHeaderId"].AsString,
+            TaskHeaderId = taskDocument["taskHeaderId"].AsObjectId.ToString(),
             TaskTitle = taskDocument["title"].AsString,
             TaskUri = taskDocument.Contains("uri") && !taskDocument["uri"].IsBsonNull
                 ? taskDocument["uri"].AsString : null,
             TaskPriorityId = (byte)taskDocument["priority"].AsInt32,
             TaskStatusId = (byte)taskDocument["status"].AsInt32,
             Deadline = taskDocument.Contains("deadline") && !taskDocument["deadline"].IsBsonNull
-                ? taskDocument["deadline"].ToUniversalTime() : null,
+            ? ParseDateTimeFromBsonDocument(taskDocument["deadline"].AsBsonDocument)
+            : null,
             ScheduledAt = taskDocument.Contains("scheduledAt") && !taskDocument["scheduledAt"].IsBsonNull
-                ? taskDocument["scheduledAt"].ToUniversalTime() : null,
+            ? ParseDateTimeFromBsonDocument(taskDocument["scheduledAt"].AsBsonDocument)
+            : null,
             DisplayAtBoard = taskDocument["displayAtBoard"].AsBoolean,
             TaskHeaderTitle = taskDocument["taskHeaderTitle"].AsString,
             Tags = taskDocument["tags"].AsBsonArray.Select(tag => tag.AsString).ToList(),
@@ -221,6 +224,7 @@ public class TaskService : ITaskService
             // Map SubTasks
             SubTasks = taskDocument["subTasks"].AsBsonArray.Select(subTask => new SubTaskReadDto
             {
+                SubTaskId = subTask["_id"].AsString, // _id is stored as GUID
                 SubTaskTitle = subTask["subTaskTitle"].AsString,
                 SubTaskUri = subTask.AsBsonDocument.Contains("subTaskUri") && !subTask["subTaskUri"].IsBsonNull
                     ? subTask["subTaskUri"].AsString : null
@@ -228,10 +232,20 @@ public class TaskService : ITaskService
         };
     }
 
+    private static DateTimeOffset ParseDateTimeFromBsonDocument(BsonDocument dateDoc)
+    {
+        var utcDateTime = dateDoc["DateTime"].ToUniversalTime();
+        var offsetMinutes = dateDoc["Offset"].AsInt32;
+
+        // Convert UTC time to local time based on the stored offset
+        var localDateTime = DateTime.SpecifyKind(utcDateTime.AddMinutes(offsetMinutes), DateTimeKind.Unspecified);
+        return new DateTimeOffset(localDateTime, TimeSpan.FromMinutes(offsetMinutes));
+    }
+
 
     public async Task<bool> IsTaskExists(string taskId)
     {
-        var task = await _taskCollection.Find(x => x.Id == taskId).FirstOrDefaultAsync();
+        var task = await _taskCollection.Find(x => x.Id == taskId && x.DeletedAt == null).FirstOrDefaultAsync();
         return task != null;
     }
 

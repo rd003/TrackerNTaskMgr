@@ -12,6 +12,7 @@ public class TaskItem
     public string Id { get; set; } = null!;
 
     [BsonElement("taskHeaderId")]
+    [BsonRepresentation(BsonType.ObjectId)]
     public string TaskHeaderId { get; set; } = null!;
 
     [BsonElement("title")]
