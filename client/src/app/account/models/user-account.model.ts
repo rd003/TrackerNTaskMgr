@@ -1,4 +1,4 @@
 export interface UserAccountModel {
-    userAccountId: number,
+    userAccountId: string,
     username: string
 }

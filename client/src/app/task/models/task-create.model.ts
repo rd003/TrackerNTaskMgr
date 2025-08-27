@@ -1,6 +1,6 @@
 export interface TaskCreateModel {
-  taskId: number,
-  taskHeaderId: number;
+  taskId: string,
+  taskHeaderId: string;
   taskTitle: string;
   taskUri: string | null;
   taskPriorityId: number;
@@ -13,7 +13,7 @@ export interface TaskCreateModel {
 }
 
 export interface SubTaskCreateModel {
-  subTaskId: number | null,
+  subTaskId: string | null,
   subTaskTitle: string;
   subTaskUri: string | null;
 }

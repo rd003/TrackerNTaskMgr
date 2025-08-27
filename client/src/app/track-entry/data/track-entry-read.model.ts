@@ -1,16 +1,15 @@
-export interface TrackEntryReadModel
-{
-    trackEntryId: number,
-    entryDate : Date,
-    sleptAt : Date,
-    wokeUpAt : Date,
-    napInMinutes: number|null,
+export interface TrackEntryReadModel {
+    trackEntryId: string,
+    entryDate: Date,
+    sleptAt: Date,
+    wokeUpAt: Date,
+    napInMinutes: number | null,
     totalSleepInMinutes: number,
-    totalWorkInMinutes:number,
-    trackEntryRemark: TrackEntryRemarkModel|null
+    totalWorkInMinutes: number,
+    Remarks: string | null
 }
 
-export interface TrackEntryRemarkModel{
-    trackEntryId:number,
-    remarks:string
-}
+// export interface TrackEntryRemarkModel {
+//     trackEntryId: string,
+//     remarks: string
+// }
