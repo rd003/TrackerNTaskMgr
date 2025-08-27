@@ -8,7 +8,7 @@ Authorization: Bearer {{token}}
 
 # TODO: no filters are working
 ### Get all 
-GET {{base_address}}?priority=2
+GET {{base_address}}?SortBy=ScheduledAt&SortDirection=
 
 ### Display board tasks
 GET {{base_address}}/displayboard-tasks
