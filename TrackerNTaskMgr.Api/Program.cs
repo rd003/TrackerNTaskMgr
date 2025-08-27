@@ -35,6 +35,7 @@ builder.Services.Configure<DatabaseSettings>(builder.Configuration.GetSection("D
 builder.Services.AddSingleton<ITrackEntryService, TrackEntryService>();
 builder.Services.AddSingleton<ITaskService, TaskService>();
 builder.Services.AddSingleton<IAuthService, AuthService>();
+builder.Services.AddSingleton<ITaskHeaderService, TaskHeaderService>();
 builder.Services.AddSingleton<IDatabaseInitializer, DatabaseInitializer>();
 
 // Global exception handling

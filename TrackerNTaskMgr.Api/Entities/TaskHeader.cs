@@ -16,6 +16,9 @@ public class TaskHeader
     [BsonRepresentation(BsonType.Document)]
     public DateTimeOffset Created { get; set; } = DateTimeOffset.UtcNow;
 
+    [BsonElement("sortOrder")]
+    public int SortOrder { get; set; }
+
     [BsonElement("updated")]
     [BsonRepresentation(BsonType.Document)]
     public DateTimeOffset? Updated { get; set; }
