@@ -11,6 +11,7 @@ using TrackerNTaskMgr.Api.Services;
 namespace TrackerNTaskMgr.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("/api/{controller}")]
 public class TasksController : ControllerBase
 {
