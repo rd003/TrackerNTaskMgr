@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 
 using MongoDB.Driver;
 
+using TrackerNTaskMgr.Api.DTOs;
 using TrackerNTaskMgr.Api.Entities;
 using TrackerNTaskMgr.Api.Settings;
 
@@ -19,17 +20,36 @@ public class DatabaseInitializer : IDatabaseInitializer
 {
     private readonly IMongoDatabase _database;
     private readonly IMongoCollection<TrackEntry> _trackEntriesCollection;
+    private readonly IAuthService _authService;
 
-    public DatabaseInitializer(IOptions<DatabaseSettings> databaseSettings)
+    public DatabaseInitializer(IOptions<DatabaseSettings> databaseSettings, IAuthService authService)
     {
         var mongoClient = new MongoClient(databaseSettings.Value.ConnectionString);
         _database = mongoClient.GetDatabase(databaseSettings.Value.DatabaseName);
+
         _trackEntriesCollection = _database.GetCollection<TrackEntry>(databaseSettings.Value.TrackEntryCollectionName);
+
+        _authService = authService;
     }
 
     public async Task InitializeAsync()
     {
-        await CreateIndexesAsync();
+        try
+        {
+            await CreateIndexesAsync();
+
+            // seed default user
+            if (!await _authService.HasAnyUserAsync())
+            {
+                var signupData = new SignupDto("user", "123");
+                await _authService.CreateUserAsync(signupData);
+                Console.WriteLine("====> user is created");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 
     private async Task CreateIndexesAsync()

@@ -61,6 +61,16 @@ public class CustomExceptionHandler : IExceptionHandler
                 Type = "https://tools.ietf.org/html/rfc7231#section-6.5.4"
             }
         ),
+            UnAuthorizedUserException => (
+               StatusCodes.Status401Unauthorized,
+               new ProblemDetails
+               {
+                   Status = StatusCodes.Status401Unauthorized,
+                   Title = "Unauthorized access",
+                   Detail = exception.Message,
+                   Type = "Authorized access exception"
+               }
+           ),
             _ => (
                 StatusCodes.Status500InternalServerError,
                 new ProblemDetails
