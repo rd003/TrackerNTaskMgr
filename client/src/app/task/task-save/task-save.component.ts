@@ -39,7 +39,7 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
     MatDividerModule,
     MatProgressSpinnerModule,
     RouterModule
-],
+  ],
   providers: [provideNativeDateAdapter()],
   templateUrl: "task-save.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -60,7 +60,7 @@ export class TaskSaveComponent implements OnInit {
   taskHeaders$ = this.taskHeaderService.getTaskHeaders();
 
   frm: FormGroup = this.fb.group({
-    taskId: [0],
+    taskId: [""],
     taskHeaderId: [null, Validators.required],
     taskTitle: ['', Validators.required],
     taskUri: [null],
@@ -92,12 +92,11 @@ export class TaskSaveComponent implements OnInit {
   save() {
     this.setLoading(true);
     var taskToSave = this.frm.value as TaskCreateModel;
-
-    if (taskToSave.taskId < 1) {
-      this.addTask(taskToSave);
+    if (taskToSave.taskId && taskToSave.taskId.length > 0) {
+      this.updateTask(taskToSave);
     }
     else {
-      this.updateTask(taskToSave);
+      this.addTask(taskToSave);
     }
   }
 
@@ -167,8 +166,7 @@ export class TaskSaveComponent implements OnInit {
   ngOnInit() {
     if (this.taskId) {
       this.setLoading(true);
-      const taskIdNum = parseInt(this.taskId);
-      this.taskService.getTask(taskIdNum).pipe(
+      this.taskService.getTask(this.taskId).pipe(
         tap((task) => {
           var taskToUpdate = {
             ...task,

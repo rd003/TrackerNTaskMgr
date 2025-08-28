@@ -87,7 +87,7 @@
     @if(task.subTasks && task.subTasks.length>0)
     {
     <h3>SubTasks</h3>
-    @for(subTask of task.subTasks; track subTask.taskId)
+    @for(subTask of task.subTasks; track subTask.subTaskId)
     {
     <div class="sub-task">{{subTask.subTaskTitle}}
         @if(subTask.subTaskUri){

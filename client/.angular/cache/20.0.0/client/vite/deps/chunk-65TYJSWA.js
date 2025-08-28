@@ -1,9 +1,4 @@
 import {
-  ScrollDispatcher,
-  ScrollingModule,
-  ViewportRuler
-} from "./chunk-4EDYWSOI.js";
-import {
   _isTestEnvironment
 } from "./chunk-QCETVJKM.js";
 import {
@@ -15,7 +10,15 @@ import {
   _getEventTarget,
   coerceArray,
   hasModifierKey
-} from "./chunk-LYVN5RTK.js";
+} from "./chunk-Y5HAB54U.js";
+import {
+  _CdkPrivateStyleLoader
+} from "./chunk-3MUPKEBL.js";
+import {
+  ScrollDispatcher,
+  ScrollingModule,
+  ViewportRuler
+} from "./chunk-CPRF4Z73.js";
 import {
   supportsScrollBehavior
 } from "./chunk-EOFW2REK.js";
@@ -24,11 +27,8 @@ import {
   Directionality
 } from "./chunk-O5V7MQQN.js";
 import {
-  _CdkPrivateStyleLoader
-} from "./chunk-3MUPKEBL.js";
-import {
   Platform
-} from "./chunk-LTOGFFRJ.js";
+} from "./chunk-J5LKWY3S.js";
 import {
   Location
 } from "./chunk-SAT5S7EZ.js";
@@ -3455,4 +3455,4 @@ export {
   CdkConnectedOverlay,
   OverlayModule
 };
-//# sourceMappingURL=chunk-5X6KWPUK.js.map
+//# sourceMappingURL=chunk-65TYJSWA.js.map

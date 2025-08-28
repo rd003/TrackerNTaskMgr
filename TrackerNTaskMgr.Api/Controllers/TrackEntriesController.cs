@@ -85,7 +85,7 @@ public class TrackEntriesController : ControllerBase
     public async Task<IActionResult> GetTrackEntries([FromQuery] GetTrackEntriesParams parameters)
     {
         ValidateGetTrackEntryParams(parameters);
-        Console.WriteLine($"====> parameters: {parameters}");
+        // Console.WriteLine($"====> parameters: {parameters}");
         var trackEntries = await _trackEntryServcice.GetTrackEntiesAsync(parameters);
         // Note: Bad practice
         // Problem: When handling 'prev' + 'desc', the data is coming in asc order, I am reordering them here. Same goes for prev+asc, we need to manually convert data to asc order.

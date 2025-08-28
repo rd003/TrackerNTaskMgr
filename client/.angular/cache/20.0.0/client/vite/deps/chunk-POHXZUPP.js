@@ -1,6 +1,6 @@
 import {
   _animationsDisabled
-} from "./chunk-DVDY5NK7.js";
+} from "./chunk-7UGADBF5.js";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -87,4 +87,4 @@ var MatPseudoCheckbox = class _MatPseudoCheckbox {
 export {
   MatPseudoCheckbox
 };
-//# sourceMappingURL=chunk-FA746CVS.js.map
+//# sourceMappingURL=chunk-POHXZUPP.js.map

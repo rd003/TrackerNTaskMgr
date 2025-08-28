@@ -5,7 +5,7 @@ import {
   Platform,
   coerceElement,
   coerceNumberProperty
-} from "./chunk-LTOGFFRJ.js";
+} from "./chunk-J5LKWY3S.js";
 import {
   APP_ID,
   CSP_NONCE,
@@ -3131,4 +3131,4 @@ export {
   removeAriaReferencedId,
   AriaDescriber
 };
-//# sourceMappingURL=chunk-LYVN5RTK.js.map
+//# sourceMappingURL=chunk-Y5HAB54U.js.map

@@ -1,50 +1,50 @@
 import {
   afterNextRender,
-    ChangeDetectionStrategy,
-    Component,
-    EventEmitter,
-    inject,
-    Inject,
-    Injector,
-    Output,
-    ViewChild,
-  } from "@angular/core";
-  import {
-    MAT_DIALOG_DATA,
-    MatDialogRef,
-    MatDialogModule,
-  } from "@angular/material/dialog";
-  import {
-    FormControl,
-    FormGroup,
-    ReactiveFormsModule,
-    Validators,
-  } from "@angular/forms";
-  import { MatFormFieldModule } from "@angular/material/form-field";
-  import { MatButtonModule } from "@angular/material/button";
-  import { MatInputModule } from "@angular/material/input";
-  import { TrackEntryUpdateModel } from "../data/track-entry-create.model";
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  inject,
+  Inject,
+  Injector,
+  Output,
+  ViewChild,
+} from "@angular/core";
+import {
+  MAT_DIALOG_DATA,
+  MatDialogRef,
+  MatDialogModule,
+} from "@angular/material/dialog";
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from "@angular/forms";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatButtonModule } from "@angular/material/button";
+import { MatInputModule } from "@angular/material/input";
+import { TrackEntryUpdateModel } from "../data/track-entry-create.model";
 import { MatDatepickerModule } from "@angular/material/datepicker";
 import { MAT_DATE_LOCALE, provideNativeDateAdapter } from "@angular/material/core";
 import { MatTimepickerModule } from "@angular/material/timepicker";
 import { CdkTextareaAutosize, TextFieldModule } from "@angular/cdk/text-field";
 import { combineDateAndTime } from "../../shared/services/date.util";
 
-  @Component({
-    selector: "app-track-entry-dialog",
-    standalone: true,
-    imports: [
-      ReactiveFormsModule,
-      MatFormFieldModule,
-      MatInputModule,
-      MatButtonModule,
-      MatDialogModule,
-      MatDatepickerModule,
-      MatTimepickerModule,
-      TextFieldModule
-    ],
-    providers: [provideNativeDateAdapter(),{provide: MAT_DATE_LOCALE, useValue: 'en-IN'}],
-    template: `
+@Component({
+  selector: "app-track-entry-dialog",
+  standalone: true,
+  imports: [
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatDialogModule,
+    MatDatepickerModule,
+    MatTimepickerModule,
+    TextFieldModule
+  ],
+  providers: [provideNativeDateAdapter(), { provide: MAT_DATE_LOCALE, useValue: 'en-IN' }],
+  template: `
       <h1 mat-dialog-title>
         {{ data.title }}
       </h1>
@@ -128,8 +128,8 @@ import { combineDateAndTime } from "../../shared/services/date.util";
         </button>
       </div>
     `,
-    styles: [
-      `
+  styles: [
+    `
         .frm {
           display: grid;
           grid-template-columns: repeat(
@@ -139,15 +139,15 @@ import { combineDateAndTime } from "../../shared/services/date.util";
           gap: 16px; /* Adjust the gap between columns as needed */
         }
       `,
-    ],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-  })
-  export class TrackEntryDialogComponent {
-    @Output() sumbit = new EventEmitter<TrackEntryUpdateModel>(); 
-    // Reason for using TrackEntryUpdateModel: We have two models TrackEntryCreateModel and TrackEntryUpdateModel
-    // Since this component is used for both add and update, that is why we are using TrackEntryUpdateModel
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class TrackEntryDialogComponent {
+  @Output() sumbit = new EventEmitter<TrackEntryUpdateModel>();
+  // Reason for using TrackEntryUpdateModel: We have two models TrackEntryCreateModel and TrackEntryUpdateModel
+  // Since this component is used for both add and update, that is why we are using TrackEntryUpdateModel
 
-    private _injector = inject(Injector);
+  private _injector = inject(Injector);
 
   @ViewChild('autosize') autosize!: CdkTextareaAutosize;
 
@@ -162,68 +162,68 @@ import { combineDateAndTime } from "../../shared/services/date.util";
       },
     );
   }
-    
-    form = new FormGroup({
-      trackEntryId: new FormControl<number>(0),
-      entryDate: new FormControl<Date|null>(null, Validators.required),
-      sleepDate: new FormControl<Date|null>(null, Validators.required),
-      sleepTime: new FormControl<Date|null>(null, Validators.required),
-      wokeUpDate: new FormControl<Date|null>(null, Validators.required),
-      wokeUpTime: new FormControl<Date|null>(null, Validators.required),
-      napInMinutes: new FormControl<number>(0),
-      totalWorkInMinutes: new FormControl<number>(0, Validators.required),
-      remarks: new FormControl<string>("")
-    });
 
-    onCanceled() {
-      this.dialogRef.close();
-    }
+  form = new FormGroup({
+    trackEntryId: new FormControl<string>(""),
+    entryDate: new FormControl<Date | null>(null, Validators.required),
+    sleepDate: new FormControl<Date | null>(null, Validators.required),
+    sleepTime: new FormControl<Date | null>(null, Validators.required),
+    wokeUpDate: new FormControl<Date | null>(null, Validators.required),
+    wokeUpTime: new FormControl<Date | null>(null, Validators.required),
+    napInMinutes: new FormControl<number>(0),
+    totalWorkInMinutes: new FormControl<number>(0, Validators.required),
+    remarks: new FormControl<string>("")
+  });
 
-    onSubmit() {
-      if (this.form.valid) {
-        const formValues = this.form.value;
-
-        // Convert string values to Date objects
-        const sleepDate = new Date(formValues.sleepDate!);
-        const sleepTime = new Date(formValues.sleepTime!);
-        const wokeUpDate = new Date(formValues.wokeUpDate!);
-        const wokeUpTime = new Date(formValues.wokeUpTime!);
-        
-        // Combine date and time fields
-        const sleptAt = combineDateAndTime(sleepDate,sleepTime);        
-        const wokeUpAt = combineDateAndTime(wokeUpDate,wokeUpTime);
-
-        const entryData: TrackEntryUpdateModel = {
-          trackEntryId: formValues.trackEntryId as number,
-          entryDate: formValues.entryDate as Date,
-          sleptAt: sleptAt as Date,
-          wokeUpAt: wokeUpAt as Date,
-          napInMinutes: formValues.napInMinutes as number,
-          totalWorkInMinutes: formValues.totalWorkInMinutes as number,
-          remarks: formValues.remarks as string
-        };
-        this.sumbit.emit(entryData);
-      }
-    }
-
-    constructor(
-      public dialogRef: MatDialogRef<TrackEntryDialogComponent>,
-      @Inject(MAT_DIALOG_DATA) public data: { trackEntry: TrackEntryUpdateModel | null; title: string }
-    ) {
-
-      if (data.trackEntry != null) {
-        this.form.patchValue({
-          trackEntryId: data.trackEntry.trackEntryId,
-          entryDate: data.trackEntry.entryDate,
-          sleepDate: data.trackEntry.sleptAt,
-          sleepTime: data.trackEntry.sleptAt,
-          wokeUpDate: data.trackEntry.wokeUpAt,
-          wokeUpTime: data.trackEntry.wokeUpAt,
-          napInMinutes: data.trackEntry.napInMinutes,
-          totalWorkInMinutes: data.trackEntry.totalWorkInMinutes,
-          remarks: data.trackEntry.remarks
-        });
-      }
-    }
-  
+  onCanceled() {
+    this.dialogRef.close();
   }
+
+  onSubmit() {
+    if (this.form.valid) {
+      const formValues = this.form.value;
+
+      // Convert string values to Date objects
+      const sleepDate = new Date(formValues.sleepDate!);
+      const sleepTime = new Date(formValues.sleepTime!);
+      const wokeUpDate = new Date(formValues.wokeUpDate!);
+      const wokeUpTime = new Date(formValues.wokeUpTime!);
+
+      // Combine date and time fields
+      const sleptAt = combineDateAndTime(sleepDate, sleepTime);
+      const wokeUpAt = combineDateAndTime(wokeUpDate, wokeUpTime);
+
+      const entryData: TrackEntryUpdateModel = {
+        trackEntryId: formValues.trackEntryId || "",
+        entryDate: formValues.entryDate as Date,
+        sleptAt: sleptAt as Date,
+        wokeUpAt: wokeUpAt as Date,
+        napInMinutes: formValues.napInMinutes as number,
+        totalWorkInMinutes: formValues.totalWorkInMinutes as number,
+        remarks: formValues.remarks as string
+      };
+      this.sumbit.emit(entryData);
+    }
+  }
+
+  constructor(
+    public dialogRef: MatDialogRef<TrackEntryDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { trackEntry: TrackEntryUpdateModel | null; title: string }
+  ) {
+
+    if (data.trackEntry != null) {
+      this.form.patchValue({
+        trackEntryId: data.trackEntry.trackEntryId,
+        entryDate: data.trackEntry.entryDate,
+        sleepDate: data.trackEntry.sleptAt,
+        sleepTime: data.trackEntry.sleptAt,
+        wokeUpDate: data.trackEntry.wokeUpAt,
+        wokeUpTime: data.trackEntry.wokeUpAt,
+        napInMinutes: data.trackEntry.napInMinutes,
+        totalWorkInMinutes: data.trackEntry.totalWorkInMinutes,
+        remarks: data.trackEntry.remarks
+      });
+    }
+  }
+
+}

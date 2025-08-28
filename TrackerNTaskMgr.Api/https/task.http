@@ -1,14 +1,18 @@
 @base_address = http://localhost:5054/api/tasks
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InVzZXIiLCJqdGkiOiJmNzgzMDE4OC03MWMwLTQ4Y2MtYjBiNi1mNjIwYmM1MjQzZDYiLCJuYmYiOjE3NDgxNzQ5NDUsImV4cCI6MTc0ODE3Njc0NSwiaWF0IjoxNzQ4MTc0OTQ1LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUwNTQiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjQyMDAifQ.L54PMFXnOVRzAln3RebySieZeX3IlNYQhdn9PBbCJds
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InVzZXIiLCJqdGkiOiI2MTJlNWZhOS0zM2JhLTQxYTktYTE3OC04ODNhZTYwNWJiNDYiLCJuYmYiOjE3NTYzOTcyNDAsImV4cCI6MTc1NjM5OTA0MCwiaWF0IjoxNzU2Mzk3MjQwLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUwNTQiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjQyMDAifQ.w1t6zLh5RvZPJp_P0Qs9XXp88fRiFs7pyoldZkM345I
 
 # Get by id
 GET {{base_address}}/68ada389f15d01a9d910094a
 Accept: application/json
 Authorization: Bearer {{token}}
 
-# TODO: no filters are working
 ### Get all 
 GET {{base_address}}?SortBy=ScheduledAt&SortDirection=
+Authorization: Bearer {{token}}
+
+### Get one
+http://localhost:5054/api/tasks/68b07d2e602c02ef47f6d694
+Authorization: Bearer {{token}}
 
 ### Display board tasks
 GET {{base_address}}/displayboard-tasks

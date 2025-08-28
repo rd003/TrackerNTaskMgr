@@ -35,7 +35,7 @@ export class TrackEntryService {
     return this.http.get<TrackEntryReadModel[]>(this.url, { params: params });
   }
 
-  getEntry(id: number): Observable<TrackEntryReadModel> {
+  getEntry(id: string): Observable<TrackEntryReadModel> {
     return this.http.get<TrackEntryReadModel>(`${this.url}/${id}`);
   }
 
@@ -48,7 +48,7 @@ export class TrackEntryService {
     return this.http.put<TrackEntryReadModel>(`${this.url}/${entryData.trackEntryId}`, formattedData);
   }
 
-  deleteEntry(id: number): Observable<void> {
+  deleteEntry(id: string): Observable<void> {
     return this.http.delete<void>(`${this.url}/${id}`);
   }
 

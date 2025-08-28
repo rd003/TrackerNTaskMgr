@@ -66,17 +66,17 @@ export class GetTasksComponent {
     sort$ = new BehaviorSubject<SortModel>({ sortColumn: null, sortDirection: 'desc' });
 
     taskPriority = new FormControl<number>(0);
-    taskHeader = new FormControl<number>(0);
-    tag = new FormControl<number>(0);
+    taskHeader = new FormControl<string>('');
+    tag = new FormControl<string>('');
 
     taskHeaderId$ = this.taskHeader.valueChanges.pipe(startWith(null));
     taskPriorityId$ = this.taskPriority.valueChanges.pipe(startWith(null));
-    tagId$ = this.tag.valueChanges.pipe(startWith(null));
+    tag$ = this.tag.valueChanges.pipe(startWith(null));
 
-    groupedTasks$: Observable<TasksByTaskHeader[]> = combineLatest([this.taskHeaderId$, this.taskPriorityId$, this.tagId$, this.isDeleted$, this.sort$]).pipe(
+    groupedTasks$: Observable<TasksByTaskHeader[]> = combineLatest([this.taskHeaderId$, this.taskPriorityId$, this.tag$, this.isDeleted$, this.sort$]).pipe(
         tap(() => this.setLoading(true)),
-        switchMap(([taskHeaderId, taskPriorityId, tagId, isDeleted, sort]) => {
-            return this._taskService.getTasks(taskHeaderId, taskPriorityId, tagId, sort.sortColumn, sort.sortDirection).pipe(
+        switchMap(([taskHeaderId, taskPriorityId, tag, isDeleted, sort]) => {
+            return this._taskService.getTasks(taskHeaderId, taskPriorityId, tag, sort.sortColumn, sort.sortDirection).pipe(
                 catchError((error) => {
                     console.log(error);
                     this.message$.next("Error has occurred");
