@@ -18,7 +18,7 @@ public static class SubTaskMapper
     {
         return new SubTask
         {
-            Id = st.SubTaskId!,
+            Id = st.SubTaskId,
             SubTaskTitle = st.SubTaskTitle,
             SubTaskUri = st.SubTaskUri
         };

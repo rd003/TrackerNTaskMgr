@@ -50,14 +50,14 @@
     @if(task.taskStatus){
     <div class="row">
         <div class="heading">Status</div>
-        <div class="content">{{task.taskStatus.taskStatusName}} {{task.taskStatus.taskStatusEmoji}}</div>
+        <div class="content">{{task.taskStatus}}</div>
     </div>
     }
 
     @if(task.taskPriority){
     <div class="row">
         <div class="heading">Priority</div>
-        <div class="content">{{task.taskPriority.taskPriorityName}} {{task.taskPriority.taskPriorityEmoji}}</div>
+        <div class="content">{{task.taskPriority}}</div>
     </div>
     }
 

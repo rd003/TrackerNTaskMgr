@@ -81,18 +81,18 @@ public class TaskService : ITaskService
         };
 
         // for debugging
-        Console.WriteLine("=== Aggregation Pipeline ===");
-        foreach (var stage in pipleline)
-        {
-            Console.WriteLine(stage.ToJson(new JsonWriterSettings { Indent = true }));
-        }
+        // Console.WriteLine("=== Aggregation Pipeline ===");
+        // foreach (var stage in pipleline)
+        // {
+        //     Console.WriteLine(stage.ToJson(new JsonWriterSettings { Indent = true }));
+        // }
 
         var taskItems = await _taskCollection.AggregateAsync<BsonDocument>(pipleline);
         var taskDocument = await taskItems.FirstOrDefaultAsync();
 
         if (taskDocument is null) return null;
 
-        Console.WriteLine("=====> taskDocument is fine");
+        // Console.WriteLine("=====> taskDocument is fine");
         // Map BsonDocument to TaskReadDTO
         var taskReadDto = MapBsonDocumentToTaskReadDTO(taskDocument);
 

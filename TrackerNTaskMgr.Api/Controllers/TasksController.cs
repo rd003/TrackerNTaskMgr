@@ -79,7 +79,6 @@ public class TasksController : ControllerBase
         return Ok(updatedTask);
     }
 
-    [AllowAnonymous]
     [HttpGet("{taskId:length(24)}", Name = nameof(GetTaskById))]
     public async Task<IActionResult> GetTaskById(string taskId)
     {

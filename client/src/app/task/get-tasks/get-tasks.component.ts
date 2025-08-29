@@ -102,17 +102,6 @@ export class GetTasksComponent {
         this.sort$.next({ sortColumn: null, sortDirection: 'desc' });
     }
 
-    trackTaskHeaderFn(index: number, task: TaskHeaderReadModel) {
-        return task.taskHeaderId
-    }
-
-    trackTaskPriorityFn(index: number, tp: TaskPriorityModel) {
-        return tp.taskPriorityId;
-    }
-
-    trackTagsFn(index: number, tag: TagModel) {
-        return tag.tagId;
-    }
 
     editTask(task: TaskReadModel) {
         this.router.navigate([`update-task/${task.taskId}`])

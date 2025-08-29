@@ -1,12 +1,16 @@
 @base_address = http://localhost:5054/api/tasks
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InVzZXIiLCJqdGkiOiI2MTJlNWZhOS0zM2JhLTQxYTktYTE3OC04ODNhZTYwNWJiNDYiLCJuYmYiOjE3NTYzOTcyNDAsImV4cCI6MTc1NjM5OTA0MCwiaWF0IjoxNzU2Mzk3MjQwLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUwNTQiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjQyMDAifQ.w1t6zLh5RvZPJp_P0Qs9XXp88fRiFs7pyoldZkM345I
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InVzZXIiLCJqdGkiOiI0YWNhZTcyZC05YWRiLTRkYWEtYjkyYy1jNDdkNDIwOTkxZjYiLCJuYmYiOjE3NTY0NTIzNTEsImV4cCI6MTc1NjQ1NDE1MSwiaWF0IjoxNzU2NDUyMzUxLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUwNTQiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjQyMDAifQ.M71bI_PrEY9zufcVbDy4XX4r4y-_YlOeCftwB-aZOvE
 
 # Get by id
-GET {{base_address}}/68ada389f15d01a9d910094a
+GET {{base_address}}/68b07d2e602c02ef47f6d694
 Accept: application/json
 Authorization: Bearer {{token}}
 
 ### Get all 
+GET {{base_address}}
+Authorization: Bearer {{token}}
+
+### Get all with filters
 GET {{base_address}}?SortBy=ScheduledAt&SortDirection=
 Authorization: Bearer {{token}}
 

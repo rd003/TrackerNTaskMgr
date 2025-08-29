@@ -17,7 +17,7 @@ import { TaskPriorityModel } from "../models/task-priority.model";
 import { TaskStatusModel } from "../models/task-status.model";
 import { TaskHeaderService } from "../../task-header/services/task-header.service";
 import { TaskHeaderReadModel } from "../../task-header/models/task-header-read.model";
-import { ActivatedRoute, RouterModule } from "@angular/router";
+import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { BehaviorSubject, catchError, finalize, of, tap } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
@@ -54,6 +54,8 @@ export class TaskSaveComponent implements OnInit {
   message$ = new BehaviorSubject<string>("");
   loading$ = new BehaviorSubject<boolean>(false);
   @Input() taskId = '';
+
+  router = inject(Router);
 
   taskStatuses$ = this.taskService.getTaskStatuses();
   taskPriorities$ = this.taskService.getTaskPriorities();
@@ -125,6 +127,7 @@ export class TaskSaveComponent implements OnInit {
       next: () => {
         this.setMessage("Saved successfully");
         this.setLoading(false);
+        this.router.navigate(['/tasks']);
       },
       error: (error) => {
         this.setMessage("Something went wrong");

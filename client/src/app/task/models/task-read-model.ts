@@ -10,8 +10,8 @@ export interface TaskReadModel {
   displayAtBoard: boolean;
   taskHeaderTitle: string;
   subTasks: SubTaskReadModel[];
-  taskStatus: TaskStatusReadModel;
-  taskPriority: TaskPriorityReadModel;
+  taskStatus: string;
+  taskPriority: string;
   tags: string[];
 }
 
