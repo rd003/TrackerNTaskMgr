@@ -1,240 +1,336 @@
 using System.Data;
-using Dapper;
-using Microsoft.Data.SqlClient;
+
+using Microsoft.Extensions.Options;
+
+using MongoDB.Bson;
+using MongoDB.Bson.IO;
+using MongoDB.Driver;
+
 using TrackerNTaskMgr.Api.DTOs;
+using TrackerNTaskMgr.Api.Entities;
+using TrackerNTaskMgr.Api.Mappers;
+using TrackerNTaskMgr.Api.Settings;
 
 namespace TrackerNTaskMgr.Api.Services;
 
 public class TaskService : ITaskService
 {
-    private readonly IConfiguration _configuration;
-    private readonly string _connectionString;
-
-    public TaskService(IConfiguration configuration)
+    private readonly IMongoCollection<TaskItem> _taskCollection;
+    public TaskService(IOptions<DatabaseSettings> databaseSettings)
     {
-        _configuration = configuration;
-        _connectionString = _configuration.GetConnectionString("Default");
+        var client = new MongoClient(databaseSettings.Value.ConnectionString);
+        var database = client.GetDatabase(databaseSettings.Value.DatabaseName);
+        _taskCollection = database.GetCollection<TaskItem>(databaseSettings.Value.TaskItemCollectionName);
     }
 
-    public async Task<int> CreateTaskAsync(TaskCreateDTO taskCreate)
+    public async Task<string> CreateTaskAsync(TaskCreateDTO taskCreate)
     {
-        using IDbConnection connection = new SqlConnection(_connectionString);
-
-        DataTable tags = new();
-        tags.Columns.Add("TagName", typeof(string));
-        
-        if(!string.IsNullOrWhiteSpace(taskCreate.Tags))
-        {
-            var tagsArray= taskCreate.Tags.Split(",");
-            foreach (var tag in tagsArray)
-            {
-                tags.Rows.Add(tag.ToLower());
-            }
-        }
-
-        DataTable subTasks = new();
-        subTasks.Columns.Add("SubTaskTitle", typeof(string));
-        subTasks.Columns.Add("SubTaskUri", typeof(string));
-
-        foreach (var subTask in taskCreate.SubTasks)
-        {
-            subTasks.Rows.Add(subTask.SubTaskTitle, subTask.SubTaskUri);
-        }
-
-        var parameters = new DynamicParameters();
-        parameters.Add("@TaskHeaderId", taskCreate.TaskHeaderId, DbType.Int32, ParameterDirection.Input);
-        parameters.Add("@TaskTitle", taskCreate.TaskTitle, DbType.String, ParameterDirection.Input);
-        parameters.Add("@TaskUri", taskCreate.TaskUri, DbType.String, ParameterDirection.Input);
-        parameters.Add("@TaskPriorityId", taskCreate.TaskPriorityId, DbType.Byte, ParameterDirection.Input);
-        parameters.Add("@TaskStatusId", taskCreate.TaskStatusId, DbType.Byte, ParameterDirection.Input);
-        parameters.Add("@Deadline", taskCreate.Deadline, DbType.DateTime2, ParameterDirection.Input);
-        parameters.Add("@ScheduledAt", taskCreate.ScheduledAt, DbType.DateTime2, ParameterDirection.Input);
-        parameters.Add("@DisplayAtBoard", taskCreate.DisplayAtBoard, DbType.Boolean);
-        parameters.Add("@SubTasks", subTasks, DbType.Object, ParameterDirection.Input);
-        parameters.Add("@Tags", tags, DbType.Object, ParameterDirection.Input);
-        parameters.Add("@TaskId", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-        await connection.ExecuteAsync("CreateTask", parameters, commandType: CommandType.StoredProcedure);
-
-        int taskId = parameters.Get<int>("@TaskId");
-        return taskId;
+        var taskItem = taskCreate.ToTaskItem();
+        await _taskCollection.InsertOneAsync(taskItem);
+        return taskItem.Id;
     }
 
     public async Task UpdateTaskAsync(TaskUpdateDto taskToUpdate)
     {
-        using IDbConnection connection = new SqlConnection(_connectionString);
-
-        DataTable subTasks = new();
-        subTasks.Columns.Add("@SubTaskId", typeof(int));
-        subTasks.Columns.Add("SubTaskTitle", typeof(string));
-        subTasks.Columns.Add("SubTaskUri", typeof(string));
-
-        foreach (var subTask in taskToUpdate.SubTasks)
-        {
-            subTasks.Rows.Add(subTask.SubTaskId, subTask.SubTaskTitle, subTask.SubTaskUri);
-        }
-
-        DataTable tags = new();
-        tags.Columns.Add("@TagName", typeof(string));
-
-        if(!string.IsNullOrWhiteSpace(taskToUpdate.Tags))
-        {
-            var tagsArray= taskToUpdate.Tags.Split(",");
-            foreach (var tag in tagsArray)
-            {
-                tags.Rows.Add(tag.ToLower());
-            }
-        }
-
-        var parameters = new DynamicParameters();
-        parameters.Add("@TaskId", taskToUpdate.TaskId, DbType.Int32);
-        parameters.Add("@TaskHeaderId", taskToUpdate.TaskHeaderId, DbType.Int32, ParameterDirection.Input);
-        parameters.Add("@TaskTitle", taskToUpdate.TaskTitle, DbType.String, ParameterDirection.Input);
-        parameters.Add("@TaskUri", taskToUpdate.TaskUri, DbType.String, ParameterDirection.Input);
-        parameters.Add("@TaskPriorityId", taskToUpdate.TaskPriorityId, DbType.Byte, ParameterDirection.Input);
-        parameters.Add("@TaskStatusId", taskToUpdate.TaskStatusId, DbType.Byte, ParameterDirection.Input);
-        parameters.Add("@Deadline", taskToUpdate.Deadline, DbType.DateTime2, ParameterDirection.Input);
-        parameters.Add("@ScheduledAt", taskToUpdate.ScheduledAt, DbType.DateTime2, ParameterDirection.Input);
-        parameters.Add("@DisplayAtBoard", taskToUpdate.DisplayAtBoard, DbType.Boolean);
-        parameters.Add("@SubTasks", subTasks, DbType.Object, ParameterDirection.Input);
-        parameters.Add("@Tags", tags, DbType.Object, ParameterDirection.Input);
-
-        await connection.ExecuteAsync("UpdateTask", parameters, commandType: CommandType.StoredProcedure);
+        var task = taskToUpdate.ToTaskItem();
+        await _taskCollection.ReplaceOneAsync(x => x.Id == task.Id, task);
     }
 
-    public async Task<TaskReadDTO?> GetTaskByTaskIdAsync(int taskId)
+    public async Task<TaskReadDTO?> GetTaskByTaskIdAsync(string taskId)
     {
-        using IDbConnection connection = new SqlConnection(_connectionString);
-
-        Dictionary<int, TaskReadDTO> taskDict = new();
-
-        await connection.QueryAsync<TaskReadDTO, TaskStatusReadDto, TaskPriorityReadDto, SubTaskReadDto, TagDto, TaskReadDTO>("GetTaskByTaskId", (task, taskStatus, taskPriority, subTask, tag) =>
+        var pipleline = new BsonDocument[]{
+            // match specific task
+            new BsonDocument("$match", new BsonDocument
         {
-            if (!taskDict.TryGetValue(task.TaskId, out TaskReadDTO cachedTask))
+            { "_id", ObjectId.Parse(taskId) },
+            { "deletedAt", BsonNull.Value }
+        }),
+
+            // Lookup TaskHeader to get header title
+            new BsonDocument("$lookup", new BsonDocument
             {
-                cachedTask = task;
-                cachedTask.SubTasks = [];
-                cachedTask.Tags = [];
-                cachedTask.TaskStatus = taskStatus;
-                cachedTask.TaskPriority = taskPriority;
-                taskDict.Add(task.TaskId, cachedTask);
+                { "from", "taskHeaders" }, // Adjust collection name as needed
+                { "localField", "taskHeaderId" },
+                { "foreignField", "_id" },
+                { "as", "taskHeader" }
+            }),
 
-            }
-
-            // Add the subtask if it's not null and not already in the list
-            if (subTask != null && subTask.SubTaskId != 0 && !cachedTask.SubTasks.Any(st => st.SubTaskId == subTask.SubTaskId))
+            // taskHeader is array, so we need to flatten it
+            new BsonDocument("$unwind", new BsonDocument
             {
-                cachedTask.SubTasks.Add(subTask);
-            }
+                { "path", "$taskHeader" },
+                { "preserveNullAndEmptyArrays", false }
+            }),
 
-            // Add the tag if it's not null and not already in the list
-            if (tag != null && !string.IsNullOrEmpty(tag.TagName) && !cachedTask.Tags.Any(tg => tg == tag.TagName))
+            // Project the fields we need
+            new BsonDocument("$project", new BsonDocument
             {
-                cachedTask.Tags.Add(tag.TagName);
-            }
+                { "_id", 1 },
+                { "taskHeaderId", 1 },
+                { "title", 1 },
+                { "uri", 1 },
+                { "priority", 1 },
+                { "status", 1 },
+                { "deadline", 1 },
+                { "scheduledAt", 1 },
+                { "displayAtBoard", 1 },
+                { "subTasks", 1 },
+                { "tags", 1 },
+                { "taskHeaderTitle", "$taskHeader.taskHeaderTitle" }
+            })
+        };
 
-            return cachedTask;
-        }, new { @TaskId = taskId }, splitOn: "TaskStatusName,TaskPriorityName,SubTaskId,TagName", commandType: CommandType.StoredProcedure);
+        // for debugging
+        // Console.WriteLine("=== Aggregation Pipeline ===");
+        // foreach (var stage in pipleline)
+        // {
+        //     Console.WriteLine(stage.ToJson(new JsonWriterSettings { Indent = true }));
+        // }
 
-        return taskDict.Values.FirstOrDefault();
+        var taskItems = await _taskCollection.AggregateAsync<BsonDocument>(pipleline);
+        var taskDocument = await taskItems.FirstOrDefaultAsync();
+
+        if (taskDocument is null) return null;
+
+        // Console.WriteLine("=====> taskDocument is fine");
+        // Map BsonDocument to TaskReadDTO
+        var taskReadDto = MapBsonDocumentToTaskReadDTO(taskDocument);
+
+        return taskReadDto;
     }
 
     public async Task<IEnumerable<TaskReadDTO>> GetTasksAsync(GetTasksParams parameters)
     {
-        using IDbConnection connection = new SqlConnection(_connectionString);
-        
-        var taskDictionary = new Dictionary<int,TaskReadDTO>();
+        // Console.WriteLine("<====Task parameters=====>");
+        // Console.WriteLine(parameters);
+        // Console.WriteLine("<=========>");
 
-        await connection.QueryAsync<TaskReadDTO,TaskStatusReadDto, TaskPriorityReadDto, SubTaskReadDto, TagDto, TaskReadDTO>("GetTasks",(task, taskStatus, taskPriority, subTask, tag)=>{
-            if(!taskDictionary.TryGetValue(task.TaskId,out TaskReadDTO taskRead))
+        var pipeline = new List<BsonDocument>();
+
+        // Step 1: Build match conditions
+        var matchConditions = new List<BsonDocument>();
+
+        // Filter by TaskHeaderId if provided
+        if (!string.IsNullOrEmpty(parameters.TaskHeaderId) && ObjectId.TryParse(parameters.TaskHeaderId, out _))
+        {
+            matchConditions.Add(new BsonDocument("taskHeaderId", ObjectId.Parse(parameters.TaskHeaderId)));
+        }
+
+        // Filter by TaskPriorityId if provided
+        if (parameters.TaskPriorityId.HasValue)
+        {
+            matchConditions.Add(new BsonDocument("priority", parameters.TaskPriorityId));
+        }
+
+        // Filter by Tag if provided (tags are stored as array of strings)
+        if (!string.IsNullOrEmpty(parameters.Tag))
+        {
+            matchConditions.Add(new BsonDocument("tags", parameters.Tag));
+        }
+
+        // Exclude deleted tasks 
+        matchConditions.Add(new BsonDocument("deletedAt", BsonNull.Value));
+
+        // Add match stage if we have conditions
+        if (matchConditions.Any())
+        {
+            var matchStage = matchConditions.Count == 1
+                ? matchConditions.First()
+                : new BsonDocument("$and", new BsonArray(matchConditions));
+
+            pipeline.Add(new BsonDocument("$match", matchStage));
+        }
+
+
+        // Step 2: Lookup TaskHeader to get header title
+        pipeline.Add(new BsonDocument("$lookup", new BsonDocument
+        {
+            { "from", "taskHeaders" },
+            { "localField", "taskHeaderId" },
+            { "foreignField", "_id" },
+            { "as", "taskHeader" }
+        }));
+
+        // Step 3: flatten taskHeader array
+        pipeline.Add(new BsonDocument("$unwind", new BsonDocument
+        {
+            { "path", "$taskHeader" },
+            { "preserveNullAndEmptyArrays", true } // Keep tasks even if header is missing
+        }));
+
+        // Step 4: Project the fields we need
+        pipeline.Add(new BsonDocument("$project", new BsonDocument
+        {
+            { "_id", 1 },
+            { "taskHeaderId", 1 },
+            { "title", 1 },
+            { "uri", 1 },
+            { "priority", 1 },
+            { "status", 1 },
+            { "deadline", 1 },
+            { "scheduledAt", 1 },
+            { "displayAtBoard", 1 },
+            { "subTasks", 1 },
+            { "tags", 1 },
+            { "createdAt", 1 },
+            { "updatedAt", 1 },
+            { "taskHeaderTitle", new BsonDocument("$ifNull", new BsonArray { "$taskHeader.taskHeaderTitle", "Unknown Header" }) }
+        }));
+
+        // Step 5: Add sorting
+        if (!string.IsNullOrEmpty(parameters.SortBy))
+        {
+            var sortDirection = string.Equals(parameters.SortDirection, "desc", StringComparison.OrdinalIgnoreCase) ? -1 : 1;
+
+            var sortField = parameters.SortBy.ToLower() switch
             {
-                taskRead = task;
-                taskRead.Tags=[];
-                taskRead.SubTasks=[];
-                taskRead.TaskStatus=taskStatus;
-                taskRead.TaskPriority=taskPriority;
-                taskDictionary.Add(task.TaskId,taskRead);
-            }
+                "deadline" => "deadline",
+                "scheduledat" => "scheduledAt",
+                _ => "createdAt" // Default sort
+            };
+            pipeline.Add(new BsonDocument("$sort", new BsonDocument(sortField, sortDirection)));
+        }
+        else
+        {
+            // Default sort by created date (newest first)
+            pipeline.Add(new BsonDocument("$sort", new BsonDocument("createdAt", -1)));
+        }
 
-            // avoid duplicate subtask
-            if(subTask!=null && subTask.SubTaskId!=0 && ! taskRead.SubTasks.Any(a=>a.SubTaskId==subTask.SubTaskId))
+        // for debugging
+        // Console.WriteLine("=== Aggregation Pipeline ===");
+        // foreach (var stage in pipeline)
+        // {
+        //     Console.WriteLine(stage.ToJson(new JsonWriterSettings { Indent = true }));
+        //     Console.WriteLine("---");
+        // }
+
+        // Execute the aggregation
+        var cursor = await _taskCollection.AggregateAsync<BsonDocument>(pipeline);
+        var taskDocuments = await cursor.ToListAsync();
+
+        // for debugging  
+        // Console.WriteLine($"Found {taskDocuments.Count} documents");
+
+        // Map to DTOs
+        var taskReadDtos = taskDocuments.Select(MapBsonDocumentToTaskReadDTO).ToList();
+
+        return taskReadDtos;
+    }
+
+    private static TaskReadDTO MapBsonDocumentToTaskReadDTO(BsonDocument taskDocument)
+    {
+        return new TaskReadDTO
+        {
+            TaskId = taskDocument["_id"].AsObjectId.ToString(),
+            TaskHeaderId = taskDocument["taskHeaderId"].AsObjectId.ToString(),
+            TaskTitle = taskDocument["title"].AsString,
+            TaskUri = taskDocument.Contains("uri") && !taskDocument["uri"].IsBsonNull
+                ? taskDocument["uri"].AsString : null,
+            TaskPriorityId = (byte)taskDocument["priority"].AsInt32,
+            TaskStatusId = (byte)taskDocument["status"].AsInt32,
+            Deadline = taskDocument.Contains("deadline") && !taskDocument["deadline"].IsBsonNull
+            ? ParseDateTimeFromBsonDocument(taskDocument["deadline"].AsBsonDocument)
+            : null,
+            ScheduledAt = taskDocument.Contains("scheduledAt") && !taskDocument["scheduledAt"].IsBsonNull
+            ? ParseDateTimeFromBsonDocument(taskDocument["scheduledAt"].AsBsonDocument)
+            : null,
+            DisplayAtBoard = taskDocument["displayAtBoard"].AsBoolean,
+            TaskHeaderTitle = taskDocument["taskHeaderTitle"].AsString,
+            Tags = taskDocument["tags"].AsBsonArray.Select(tag => tag.AsString).ToList(),
+
+            // Map SubTasks
+            SubTasks = taskDocument["subTasks"].AsBsonArray.Select(subTask => new SubTaskReadDto
             {
-                taskRead.SubTasks.Add(subTask);
-            }
+                SubTaskId = subTask["_id"].AsString, // _id is stored as GUID
+                SubTaskTitle = subTask["subTaskTitle"].AsString,
+                SubTaskUri = subTask.AsBsonDocument.Contains("subTaskUri") && !subTask["subTaskUri"].IsBsonNull
+                    ? subTask["subTaskUri"].AsString : null
+            }).ToList()
+        };
+    }
 
-            // avoid duplicate tags
-            if(tag!=null && !string.IsNullOrEmpty(tag.TagName) && !taskRead.Tags.Contains(tag.TagName))
-            {
-                taskRead.Tags.Add(tag.TagName);
-            }
+    private static DateTimeOffset ParseDateTimeFromBsonDocument(BsonDocument dateDoc)
+    {
+        var utcDateTime = dateDoc["DateTime"].ToUniversalTime();
+        var offsetMinutes = dateDoc["Offset"].AsInt32;
 
-            return taskRead;
-        },parameters,splitOn:"TaskStatusName,TaskPriorityName,SubTaskId,TagName",commandType:CommandType.StoredProcedure);
-
-        return taskDictionary.Values;
-
-        // I am unable to do this, please help me
+        // Convert UTC time to local time based on the stored offset
+        var localDateTime = DateTime.SpecifyKind(utcDateTime.AddMinutes(offsetMinutes), DateTimeKind.Unspecified);
+        return new DateTimeOffset(localDateTime, TimeSpan.FromMinutes(offsetMinutes));
     }
 
 
-    public async Task<bool> IsTaskExists(int taskId)
+    public async Task<bool> IsTaskExists(string taskId)
     {
-        using IDbConnection connection = new SqlConnection(_connectionString);
-        string sql = @"SELECT CASE
-                       WHEN EXISTS(SELECT 1 FROM Tasks where TaskId=@TaskId and Deleted is null)
-                       THEN 1
-                       ELSE 0
-                       END";
-        bool exists = await connection.QueryFirstAsync<bool>(sql, new { taskId });
-        return exists;
+        var task = await _taskCollection.Find(x => x.Id == taskId && x.DeletedAt == null).FirstOrDefaultAsync();
+        return task != null;
     }
 
-    public async System.Threading.Tasks.Task DeleteTask(int taskId)
+    public async Task DeleteTask(string taskId)
     {
-        using IDbConnection connection = new SqlConnection(_connectionString);
-        await connection.ExecuteAsync("DeleteTask", new { taskId }, commandType: CommandType.StoredProcedure);
+        var filter = Builders<TaskItem>.Filter.Eq(x => x.Id, taskId);
+        var update = Builders<TaskItem>.Update.Set(x => x.DeletedAt, DateTimeOffset.UtcNow);
+        await _taskCollection.UpdateOneAsync(filter, update);
     }
 
     public async Task<IEnumerable<DisplayBoardTaskDto>> GetDisplayBoardTasksAsync()
     {
-        using IDbConnection connection = new SqlConnection(_connectionString);
-        var tasks= await connection.QueryAsync<DisplayBoardTaskDto>("GetDisplayBoardTask",commandType:CommandType.StoredProcedure);
-        return tasks;
+        // Get task where display at board is true and order it by deadline desc
+        var filter = Builders<TaskItem>.Filter.And(
+            Builders<TaskItem>.Filter.Eq(x => x.DeletedAt, null),
+            Builders<TaskItem>.Filter.Eq(x => x.DisplayAtBoard, true)
+        );
+        var sort = Builders<TaskItem>.Sort.Descending(x => x.Deadline);
+
+        var tasks = await _taskCollection
+                    .Find(filter)
+                    .Sort(sort)
+                    .ToListAsync();
+        return tasks.Select(
+            t => new DisplayBoardTaskDto
+            {
+                TaskId = t.Id,
+                TaskTitle = t.Title,
+                TaskPriorityName = t.Priority.ToString(),
+                TaskStatusName = t.Status.ToString(),
+                ScheduledAt = t.ScheduledAt,
+                Deadline = t.Deadline
+            }
+        ).ToList();
     }
 
     public async Task<IEnumerable<TaskStatusSelect>> GetTaskStatusesAsync()
     {
-       using IDbConnection connection = new SqlConnection(_connectionString);
-       string sql = @"select 
-                        ts.TaskStatusId,
-                        ts.TaskStatusName + ' ' + 
-                        ts.TaskStatusEmoji as TaskStatusName
-                    from TaskStatuses ts
-                    where ts.Deleted is null
-                    ";
-       var taskStatuses = await connection.QueryAsync<TaskStatusSelect>(sql);   
-       return taskStatuses;                 
+        var statuses = Enum.GetValues(typeof(Constants.TaskStatus))
+         .Cast<Constants.TaskStatus>()
+         .Select(status => new TaskStatusSelect(
+             (byte)status,
+             status.ToString()
+         ));
+
+        return await Task.FromResult(statuses);
     }
 
     public async Task<IEnumerable<TaskPrioritySelect>> GetTaskPrioritiesAsync()
     {
-        using IDbConnection connection = new SqlConnection(_connectionString);
-        string sql = @"select 
-                        tp.TaskPriorityId,
-                        tp.TaskPriorityName + ' ' + 
-                        tp.TaskPriorityEmoji as TaskPriorityName
-                    from TaskPriorities tp
-                    where tp.Deleted is null";
-        var taskPriorities = await connection.QueryAsync<TaskPrioritySelect>(sql);
-        return taskPriorities;
+        var taskPriorities = Enum.GetValues(typeof(Constants.TaskPriority))
+                 .Cast<Constants.TaskPriority>()
+                 .Select(status => new TaskPrioritySelect(
+                     (byte)status,
+                     status.ToString()
+                 ));
+
+        return await Task.FromResult(taskPriorities);
     }
 
     public async Task<IEnumerable<TagReadDto>> GetAllTagsAsync()
     {
-        using IDbConnection connection = new SqlConnection(_connectionString);
-        string sql = @"select TagId, TagName from Tags where deleted is null";
-        var tags = await connection.QueryAsync<TagReadDto>(sql);
-        return tags;
+        var distinctTags = await _taskCollection
+       .DistinctAsync<string>("tags", Builders<TaskItem>.Filter.Empty);
+
+        var tagList = await distinctTags.ToListAsync();
+
+        return tagList.Select(tag => new TagReadDto { TagName = tag });
     }
 }
 

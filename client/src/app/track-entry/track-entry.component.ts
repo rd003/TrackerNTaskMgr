@@ -113,7 +113,7 @@ export class TrackEntryComponent implements OnDestroy {
   onAddUpdate(action: string, trackEntry: TrackEntryReadModel | null = null) {
     let trackEntryUpdate: TrackEntryUpdateModel | null = null;
     if (trackEntry != null) {
-      trackEntryUpdate = { ...trackEntry, remarks: trackEntry.trackEntryRemark?.remarks ?? "" };
+      trackEntryUpdate = { ...trackEntry, remarks: trackEntry.remarks ?? "" };
     }
     const dialogRef = this.dialog.open(TrackEntryDialogComponent, {
       data: { trackEntry: trackEntryUpdate, title: action + " TrackEntry" },
@@ -124,7 +124,7 @@ export class TrackEntryComponent implements OnDestroy {
       .subscribe((submittedData) => {
         if (!submittedData) return;
 
-        if (submittedData.trackEntryId) {
+        if (submittedData.trackEntryId && submittedData.trackEntryId.length > 0) {
           // update book
           this.store.updateEntry(submittedData);
         } else {

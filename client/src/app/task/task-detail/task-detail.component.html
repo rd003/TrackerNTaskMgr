@@ -50,14 +50,14 @@
     @if(task.taskStatus){
     <div class="row">
         <div class="heading">Status</div>
-        <div class="content">{{task.taskStatus.taskStatusName}} {{task.taskStatus.taskStatusEmoji}}</div>
+        <div class="content">{{task.taskStatus}}</div>
     </div>
     }
 
     @if(task.taskPriority){
     <div class="row">
         <div class="heading">Priority</div>
-        <div class="content">{{task.taskPriority.taskPriorityName}} {{task.taskPriority.taskPriorityEmoji}}</div>
+        <div class="content">{{task.taskPriority}}</div>
     </div>
     }
 
@@ -87,7 +87,7 @@
     @if(task.subTasks && task.subTasks.length>0)
     {
     <h3>SubTasks</h3>
-    @for(subTask of task.subTasks; track subTask.taskId)
+    @for(subTask of task.subTasks; track subTask.subTaskId)
     {
     <div class="sub-task">{{subTask.subTaskTitle}}
         @if(subTask.subTaskUri){

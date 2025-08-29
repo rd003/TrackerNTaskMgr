@@ -1,5 +1,5 @@
 export interface DisplayBoardTaskModel {
-    taskId: number,
+    taskId: string,
     taskTitle: string,
     scheduledAt: string,
     deadline: string,

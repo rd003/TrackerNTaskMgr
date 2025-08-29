@@ -42,7 +42,7 @@ export class TaskHeaderComponent {
     fb = inject(FormBuilder);
 
     form = this.fb.group({
-        taskHeaderId: [0],
+        taskHeaderId: [''],
         taskHeaderTitle: ['', Validators.required],
         sortOrder: [0, Validators.required],
     });
@@ -62,7 +62,7 @@ export class TaskHeaderComponent {
     onSave() {
         var submittedData = this.form.value;
 
-        if (submittedData.taskHeaderId == null || submittedData.taskHeaderId < 1) {
+        if (submittedData.taskHeaderId == null || submittedData.taskHeaderId?.length < 1) {
             this.store.addTaskHeader(submittedData as TaskHeaderCreateModel);
         }
 

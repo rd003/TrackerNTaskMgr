@@ -1,6 +1,6 @@
 export interface TaskReadModel {
-  taskId: number;
-  taskHeaderId: number;
+  taskId: string;
+  taskHeaderId: string;
   taskTitle: string;
   taskUri?: string | null;
   taskPriorityId: number;
@@ -10,14 +10,13 @@ export interface TaskReadModel {
   displayAtBoard: boolean;
   taskHeaderTitle: string;
   subTasks: SubTaskReadModel[];
-  taskStatus: TaskStatusReadModel;
-  taskPriority: TaskPriorityReadModel;
+  taskStatus: string;
+  taskPriority: string;
   tags: string[];
 }
 
 export interface SubTaskReadModel {
-  subTaskId: number;
-  taskId: number;
+  subTaskId: string;
   subTaskTitle: string;
   subTaskUri: string;
 }

@@ -75,7 +75,7 @@ export class TrackEntryStore {
          .subscribe();
    }
 
-   deleteTrackEntry(id: number) {
+   deleteTrackEntry(id: string) {
       this._trackEntryService.deleteEntry(id)
          .pipe(
             tap((_) => {

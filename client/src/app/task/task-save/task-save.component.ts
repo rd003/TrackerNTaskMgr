@@ -17,7 +17,7 @@ import { TaskPriorityModel } from "../models/task-priority.model";
 import { TaskStatusModel } from "../models/task-status.model";
 import { TaskHeaderService } from "../../task-header/services/task-header.service";
 import { TaskHeaderReadModel } from "../../task-header/models/task-header-read.model";
-import { ActivatedRoute, RouterModule } from "@angular/router";
+import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { BehaviorSubject, catchError, finalize, of, tap } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
@@ -39,7 +39,7 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
     MatDividerModule,
     MatProgressSpinnerModule,
     RouterModule
-],
+  ],
   providers: [provideNativeDateAdapter()],
   templateUrl: "task-save.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -55,12 +55,14 @@ export class TaskSaveComponent implements OnInit {
   loading$ = new BehaviorSubject<boolean>(false);
   @Input() taskId = '';
 
+  router = inject(Router);
+
   taskStatuses$ = this.taskService.getTaskStatuses();
   taskPriorities$ = this.taskService.getTaskPriorities();
   taskHeaders$ = this.taskHeaderService.getTaskHeaders();
 
   frm: FormGroup = this.fb.group({
-    taskId: [0],
+    taskId: [""],
     taskHeaderId: [null, Validators.required],
     taskTitle: ['', Validators.required],
     taskUri: [null],
@@ -92,12 +94,11 @@ export class TaskSaveComponent implements OnInit {
   save() {
     this.setLoading(true);
     var taskToSave = this.frm.value as TaskCreateModel;
-
-    if (taskToSave.taskId < 1) {
-      this.addTask(taskToSave);
+    if (taskToSave.taskId && taskToSave.taskId.length > 0) {
+      this.updateTask(taskToSave);
     }
     else {
-      this.updateTask(taskToSave);
+      this.addTask(taskToSave);
     }
   }
 
@@ -126,6 +127,7 @@ export class TaskSaveComponent implements OnInit {
       next: () => {
         this.setMessage("Saved successfully");
         this.setLoading(false);
+        this.router.navigate(['/tasks']);
       },
       error: (error) => {
         this.setMessage("Something went wrong");
@@ -167,8 +169,7 @@ export class TaskSaveComponent implements OnInit {
   ngOnInit() {
     if (this.taskId) {
       this.setLoading(true);
-      const taskIdNum = parseInt(this.taskId);
-      this.taskService.getTask(taskIdNum).pipe(
+      this.taskService.getTask(this.taskId).pipe(
         tap((task) => {
           var taskToUpdate = {
             ...task,

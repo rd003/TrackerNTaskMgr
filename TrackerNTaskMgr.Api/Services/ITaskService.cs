@@ -4,11 +4,11 @@ namespace TrackerNTaskMgr.Api.Services;
 
 public interface ITaskService
 {
-    Task<int> CreateTaskAsync(TaskCreateDTO taskCreate);
+    Task<string> CreateTaskAsync(TaskCreateDTO taskCreate);
     Task UpdateTaskAsync(TaskUpdateDto taskToUpdate);
-    Task<TaskReadDTO?> GetTaskByTaskIdAsync(int taskId);
-    System.Threading.Tasks.Task DeleteTask(int taskId);
-    Task<bool> IsTaskExists(int taskId);
+    Task<TaskReadDTO?> GetTaskByTaskIdAsync(string taskId);
+    System.Threading.Tasks.Task DeleteTask(string taskId);
+    Task<bool> IsTaskExists(string taskId);
     Task<IEnumerable<TaskReadDTO>> GetTasksAsync(GetTasksParams parameters);
     Task<IEnumerable<DisplayBoardTaskDto>> GetDisplayBoardTasksAsync();
     Task<IEnumerable<TagReadDto>> GetAllTagsAsync();
