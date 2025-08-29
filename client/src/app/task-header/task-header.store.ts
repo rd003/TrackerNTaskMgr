@@ -54,7 +54,7 @@ export class TaskHeaderStore {
         });
     }
 
-    deleteTaskHeader(taskHeaderId: number) {
+    deleteTaskHeader(taskHeaderId: string) {
         this.setLoading(true);
         this._taskHeaderService.deleteTaskHeader(taskHeaderId).subscribe({
             next: (() => {

@@ -23,7 +23,7 @@ export class TaskHeaderService {
         return this.http.get<TaskHeaderReadModel>(`${this.url}/${id}`);
     }
 
-    deleteTaskHeader(id: number) {
+    deleteTaskHeader(id: string) {
         return this.http.delete<void>(`${this.url}/${id}`);
     }
 

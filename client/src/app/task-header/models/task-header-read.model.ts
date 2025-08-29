@@ -1,5 +1,5 @@
 export interface TaskHeaderReadModel {
-    taskHeaderId: number,
+    taskHeaderId: string,
     taskHeaderTitle: string,
     sortOrder: number
 }

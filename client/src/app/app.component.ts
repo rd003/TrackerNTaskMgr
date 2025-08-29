@@ -27,10 +27,12 @@ export class AppComponent implements OnInit {
 
   isLoggedIn$ = this.authService.isLoggedIn$.pipe(
     tap((isLoggedIn) => {
-      if (isLoggedIn) {
+      if (!isLoggedIn) {
         this.router.navigate([`/login`]);
       }
-      this.router.navigate([`/dashboard`]);
+      else {
+        this.router.navigateByUrl(window.location.pathname);
+      }
     }),
     catchError((error) => {
       console.log(error);

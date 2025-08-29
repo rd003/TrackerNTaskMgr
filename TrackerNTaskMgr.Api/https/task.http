@@ -1,13 +1,24 @@
 @base_address = http://localhost:5054/api/tasks
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InVzZXIiLCJqdGkiOiJmNzgzMDE4OC03MWMwLTQ4Y2MtYjBiNi1mNjIwYmM1MjQzZDYiLCJuYmYiOjE3NDgxNzQ5NDUsImV4cCI6MTc0ODE3Njc0NSwiaWF0IjoxNzQ4MTc0OTQ1LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUwNTQiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjQyMDAifQ.L54PMFXnOVRzAln3RebySieZeX3IlNYQhdn9PBbCJds
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InVzZXIiLCJqdGkiOiI0YWNhZTcyZC05YWRiLTRkYWEtYjkyYy1jNDdkNDIwOTkxZjYiLCJuYmYiOjE3NTY0NTIzNTEsImV4cCI6MTc1NjQ1NDE1MSwiaWF0IjoxNzU2NDUyMzUxLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUwNTQiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjQyMDAifQ.M71bI_PrEY9zufcVbDy4XX4r4y-_YlOeCftwB-aZOvE
 
-GET {{base_address}}/2003
+# Get by id
+GET {{base_address}}/68b07d2e602c02ef47f6d694
 Accept: application/json
 Authorization: Bearer {{token}}
-###
-GET {{base_address}}?SortBy=deadline&SortDirection=desc
 
-###
+### Get all 
+GET {{base_address}}
+Authorization: Bearer {{token}}
+
+### Get all with filters
+GET {{base_address}}?SortBy=ScheduledAt&SortDirection=
+Authorization: Bearer {{token}}
+
+### Get one
+http://localhost:5054/api/tasks/68b07d2e602c02ef47f6d694
+Authorization: Bearer {{token}}
+
+### Display board tasks
 GET {{base_address}}/displayboard-tasks
 
 ###
@@ -21,58 +32,58 @@ POST {{base_address}}
 Content-Type: application/json
 
 {
-  "TaskHeaderId": 1,
-  "TaskTitle": "Video on global exception handling",
-  "TaskUri": null,
+  "TaskHeaderId": "68ac482c1867c4f34789b03f",
+  "TaskTitle": "temp",
+  "TaskUri": "htttp://blah.com",
   "TaskPriorityId": 2,
+  "TaskStatusId": 1,
   "Deadline": null,
   "ScheduledAt": null,
-  "DisplayAtBoard":true,
+  "DisplayAtBoard":false,
   "SubTasks": [
     {
-      "SubTaskTitle": "Edit video",
+      "SubTaskTitle": "Write a blog post",
+      "SubTaskUri": "http://azure.xyx/get/xfs/dee"
+    },
+    {
+      "SubTaskTitle": "Schedule it on medium.com",
       "SubTaskUri": null
     }
   ],
-  "Tags": "blog,angular,programming"
+  "Tags": "blog,azure,chsharp"
   }
 
 ###
-PUT {{base_address}}/2003
+PUT {{base_address}}/68ad61d9ac43edf9b40985bd
 Content-Type: application/json
 
 {
-  "TaskId":2003,
-  "TaskHeaderId": 1,
-  "TaskTitle": "Create a video on global exception handling",
-  "TaskUri": null,
-  "TaskPriorityId": 3,
-  "TaskStatusId": 2,
-  "Deadline": "2025-05-25T15:18:20",
+  "TaskId":"68ad61d9ac43edf9b40985bd",
+  "TaskHeaderId": "68ac482c1867c4f34789b03f",
+  "TaskTitle": "Create a blog post on azure blob storage",
+  "TaskUri": "htttp://blahh.com",
+  "TaskPriorityId": 2,
+  "TaskStatusId": 1,
+  "Deadline": null,
   "ScheduledAt": null,
-  "DisplayAtBoard":true,
+  "DisplayAtBoard":false,
   "SubTasks": [
     {
-      "SubTaskId":2004,
-      "SubTaskTitle": "Edit the video",
-      "SubTaskUri": null
+      "SubTaskId": "7f995b0d-0840-425b-9ee2-4fffdc8c2c3f",
+      "SubTaskTitle": "Write a blog post",
+      "SubTaskUri": "http://azure.xyx/get/xfs/dee"
     },
     {
-      "SubTaskId":2008,
-      "SubTaskTitle": "Make a thumnail for this video",
-      "SubTaskUri": null
-    },
-    {
-      "SubTaskId":2009,
-      "SubTaskTitle": "Post this video in a Youtube",
+      "SubTaskId":"c5b151b4-0427-4922-8d91-1836bb64b161",
+      "SubTaskTitle": "Post at ravindradevrani.com and Schedule it on medium.com",
       "SubTaskUri": null
     }
   ],
-  "Tags": "video,dotnet,programming"
-}
+  "Tags": "blog,azure,dotnet"
+  }
 
 ###
-DELETE  {{base_address}}/2002
+DELETE  {{base_address}}/68ada389f15d01a9d910094a
 
 ###
 GET http://localhost:5054/api/tags

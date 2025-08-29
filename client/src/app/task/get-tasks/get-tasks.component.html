@@ -3,127 +3,124 @@
 </div>
 
 @if (message$|async; as message) {
-  <div class="form-row">
-    {{message}}
-  </div>
+<div class="form-row">
+  {{message}}
+</div>
 }
 
 @if ((loading$|async) === true) {
-  <div class="form-row">
-    <mat-spinner [diameter]="70"></mat-spinner>
-  </div>
+<div class="form-row">
+  <mat-spinner [diameter]="70"></mat-spinner>
+</div>
 }
 
 <div class="filters" style="display: flex; gap:10px">
   @if (taskHeaders$ | async; as taskHeaders) {
-    <mat-form-field>
-      <mat-label>Group/header</mat-label>
-      <mat-select [formControl]="taskHeader">
-        @for (header of taskHeaders; track trackTaskHeaderFn($index, header)) {
-          <mat-option [value]="header.taskHeaderId">
-            {{header.taskHeaderTitle}}
-          </mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+  <mat-form-field>
+    <mat-label>Group/header</mat-label>
+    <mat-select [formControl]="taskHeader">
+      @for (header of taskHeaders; track header.taskHeaderId) {
+      <mat-option [value]="header.taskHeaderId">
+        {{header.taskHeaderTitle}}
+      </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
   }
 
   @if (taskPriorities$ | async; as taskPriorities) {
-    <mat-form-field>
-      <mat-label>Priority</mat-label>
-      <mat-select [formControl]="taskPriority">
-        @for (tp of taskPriorities; track trackTaskPriorityFn($index, tp)) {
-          <mat-option [value]="tp.taskPriorityId">
-            {{tp.taskPriorityName}}
-          </mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+  <mat-form-field>
+    <mat-label>Priority</mat-label>
+    <mat-select [formControl]="taskPriority">
+      @for (tp of taskPriorities; track tp.taskPriorityId) {
+      <mat-option [value]="tp.taskPriorityId">
+        {{tp.taskPriorityName}}
+      </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
   }
 
   @if (tags$ | async; as tags) {
-    <mat-form-field>
-      <mat-label>Tags</mat-label>
-      <mat-select [formControl]="tag">
-        @for (status of tags; track trackTagsFn($index, status)) {
-          <mat-option [value]="status.tagId">
-            {{status.tagName}}
-          </mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+  <mat-form-field>
+    <mat-label>Tags</mat-label>
+    <mat-select [formControl]="tag">
+      @for (tag of tags; track tag.tagName) {
+      <mat-option [value]="tag.tagName">
+        {{tag.tagName}}
+      </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
   }
 
   <button mat-raised-button (click)="clearFilter()">Clear</button>
 </div>
 
 @if (groupedTasks$|async; as groupedTasks) {
-  @for (task of groupedTasks; track task) {
-    <div style="margin-bottom: 20px;">
-      <div style="margin: 20px 0px;font-size: 1.5em;">{{task.taskHeaderTitle}}</div>
-      <table mat-table [dataSource]="task.tasks" matSort (matSortChange)="onSort($event)" class="mat-elevation-z8">
-        <!-- taskTitle Column -->
-        <ng-container matColumnDef="taskTitle">
-          <th mat-header-cell *matHeaderCellDef> Title </th>
-          <td mat-cell *matCellDef="let element">
-            {{element.taskTitle}}
-            @if (element.taskUri) {
-              <a [href]="element.taskUri" target="_blank">
-                <mat-icon class="link-icon">link</mat-icon>
-              </a>
-            }
-          </td>
-        </ng-container>
-        <!-- Status Column -->
-        <ng-container matColumnDef="status">
-          <th mat-header-cell *matHeaderCellDef> Status </th>
-          <td mat-cell *matCellDef="let element">
-            {{element.taskStatus.taskStatusName}}
-            {{element.taskStatus.taskStatusEmoji}}
-          </td>
-        </ng-container>
-        <!-- priority Column -->
-        <ng-container matColumnDef="priority">
-          <th mat-header-cell *matHeaderCellDef> Priority </th>
-          <td mat-cell *matCellDef="let element">
-            {{ element.taskPriority.taskPriorityName }}
-            {{ element.taskPriority.taskPriorityEmoji }}
-          </td>
-        </ng-container>
-        <!-- tags Column -->
-        <ng-container matColumnDef="tags">
-          <th mat-header-cell *matHeaderCellDef> Tags </th>
-          <td mat-cell *matCellDef="let element"> {{element.tags.join(',')}} </td>
-        </ng-container>
-        <!-- deadline Column -->
-        <ng-container matColumnDef="deadline">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Deadline </th>
-          <td mat-cell *matCellDef="let element"> {{element.deadline | date:'dd-MMM-yyyy'}} </td>
-        </ng-container>
-        <!-- scheduledAt Column -->
-        <ng-container matColumnDef="scheduledAt">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Scheduled At </th>
-          <td mat-cell *matCellDef="let element"> {{element.scheduledAt | date:'dd-MMM-yyyy h:mm:ss a'}} </td>
-        </ng-container>
-        <!-- Actions -->
-        <ng-container matColumnDef="action">
-          <th mat-header-cell *matHeaderCellDef> Actions </th>
-          <td mat-cell *matCellDef="let element" class="action-cell">
-            <a mat-mini-fab area-label="task-detail" routerLink="/task-detail/{{element.taskId}}"
-              color="primary">
-              <mat-icon>assignment</mat-icon>
-            </a>
-            <button mat-mini-fab aria-label="edit-entry" color="accent" (click)="editTask(element)">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button mat-mini-fab aria-label="delete-entry" color="warn" (click)="deleteTask(element)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </td>
-        </ng-container>
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      </table>
-    </div>
-  }
+@for (task of groupedTasks; track task) {
+<div style="margin-bottom: 20px;">
+  <div style="margin: 20px 0px;font-size: 1.5em;">{{task.taskHeaderTitle}}</div>
+  <table mat-table [dataSource]="task.tasks" matSort (matSortChange)="onSort($event)" class="mat-elevation-z8">
+    <!-- taskTitle Column -->
+    <ng-container matColumnDef="taskTitle">
+      <th mat-header-cell *matHeaderCellDef> Title </th>
+      <td mat-cell *matCellDef="let element">
+        {{element.taskTitle}}
+        @if (element.taskUri) {
+        <a [href]="element.taskUri" target="_blank">
+          <mat-icon class="link-icon">link</mat-icon>
+        </a>
+        }
+      </td>
+    </ng-container>
+    <!-- Status Column -->
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef> Status </th>
+      <td mat-cell *matCellDef="let element">
+        {{element.taskStatus}}
+      </td>
+    </ng-container>
+    <!-- priority Column -->
+    <ng-container matColumnDef="priority">
+      <th mat-header-cell *matHeaderCellDef> Priority </th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.taskPriority }}
+      </td>
+    </ng-container>
+    <!-- tags Column -->
+    <ng-container matColumnDef="tags">
+      <th mat-header-cell *matHeaderCellDef> Tags </th>
+      <td mat-cell *matCellDef="let element"> {{element.tags.join(',')}} </td>
+    </ng-container>
+    <!-- deadline Column -->
+    <ng-container matColumnDef="deadline">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Deadline </th>
+      <td mat-cell *matCellDef="let element"> {{element.deadline | date:'dd-MMM-yyyy'}} </td>
+    </ng-container>
+    <!-- scheduledAt Column -->
+    <ng-container matColumnDef="scheduledAt">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Scheduled At </th>
+      <td mat-cell *matCellDef="let element"> {{element.scheduledAt | date:'dd-MMM-yyyy h:mm:ss a'}} </td>
+    </ng-container>
+    <!-- Actions -->
+    <ng-container matColumnDef="action">
+      <th mat-header-cell *matHeaderCellDef> Actions </th>
+      <td mat-cell *matCellDef="let element" class="action-cell">
+        <a mat-mini-fab area-label="task-detail" routerLink="/task-detail/{{element.taskId}}" color="primary">
+          <mat-icon>assignment</mat-icon>
+        </a>
+        <button mat-mini-fab aria-label="edit-entry" color="accent" (click)="editTask(element)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-mini-fab aria-label="delete-entry" color="warn" (click)="deleteTask(element)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>
+}
 }
